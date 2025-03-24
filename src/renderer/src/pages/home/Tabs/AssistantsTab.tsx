@@ -1,15 +1,15 @@
 import { PlusOutlined } from '@ant-design/icons'
+import { helperApi } from '@renderer/api/helper'
 import DragableList from '@renderer/components/DragableList'
 import Scrollbar from '@renderer/components/Scrollbar'
 import { useAgents } from '@renderer/hooks/useAgents'
 import { useAssistants } from '@renderer/hooks/useAssistant'
 import { Assistant } from '@renderer/types'
-import { FC, useCallback, useState } from 'react'
+import { FC, useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import AssistantItem from './AssistantItem'
-
 interface AssistantsTabProps {
   activeAssistant: Assistant
   setActiveAssistant: (assistant: Assistant) => void
@@ -27,7 +27,43 @@ const Assistants: FC<AssistantsTabProps> = ({
   const [dragging, setDragging] = useState(false)
   const { addAgent } = useAgents()
   const { t } = useTranslation()
-  console.log('[AssistantsTab] assistants:', assistants)
+  console.log('[AssistantsTab666] assistants:', assistants)
+  const [isLoading, setIsLoading] = useState(false)
+  // 从API获取助手数据并更新状态
+  useEffect(() => {
+    const fetchAssistantsData = async () => {
+      try {
+        // setIsLoading(true)
+        // 替换为实际的API端点
+        const response = await helperApi.query({})
+        console.log(response.Data.records)
+        const formattedAssistants = response.Data.records.map((record: any) => {
+          return {
+            ...record,
+            settings: {
+              ...(record.settings || {}),
+              streamOutput: record.settings?.streamOutput === 1 ? true : false
+            }
+          }
+        })
+        console.log('formattedAssistants:', formattedAssistants)
+        updateAssistants(formattedAssistants)
+      } catch (error) {
+        console.error('获取助手数据出错:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchAssistantsData()
+  }, [])
+
+  // 监听助手创建事件
+  const handleCreateAssistant = useCallback(() => {
+    console.log('[AssistantsTab] onCreateAssistant called')
+    onCreateAssistant()
+  }, [onCreateAssistant])
+
   const onDelete = useCallback(
     (assistant: Assistant) => {
       const remaining = assistants.filter((a) => a.id !== assistant.id)
@@ -37,12 +73,14 @@ const Assistants: FC<AssistantsTabProps> = ({
     },
     [assistants, removeAssistant, setActiveAssistant, onCreateDefaultAssistant]
   )
-
   return (
     <Container className="assistants-tab">
       <DragableList
         list={assistants}
-        onUpdate={updateAssistants}
+        onUpdate={(updatedAssistants) => {
+          console.log('[AssistantsTab] DragableList onUpdate:', updatedAssistants)
+          updateAssistants(updatedAssistants)
+        }}
         style={{ paddingBottom: dragging ? '34px' : 0 }}
         onDragStart={() => setDragging(true)}
         onDragEnd={() => setDragging(false)}>
@@ -51,16 +89,22 @@ const Assistants: FC<AssistantsTabProps> = ({
             key={assistant.id}
             assistant={assistant}
             isActive={assistant.id === activeAssistant.id}
-            onSwitch={setActiveAssistant}
+            onSwitch={(assistant) => {
+              console.log('[AssistantsTab] Switch to assistant:', assistant)
+              setActiveAssistant(assistant)
+            }}
             onDelete={onDelete}
             addAgent={addAgent}
-            addAssistant={addAssistant}
+            addAssistant={(assistant) => {
+              console.log('[AssistantsTab] Add assistant:', assistant)
+              addAssistant(assistant)
+            }}
             onCreateDefaultAssistant={onCreateDefaultAssistant}
           />
         )}
       </DragableList>
       {!dragging && (
-        <AssistantAddItem onClick={onCreateAssistant}>
+        <AssistantAddItem onClick={onCreateAssistant} style={{ display: 'none' }}>
           <AssistantName>
             <PlusOutlined style={{ color: 'var(--color-text-2)', marginRight: 4 }} />
             {t('chat.add.assistant.title')}

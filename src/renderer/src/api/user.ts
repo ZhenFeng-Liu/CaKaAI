@@ -13,5 +13,5 @@ export const userApi = {
   },
 
   // 获取用户信息
-  getUserInfo: (name: string) => http.post('/User/Query', { name })
+  getUserInfo: (uid: any) => http.post('/User/Query', { uid })
 }

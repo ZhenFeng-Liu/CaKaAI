@@ -1,3 +1,4 @@
+import { helperApi } from '@renderer/api/helper'
 import { db } from '@renderer/databases'
 import { getDefaultTopic } from '@renderer/services/AssistantService'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
@@ -21,14 +22,24 @@ import { Assistant, AssistantSettings, Model, Topic } from '@renderer/types'
 import { TopicManager } from './useTopic'
 
 export function useAssistants() {
-  const { assistants } = useAppSelector((state) => state.assistants)
+  const { assistants } = useAppSelector((state) => {
+    console.log('[useAssistants] state.assistants:', state.assistants)
+    return state.assistants
+  })
   const dispatch = useAppDispatch()
 
   return {
     assistants,
-    updateAssistants: (assistants: Assistant[]) => dispatch(updateAssistants(assistants)),
-    addAssistant: (assistant: Assistant) => dispatch(addAssistant(assistant)),
+    updateAssistants: (assistants: Assistant[]) => {
+      console.log('[useAssistants] updateAssistants:', assistants)
+      dispatch(updateAssistants(assistants))
+    },
+    addAssistant: (assistant: Assistant) => {
+      console.log('[useAssistants] addAssistant:', assistant)
+      dispatch(addAssistant(assistant))
+    },
     removeAssistant: (id: string) => {
+      console.log('[useAssistants] removeAssistant:', id)
       dispatch(removeAssistant({ id }))
       const assistant = assistants.find((a) => a.id === id)
       const topics = assistant?.topics || []
@@ -70,8 +81,89 @@ export function useAssistant(id: string) {
     updateTopics: (topics: Topic[]) => dispatch(updateTopics({ assistantId: assistant.id, topics })),
     removeAllTopics: () => dispatch(removeAllTopics({ assistantId: assistant.id })),
     setModel: (model: Model) => dispatch(setModel({ assistantId: assistant.id, model })),
-    updateAssistant: (assistant: Assistant) => dispatch(updateAssistant(assistant)),
+    updateAssistant: async (assistant: Assistant) => {
+      // console.log('[useAssistant] updateAssistant:', assistant)
+      // dispatch(updateAssistant(assistant))
+      try {
+        console.log('[useAssistant] 准备更新助手:', assistant)
+        // 构建符合API要求的参数对象
+        const _assistantAddInfo = {
+          id: assistant.id,
+          name: assistant.name || '',
+          emoji: assistant.emoji || '',
+          prompt: assistant.prompt || '',
+          type: 'assistant',
+          // 处理知识库ID
+          knowledge_uid:
+            assistant.knowledge_uid ||
+            assistant.knowledge_bases?.[0]?.uid ||
+            (Array.isArray(assistant.knowledge_bases) ? null : assistant.knowledge_bases) ||
+            null,
+          // 处理模型ID
+          model_uid:
+            assistant.model_uid || assistant.model?.uid || assistant.model || assistant.default_model_uid || null,
+          // 处理默认模型ID
+          default_model_uid:
+            assistant.default_model_uid || assistant.defaultModel?.uid || assistant.defaultModel || null,
+          // 确保settings字段完整
+          settings: assistant.settings || {
+            temperature: 1,
+            contextCount: 5,
+            enableMaxTokens: false,
+            maxTokens: 0,
+            streamOutput: true,
+            hideMessages: false,
+            customParameters: []
+          },
+          // 保留消息历史
+          messages: assistant.messages || [],
+          // 可选字段，如果存在则包含
+          ...(assistant.topics && { topics: assistant.topics }),
+          ...(assistant.uid && { uid: assistant.uid })
+        }
+
+        // 打印构建的参数对象
+        console.log('[useAssistant] 构建的助手参数:', _assistantAddInfo)
+
+        const response = await helperApi.update(_assistantAddInfo)
+        console.log('[useAssistant] 更新助手API响应:', response)
+
+        if (response && response.Code === 0) {
+          console.log('[useAssistant] 更新助手成功')
+          dispatch(updateAssistant(assistant))
+
+          // 显示成功消息
+          window.message.success({
+            content: response.Msg || '助手更新成功',
+            key: 'update-assistant'
+          })
+
+          return { success: true, data: response.Data }
+        } else {
+          console.error('[useAssistant] 更新助手失败:', response)
+
+          // 显示错误消息
+          window.message.error({
+            content: response.Msg || '助手更新失败',
+            key: 'update-assistant'
+          })
+
+          return { success: false, error: response.Msg || '更新失败' }
+        }
+      } catch (error) {
+        console.error('[useAssistant] 更新助手出错:', error)
+
+        // 显示错误消息
+        window.message.error({
+          content: `助手更新出错: ${error}`,
+          key: 'update-assistant'
+        })
+
+        return { success: false, error: String(error) }
+      }
+    },
     updateAssistantSettings: (settings: Partial<AssistantSettings>) => {
+      console.log('[useAssistant] updateAssistantSettings:', settings)
       dispatch(updateAssistantSettings({ assistantId: assistant.id, settings }))
     }
   }

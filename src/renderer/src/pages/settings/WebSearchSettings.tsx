@@ -28,7 +28,15 @@ const WebSearchSettings: FC = () => {
   const { Paragraph } = Typography
   const { theme } = useTheme()
   const { provider, updateProvider } = useWebSearchProvider('tavily')
-  const [apiKey, setApiKey] = useState(provider.apiKey)
+
+  // 从缓存中获取apiKey
+  const cachedApiKey = localStorage.getItem('tavily_api_key') || sessionStorage.getItem('tavily_api_key') || ''
+
+  // 优先使用provider.apiKey，如果为空则使用缓存中的apiKey
+  const [apiKey, setApiKey] = useState(provider.apiKey || cachedApiKey || '')
+
+  console.log('[WebSearchSettings] 初始apiKey来源:', provider.apiKey ? 'provider' : cachedApiKey ? '缓存' : '空')
+
   const logo = theme === 'dark' ? tavilyLogoDark : tavilyLogo
   const searchWithTime = useAppSelector((state) => state.websearch.searchWithTime)
   const maxResults = useAppSelector((state) => state.websearch.maxResults)
@@ -38,10 +46,45 @@ const WebSearchSettings: FC = () => {
 
   const dispatch = useAppDispatch()
 
+  // 监听登录状态变化，更新apiKey
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
+      if (isLoggedIn && !apiKey) {
+        const newCachedApiKey = localStorage.getItem('tavily_api_key') || sessionStorage.getItem('tavily_api_key') || ''
+        if (newCachedApiKey && newCachedApiKey !== apiKey) {
+          console.log('[WebSearchSettings] 登录后更新apiKey')
+          setApiKey(newCachedApiKey)
+        }
+      }
+    }
+
+    // 初始检查
+    checkLoginStatus()
+
+    // 添加事件监听器
+    window.addEventListener('storage', checkLoginStatus)
+
+    return () => {
+      window.removeEventListener('storage', checkLoginStatus)
+    }
+  }, [apiKey])
+
+  useEffect(() => {
+    console.log('[WebSearchSettings] provider变化:', provider)
+    if (provider.apiKey && provider.apiKey !== apiKey) {
+      console.log('[WebSearchSettings] 从provider更新apiKey')
+      setApiKey(provider.apiKey)
+    }
+  }, [provider, apiKey])
+
   useEffect(() => {
     return () => {
       if (apiKey && apiKey !== provider.apiKey) {
+        console.log('[WebSearchSettings] 组件卸载时保存apiKey')
         updateProvider({ ...provider, apiKey })
+        // 同时保存到localStorage
+        localStorage.setItem('tavily_api_key', apiKey)
       }
     }
   }, [apiKey, provider, updateProvider])

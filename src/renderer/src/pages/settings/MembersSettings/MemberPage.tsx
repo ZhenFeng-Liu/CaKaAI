@@ -99,11 +99,11 @@ const MemberPage: FC = () => {
       dataIndex: 'roleName',
       key: 'roleName'
     },
-    {
-      title: '在职状态',
-      dataIndex: 'status',
-      key: 'status'
-    },
+    // {
+    //   title: '在职状态',
+    //   dataIndex: 'status',
+    //   key: 'status'
+    // },
     {
       title: '账号状态',
       dataIndex: 'accountStatus',
@@ -150,7 +150,8 @@ const MemberPage: FC = () => {
       if (response.Data?.records) {
         const roleOptions = response.Data.records.map((role) => ({
           value: String(role.uid),
-          label: role.name
+          label: role.name,
+          disabled: role.enable !== 1
         }))
         setRoles(roleOptions)
       }
@@ -397,7 +398,15 @@ const MemberPage: FC = () => {
             + 添加会员
           </Button>
         </Header>
-        <Table columns={columns} dataSource={roleList} pagination={false} bordered size="middle" loading={loading} />
+        <Table
+          columns={columns}
+          dataSource={roleList}
+          pagination={false}
+          bordered
+          size="middle"
+          loading={loading}
+          scroll={{ x: 'max-content' }}
+        />
       </ContentContainer>
 
       {/* 添加/修改角色弹窗 */}
@@ -611,6 +620,7 @@ const ContentContainer = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
+  verflow: auto; // 添加此行，使容器可滚动
 `
 
 const Header = styled.div`

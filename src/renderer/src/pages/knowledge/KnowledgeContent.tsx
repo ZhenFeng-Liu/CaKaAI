@@ -329,7 +329,26 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
                   <StatusIconWrapper>
                     <StatusIcon sourceId={item.id} base={base} getProcessingStatus={getProcessingStatus} type="file" />
                   </StatusIconWrapper>
-                  <Button type="text" danger onClick={() => removeItem(item)} icon={<DeleteOutlined />} />
+                  <Button
+                    type="text"
+                    danger
+                    onClick={async () => {
+                      try {
+                        console.log('删除知识库项目:', item)
+                        const response = await knowledgeApi.deleteKnowledgeItem({
+                          uid: item.content.uid
+                        })
+                        if (response.Code === 0) {
+                          removeItem(item)
+                          message.success('删除成功')
+                        }
+                      } catch (error) {
+                        console.error('删除知识库项目失败:', error)
+                        message.error('删除失败')
+                      }
+                    }}
+                    icon={<DeleteOutlined />}
+                  />
                 </FlexAlignCenter>
               </ItemContent>
             </ItemCard>
@@ -367,7 +386,27 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
                       type="directory"
                     />
                   </StatusIconWrapper>
-                  <Button type="text" danger onClick={() => removeItem(item)} icon={<DeleteOutlined />} />
+                  <Button
+                    type="text"
+                    danger
+                    onClick={async () => {
+                      try {
+                        console.log('删除知识库项目:', item)
+                        const response = await knowledgeApi.deleteKnowledgeItem({
+                          uid: base.uid,
+                          id: item.id
+                        })
+                        if (response.Code === 0) {
+                          removeItem(item)
+                          message.success('删除成功')
+                        }
+                      } catch (error) {
+                        console.error('删除知识库项目失败:', error)
+                        message.error('删除失败')
+                      }
+                    }}
+                    icon={<DeleteOutlined />}
+                  />
                 </FlexAlignCenter>
               </ItemContent>
             </ItemCard>
@@ -425,7 +464,27 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
                   <StatusIconWrapper>
                     <StatusIcon sourceId={item.id} base={base} getProcessingStatus={getProcessingStatus} type="url" />
                   </StatusIconWrapper>
-                  <Button type="text" danger onClick={() => removeItem(item)} icon={<DeleteOutlined />} />
+                  <Button
+                    type="text"
+                    danger
+                    onClick={async () => {
+                      try {
+                        console.log('删除知识库项目:', item)
+                        const response = await knowledgeApi.deleteKnowledgeItem({
+                          uid: base.uid,
+                          id: item.id
+                        })
+                        if (response.Code === 0) {
+                          removeItem(item)
+                          message.success('删除成功')
+                        }
+                      } catch (error) {
+                        console.error('删除知识库项目失败:', error)
+                        message.error('删除失败')
+                      }
+                    }}
+                    icon={<DeleteOutlined />}
+                  />
                 </FlexAlignCenter>
               </ItemContent>
             </ItemCard>
@@ -466,7 +525,27 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
                       type="sitemap"
                     />
                   </StatusIconWrapper>
-                  <Button type="text" danger onClick={() => removeItem(item)} icon={<DeleteOutlined />} />
+                  <Button
+                    type="text"
+                    danger
+                    onClick={async () => {
+                      try {
+                        console.log('删除知识库项目:', item)
+                        const response = await knowledgeApi.deleteKnowledgeItem({
+                          uid: base.uid,
+                          id: item.id
+                        })
+                        if (response.Code === 0) {
+                          removeItem(item)
+                          message.success('删除成功')
+                        }
+                      } catch (error) {
+                        console.error('删除知识库项目失败:', error)
+                        message.error('删除失败')
+                      }
+                    }}
+                    icon={<DeleteOutlined />}
+                  />
                 </FlexAlignCenter>
               </ItemContent>
             </ItemCard>
@@ -493,7 +572,27 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
                   <StatusIconWrapper>
                     <StatusIcon sourceId={note.id} base={base} getProcessingStatus={getProcessingStatus} type="note" />
                   </StatusIconWrapper>
-                  <Button type="text" danger onClick={() => removeItem(note)} icon={<DeleteOutlined />} />
+                  <Button
+                    type="text"
+                    danger
+                    onClick={async () => {
+                      try {
+                        console.log('删除知识库项目:', note)
+                        const response = await knowledgeApi.deleteKnowledgeItem({
+                          uid: base.uid,
+                          id: note.id
+                        })
+                        if (response.Code === 0) {
+                          removeItem(note)
+                          message.success('删除成功')
+                        }
+                      } catch (error) {
+                        console.error('删除知识库项目失败:', error)
+                        message.error('删除失败')
+                      }
+                    }}
+                    icon={<DeleteOutlined />}
+                  />
                 </FlexAlignCenter>
               </ItemContent>
             </ItemCard>

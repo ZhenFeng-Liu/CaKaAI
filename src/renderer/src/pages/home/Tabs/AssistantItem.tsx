@@ -1,4 +1,5 @@
 import { DeleteOutlined, EditOutlined, MinusCircleOutlined, SaveOutlined } from '@ant-design/icons'
+import { helperApi } from '@renderer/api/helper'
 import ModelAvatar from '@renderer/components/Avatar/ModelAvatar'
 import CopyIcon from '@renderer/components/Icons/CopyIcon'
 import { useAssistant } from '@renderer/hooks/useAssistant'
@@ -15,7 +16,6 @@ import { omit } from 'lodash'
 import { FC, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-
 interface AssistantItemProps {
   assistant: Assistant
   isActive: boolean
@@ -38,16 +38,68 @@ const AssistantItem: FC<AssistantItemProps> = ({ assistant, isActive, onSwitch, 
         label: t('assistants.edit.title'),
         key: 'edit',
         icon: <EditOutlined />,
-        onClick: () => AssistantSettingsPopup.show({ assistant })
+        onClick: () => {
+          console.log('[AssistantItem] Edit assistant:', assistant)
+          AssistantSettingsPopup.show({ assistant })
+        }
       },
       {
         label: t('assistants.copy.title'),
         key: 'duplicate',
         icon: <CopyIcon />,
         onClick: async () => {
-          const _assistant: Assistant = { ...assistant, id: uuid(), topics: [getDefaultTopic(assistant.id)] }
-          addAssistant(_assistant)
-          onSwitch(_assistant)
+          try {
+            const _assistant: Assistant = { ...assistant, id: uuid(), topics: [getDefaultTopic(assistant.id)] }
+            console.log('[AssistantItem] 准备复制助手:', _assistant)
+            // 构建符合API要求的参数对象
+            const _assistantAddInfo = {
+              id: _assistant.id,
+              name: _assistant.name || '',
+              emoji: _assistant.emoji || '',
+              prompt: _assistant.prompt || '',
+              topics: _assistant.topics, // 保留原始的topics
+              type: 'assistant',
+              knowledge_uid: _assistant.knowledge_bases[0]?.uid || null,
+              model_uid: _assistant.model?.uid || _assistant.default_model_uid || null,
+              default_model_uid: _assistant.defaultModel?.uid || null,
+              settings: _assistant.settings || {
+                temperature: 1,
+                contextCount: 5,
+                enableMaxTokens: false,
+                maxTokens: 0,
+                streamOutput: true,
+                hideMessages: false,
+                customParameters: []
+              },
+              messages: _assistant.messages || []
+            }
+            console.log('[AssistantItem] 复制助手信息:', _assistantAddInfo)
+            const response = await helperApi.add(_assistantAddInfo)
+            console.log('[AssistantItem] 复制助手API响应:', response)
+
+            if (response && response.Code === 0) {
+              console.log('[AssistantItem] 复制助手成功:', _assistant)
+              addAssistant(_assistant)
+              onSwitch(_assistant)
+
+              window.message.success({
+                content: response.Msg,
+                key: 'duplicate-assistant'
+              })
+            } else {
+              console.error('[AssistantItem] 复制助手失败:', response)
+              window.message.error({
+                content: response.Msg,
+                key: 'duplicate-assistant'
+              })
+            }
+          } catch (error) {
+            console.error('[AssistantItem] 复制助手出错:', error)
+            window.message.error({
+              content: t(`复制助手出错:${error}`),
+              key: 'duplicate-assistant'
+            })
+          }
         }
       },
       {
@@ -60,7 +112,10 @@ const AssistantItem: FC<AssistantItemProps> = ({ assistant, isActive, onSwitch, 
             content: t('assistants.clear.content'),
             centered: true,
             okButtonProps: { danger: true },
-            onOk: () => removeAllTopics() // 使用当前助手的removeAllTopics
+            onOk: () => {
+              console.log('[AssistantItem] Clear all topics for assistant:', assistant)
+              removeAllTopics()
+            } // 使用当前助手的removeAllTopics
           })
         }
       },
@@ -72,6 +127,7 @@ const AssistantItem: FC<AssistantItemProps> = ({ assistant, isActive, onSwitch, 
           const agent = omit(assistant, ['model', 'emoji'])
           agent.id = uuid()
           agent.type = 'agent'
+          console.log('[AssistantItem] Save assistant to agent:', agent)
           addAgent(agent)
           window.message.success({
             content: t('assistants.save.success'),
@@ -91,7 +147,35 @@ const AssistantItem: FC<AssistantItemProps> = ({ assistant, isActive, onSwitch, 
             content: t('assistants.delete.content'),
             centered: true,
             okButtonProps: { danger: true },
-            onOk: () => onDelete(assistant)
+            onOk: async () => {
+              try {
+                console.log('[AssistantItem] 准备删除助手:', assistant)
+                const response = await helperApi.delete({ uid: assistant.uid })
+                console.log('[AssistantItem] 删除助手API响应:', response)
+
+                if (response && response.Code === 0) {
+                  console.log('[AssistantItem] 删除助手成功')
+                  onDelete(assistant)
+
+                  window.message.success({
+                    content: response.Msg || t('assistants.delete.success'),
+                    key: 'delete-assistant'
+                  })
+                } else {
+                  console.error('[AssistantItem] 删除助手失败:', response)
+                  window.message.error({
+                    content: response.Msg || t('assistants.delete.error'),
+                    key: 'delete-assistant'
+                  })
+                }
+              } catch (error) {
+                console.error('[AssistantItem] 删除助手出错:', error)
+                window.message.error({
+                  content: t(`assistants.delete.error: ${error}`),
+                  key: 'delete-assistant'
+                })
+              }
+            }
           })
         }
       }
@@ -101,7 +185,7 @@ const AssistantItem: FC<AssistantItemProps> = ({ assistant, isActive, onSwitch, 
 
   const handleSwitch = useCallback(async () => {
     await modelGenerating()
-
+    console.log('[AssistantItem] Switch to assistant:', assistant)
     if (topicPosition === 'left' && clickAssistantToShowTopic) {
       EventEmitter.emit(EVENT_NAMES.SWITCH_TOPIC_SIDEBAR)
     }

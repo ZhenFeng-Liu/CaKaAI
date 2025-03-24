@@ -403,6 +403,7 @@ const RolePage: FC = () => {
           bordered // 添加边框
           size="middle" // 紧凑型表格
           loading={loading}
+          scroll={{ x: 'max-content' }}
         />
       </ContentContainer>
 
@@ -542,6 +543,7 @@ const ContentContainer = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
+  overflow: auto; // 添加此行，使容器可滚动
 `
 
 const Header = styled.div`

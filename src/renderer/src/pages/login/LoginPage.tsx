@@ -32,14 +32,19 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
         psw: values.password,
         tokenTime: values.rememberMe ? 7 : 1
       })
+      console.log('[LoginPage] 登录响应', response)
       if (response.Code === 0) {
         // 获取token
         localStorage.setItem('token', response.Msg)
-
+        localStorage.setItem('tavily_api_key', response.Data?.netKey || '')
         try {
+          message.loading('正在获取用户信息...', 0.5) // 添加加载提示
           // 获取最新的用户信息
-          const userInfoResponse = await userApi.getUserInfo(response.Data.name)
+          const userInfoResponse = await userApi.getUserInfo(response.Data.uid)
           if (userInfoResponse.Code === 0) {
+            // 判断并打印是否为超级管理员
+            const isAdmin = userInfoResponse.Data?.records[0]?.roleList[0]?.admin === 1
+            console.log('[LoginPage] 当前用户是否为超级管理员:', isAdmin)
             const userInfo = userInfoResponse.Data?.records[0]
             console.log('原始用户信息', userInfo)
             // 提取权限信息
@@ -62,27 +67,51 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
             // 存储用户信息和权限
             localStorage.setItem('userInfo', JSON.stringify(userInfo))
             localStorage.setItem('menuPermissions', JSON.stringify(uniqueMenus))
-
-            message.success('登录成功')
+            localStorage.setItem('isAdmin', String(isAdmin))
+            // 使用更友好的成功提示
+            message.success({
+              content: `欢迎回来，${userInfo.name || '用户'}`,
+              duration: 2
+            })
             // 登录成功后跳转到首页
             window.location.href = '/#/' // 使用 hash 路由跳转到首页
             // 直接更新认证状态，触发路由更新
             setIsAuthenticated(true)
           } else {
-            message.error('获取用户信息失败')
+            message.error({
+              content: '获取用户信息失败，请重试',
+              duration: 3
+            })
             return
           }
         } catch (error) {
           console.error('获取用户信息失败:', error)
-          message.error('获取用户信息失败')
+          message.error({
+            content: '获取用户信息失败，请检查网络连接',
+            duration: 3
+          })
           return
         }
       } else {
-        message.error(response.Msg || '登录失败')
+        // 根据不同的错误码显示不同的错误信息
+        if (response.Code === 1) {
+          message.error({
+            content: response.Msg || '账号或密码错误',
+            duration: 3
+          })
+        } else {
+          message.error({
+            content: response.Msg || '登录失败，请稍后重试',
+            duration: 3
+          })
+        }
       }
     } catch (error) {
       console.error('Login failed:', error)
-      message.error('登录失败,请重试')
+      message.error({
+        content: '账号或密码错误或者网络异常，请检查网络连接后重试',
+        duration: 3
+      })
     } finally {
       setLoading(false)
     }
@@ -194,7 +223,7 @@ const shimmerAnimation = keyframes`
 `
 
 const Container = styled.div<{ $mounted: boolean }>`
-  z-index: 9999;
+  // z-index: 9999;
   width: 100%;
   height: 100vh;
   display: flex;

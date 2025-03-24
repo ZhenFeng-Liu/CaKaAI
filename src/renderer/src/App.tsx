@@ -1,5 +1,6 @@
 import '@renderer/databases'
 
+import { knowledgeApi } from '@renderer/api/knowledge'
 import { providerApi } from '@renderer/api/provider'
 import AuthRoute from '@renderer/components/AuthRoute'
 import { useProviders } from '@renderer/hooks/useProvider'
@@ -30,7 +31,6 @@ import MemberPage from './pages/settings/MembersSettings/MemberPage'
 import RolePage from './pages/settings/MembersSettings/RolePage'
 import SettingsPage from './pages/settings/SettingsPage'
 import TranslatePage from './pages/translate/TranslatePage'
-
 const MainContent: FC = () => {
   return (
     <>
@@ -128,8 +128,22 @@ const MainContent: FC = () => {
 
 function AppDataInitializer() {
   const { updateProviders } = useProviders()
-
+  const [knowledgeBases, setKnowledgeBases] = useState([])
   useEffect(() => {
+    // 预加载知识库数据
+    const fetchKnowledgeBases = async () => {
+      try {
+        const response = await knowledgeApi.getKnowledgeBases({})
+        if (response.Code === 0 && response.Data) {
+          const knowledgeData = response.Data.records || []
+          setKnowledgeBases(knowledgeData)
+          console.log('知识库数据已预加载')
+        }
+      } catch (error) {
+        console.error('预加载知识库数据失败:', error)
+      }
+    }
+    // 预加载 Provider 数据
     const fetchProviders = async () => {
       try {
         const response = await providerApi.query({})
@@ -156,8 +170,8 @@ function AppDataInitializer() {
       }
     }
 
-    // 用户登录后执行
-    fetchProviders()
+    // 用户登录后执行所有预加载
+    Promise.all([fetchProviders(), fetchKnowledgeBases()]).catch((error) => console.error('数据预加载失败:', error))
   }, [])
 
   return null // 这是一个纯逻辑组件，不渲染任何UI
