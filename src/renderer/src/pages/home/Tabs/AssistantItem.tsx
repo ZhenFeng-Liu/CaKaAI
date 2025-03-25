@@ -59,7 +59,7 @@ const AssistantItem: FC<AssistantItemProps> = ({ assistant, isActive, onSwitch, 
               prompt: _assistant.prompt || '',
               topics: _assistant.topics, // 保留原始的topics
               type: 'assistant',
-              knowledge_uid: _assistant.knowledge_bases[0]?.uid || null,
+              knowledge_uid: _assistant?.knowledge_bases?.[0]?.uid || null,
               model_uid: _assistant.model?.uid || _assistant.default_model_uid || null,
               default_model_uid: _assistant.defaultModel?.uid || null,
               settings: _assistant.settings || {

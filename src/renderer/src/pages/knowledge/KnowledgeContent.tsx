@@ -335,8 +335,9 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
                     onClick={async () => {
                       try {
                         console.log('删除知识库项目:', item)
+                        console.log('删除知识库项目base:', base)
                         const response = await knowledgeApi.deleteKnowledgeItem({
-                          uid: item.content.uid
+                          uid: item.uid
                         })
                         if (response.Code === 0) {
                           removeItem(item)

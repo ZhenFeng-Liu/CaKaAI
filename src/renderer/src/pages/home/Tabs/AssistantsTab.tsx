@@ -28,7 +28,7 @@ const Assistants: FC<AssistantsTabProps> = ({
   const { addAgent } = useAgents()
   const { t } = useTranslation()
   console.log('[AssistantsTab666] assistants:', assistants)
-  const [isLoading, setIsLoading] = useState(false)
+  const [, setIsLoading] = useState(false)
   // 从API获取助手数据并更新状态
   useEffect(() => {
     const fetchAssistantsData = async () => {
@@ -59,10 +59,10 @@ const Assistants: FC<AssistantsTabProps> = ({
   }, [])
 
   // 监听助手创建事件
-  const handleCreateAssistant = useCallback(() => {
-    console.log('[AssistantsTab] onCreateAssistant called')
-    onCreateAssistant()
-  }, [onCreateAssistant])
+  // const handleCreateAssistant = useCallback(() => {
+  //   console.log('[AssistantsTab] onCreateAssistant called')
+  //   onCreateAssistant()
+  // }, [onCreateAssistant])
 
   const onDelete = useCallback(
     (assistant: Assistant) => {

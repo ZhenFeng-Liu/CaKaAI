@@ -128,7 +128,7 @@ const MainContent: FC = () => {
 
 function AppDataInitializer() {
   const { updateProviders } = useProviders()
-  const [knowledgeBases, setKnowledgeBases] = useState([])
+  const [, setKnowledgeBases] = useState([])
   useEffect(() => {
     // 预加载知识库数据
     const fetchKnowledgeBases = async () => {

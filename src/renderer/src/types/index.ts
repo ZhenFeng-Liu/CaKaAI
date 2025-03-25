@@ -4,6 +4,7 @@ import React from 'react'
 import { BuiltinTheme } from 'shiki'
 
 export type Assistant = {
+  uid?: string
   id: string
   name: string
   prompt: string
@@ -17,6 +18,9 @@ export type Assistant = {
   settings?: Partial<AssistantSettings>
   messages?: AssistantMessage[]
   enableWebSearch?: boolean
+  knowledge_uid?: string | null
+  model_uid?: string | null
+  default_model_uid?: string | null
 }
 
 export type AssistantMessage = {
@@ -127,6 +131,7 @@ export type Model = {
   owned_by?: string
   description?: string
   type?: ModelType[]
+  uid?: string
 }
 
 export type Suggestion = {
@@ -222,6 +227,7 @@ export type ProcessingStatus = 'pending' | 'processing' | 'completed' | 'failed'
 export type KnowledgeItemType = 'file' | 'url' | 'note' | 'sitemap' | 'directory'
 
 export type KnowledgeItem = {
+  uid?: string
   id: string
   baseId?: string
   uniqueId?: string
