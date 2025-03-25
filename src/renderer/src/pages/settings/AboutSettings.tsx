@@ -46,7 +46,17 @@ const AboutSettings: FC = () => {
       try {
         await window.api.checkForUpdate()
       } catch (error) {
-        window.message.error(t('settings.about.updateError'))
+        console.error('Update check error:', error)
+        // window.message.error(t('settings.about.updateError'))
+        // 检查是否是版本号无效的错误
+        const errorMessage = (error as Error).toString() || ''
+        if (errorMessage.includes('valid semver version') || errorMessage.includes('undefined')) {
+          window.message.error(
+            t('settings.about.updateVersionError', { defaultValue: '更新服务器返回的版本号无效，请稍后再试' })
+          )
+        } else {
+          window.message.error(t('settings.about.updateError'))
+        }
       }
 
       dispatch(setUpdateState({ checking: false }))
@@ -101,7 +111,7 @@ const AboutSettings: FC = () => {
         <SettingTitle>
           {t('settings.about.title')}
           <HStack alignItems="center">
-            <Link to="https://github.com/kangfenmao/cherry-studio">
+            <Link to="https://github.com/ZhenFeng-Liu/CaKaAI">
               <GithubOutlined style={{ marginRight: 4, color: 'var(--color-text)', fontSize: 20 }} />
             </Link>
           </HStack>
@@ -109,7 +119,7 @@ const AboutSettings: FC = () => {
         <SettingDivider />
         <AboutHeader>
           <Row align="middle">
-            <AvatarWrapper onClick={() => onOpenWebsite('https://github.com/kangfenmao/cherry-studio')}>
+            <AvatarWrapper onClick={() => onOpenWebsite('https://github.com/ZhenFeng-Liu/CaKaAI')}>
               {update.downloadProgress > 0 && (
                 <ProgressCircle
                   type="circle"
@@ -126,7 +136,7 @@ const AboutSettings: FC = () => {
               <Title>{APP_NAME}</Title>
               <Description>{t('settings.about.description')}</Description>
               <Tag
-                onClick={() => onOpenWebsite('https://github.com/kangfenmao/cherry-studio/releases')}
+                onClick={() => onOpenWebsite('https://github.com/ZhenFeng-Liu/CaKaAI/releases')}
                 color="cyan"
                 style={{ marginTop: 8, cursor: 'pointer' }}>
                 v{version}
