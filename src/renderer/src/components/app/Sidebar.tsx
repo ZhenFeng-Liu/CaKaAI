@@ -85,13 +85,15 @@ const Sidebar: FC = () => {
         )}
       </MainMenusContainer>
       <Menus>
-        <Tooltip title={t('docs.title')} mouseEnterDelay={0.8} placement="right">
-          <Icon
-            onClick={onOpenDocs}
-            className={minappShow && MinApp.app?.url === 'https://docs.cherry-ai.com/' ? 'active' : ''}>
-            <QuestionCircleOutlined />
-          </Icon>
-        </Tooltip>
+        {isAdmin && (
+          <Tooltip title={t('docs.title')} mouseEnterDelay={0.8} placement="right">
+            <Icon
+              onClick={onOpenDocs}
+              className={minappShow && MinApp.app?.url === 'https://docs.cherry-ai.com/' ? 'active' : ''}>
+              <QuestionCircleOutlined />
+            </Icon>
+          </Tooltip>
+        )}
         <Tooltip title={t('settings.theme.title')} mouseEnterDelay={0.8} placement="right">
           <Icon onClick={() => toggleTheme()}>
             {theme === 'dark' ? (

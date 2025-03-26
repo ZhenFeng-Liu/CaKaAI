@@ -25,161 +25,185 @@ interface AssistantItemProps {
   addAgent: (agent: any) => void
   addAssistant: (assistant: Assistant) => void
 }
-
+import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 const AssistantItem: FC<AssistantItemProps> = ({ assistant, isActive, onSwitch, onDelete, addAgent, addAssistant }) => {
   const { t } = useTranslation()
   const { removeAllTopics } = useAssistant(assistant.id) // 使用当前助手的ID
   const { clickAssistantToShowTopic, topicPosition, showAssistantIcon } = useSettings()
   const defaultModel = getDefaultModel()
-
+  const { isAdmin } = useAdminCheck()
   const getMenuItems = useCallback(
-    (assistant: Assistant): ItemType[] => [
-      {
-        label: t('assistants.edit.title'),
-        key: 'edit',
-        icon: <EditOutlined />,
-        onClick: () => {
-          console.log('[AssistantItem] Edit assistant:', assistant)
-          AssistantSettingsPopup.show({ assistant })
-        }
-      },
-      {
-        label: t('assistants.copy.title'),
-        key: 'duplicate',
-        icon: <CopyIcon />,
-        onClick: async () => {
-          try {
-            const _assistant: Assistant = { ...assistant, id: uuid(), topics: [getDefaultTopic(assistant.id)] }
-            console.log('[AssistantItem] 准备复制助手:', _assistant)
-            // 构建符合API要求的参数对象
-            const _assistantAddInfo = {
-              id: _assistant.id,
-              name: _assistant.name || '',
-              emoji: _assistant.emoji || '',
-              prompt: _assistant.prompt || '',
-              topics: _assistant.topics, // 保留原始的topics
-              type: 'assistant',
-              knowledge_uid: _assistant?.knowledge_bases?.[0]?.uid || null,
-              model_uid: _assistant.model?.uid || _assistant.default_model_uid || null,
-              default_model_uid: _assistant.defaultModel?.uid || null,
-              settings: _assistant.settings || {
-                temperature: 1,
-                contextCount: 5,
-                enableMaxTokens: false,
-                maxTokens: 0,
-                streamOutput: true,
-                hideMessages: false,
-                customParameters: []
-              },
-              messages: _assistant.messages || []
-            }
-            console.log('[AssistantItem] 复制助手信息:', _assistantAddInfo)
-            const response = await helperApi.add(_assistantAddInfo)
-            console.log('[AssistantItem] 复制助手API响应:', response)
-
-            if (response && response.Code === 0) {
-              console.log('[AssistantItem] 复制助手成功:', _assistant)
-              addAssistant(_assistant)
-              onSwitch(_assistant)
-
-              window.message.success({
-                content: response.Msg,
-                key: 'duplicate-assistant'
-              })
-            } else {
-              console.error('[AssistantItem] 复制助手失败:', response)
-              window.message.error({
-                content: response.Msg,
-                key: 'duplicate-assistant'
-              })
-            }
-          } catch (error) {
-            console.error('[AssistantItem] 复制助手出错:', error)
-            window.message.error({
-              content: t(`复制助手出错:${error}`),
-              key: 'duplicate-assistant'
+    (assistant: Assistant): ItemType[] => {
+      const baseMenuItems: ItemType[] = [
+        // 基础菜单项，所有用户都可以看到
+        {
+          label: t('assistants.clear.title'),
+          key: 'clear',
+          icon: <MinusCircleOutlined />,
+          onClick: () => {
+            window.modal.confirm({
+              title: t('assistants.clear.title'),
+              content: t('assistants.clear.content'),
+              centered: true,
+              okButtonProps: { danger: true },
+              onOk: () => {
+                console.log('[AssistantItem] Clear all topics for assistant:', assistant)
+                removeAllTopics()
+              } // 使用当前助手的removeAllTopics
             })
           }
         }
-      },
-      {
-        label: t('assistants.clear.title'),
-        key: 'clear',
-        icon: <MinusCircleOutlined />,
-        onClick: () => {
-          window.modal.confirm({
-            title: t('assistants.clear.title'),
-            content: t('assistants.clear.content'),
-            centered: true,
-            okButtonProps: { danger: true },
-            onOk: () => {
-              console.log('[AssistantItem] Clear all topics for assistant:', assistant)
-              removeAllTopics()
-            } // 使用当前助手的removeAllTopics
-          })
-        }
-      },
-      {
-        label: t('assistants.save.title'),
-        key: 'save-to-agent',
-        icon: <SaveOutlined />,
-        onClick: async () => {
-          const agent = omit(assistant, ['model', 'emoji'])
-          agent.id = uuid()
-          agent.type = 'agent'
-          console.log('[AssistantItem] Save assistant to agent:', agent)
-          addAgent(agent)
-          window.message.success({
-            content: t('assistants.save.success'),
-            key: 'save-to-agent'
-          })
-        }
-      },
-      { type: 'divider' },
-      {
-        label: t('common.delete'),
-        key: 'delete',
-        icon: <DeleteOutlined />,
-        danger: true,
-        onClick: () => {
-          window.modal.confirm({
-            title: t('assistants.delete.title'),
-            content: t('assistants.delete.content'),
-            centered: true,
-            okButtonProps: { danger: true },
-            onOk: async () => {
-              try {
-                console.log('[AssistantItem] 准备删除助手:', assistant)
-                const response = await helperApi.delete({ uid: assistant.uid })
-                console.log('[AssistantItem] 删除助手API响应:', response)
+      ]
+      const adminMenuItems: ItemType[] = [
+        {
+          label: t('assistants.edit.title'),
+          key: 'edit',
+          icon: <EditOutlined />,
+          onClick: () => {
+            console.log('[AssistantItem] Edit assistant:', assistant)
+            AssistantSettingsPopup.show({ assistant })
+          }
+        },
+        {
+          label: t('assistants.copy.title'),
+          key: 'duplicate',
+          icon: <CopyIcon />,
+          onClick: async () => {
+            try {
+              const _assistant: Assistant = { ...assistant, id: uuid(), topics: [getDefaultTopic(assistant.id)] }
+              console.log('[AssistantItem] 准备复制助手:', _assistant)
+              // 构建符合API要求的参数对象
+              const _assistantAddInfo = {
+                id: _assistant.id,
+                name: _assistant.name || '',
+                emoji: _assistant.emoji || '',
+                prompt: _assistant.prompt || '',
+                topics: _assistant.topics, // 保留原始的topics
+                type: 'assistant',
+                knowledge_uid: _assistant?.knowledge_bases?.[0]?.uid || null,
+                model_uid: _assistant.model?.uid || _assistant.default_model_uid || null,
+                default_model_uid: _assistant.defaultModel?.uid || null,
+                settings: _assistant.settings || {
+                  temperature: 1,
+                  contextCount: 5,
+                  enableMaxTokens: false,
+                  maxTokens: 0,
+                  streamOutput: true,
+                  hideMessages: false,
+                  customParameters: []
+                },
+                messages: _assistant.messages || []
+              }
+              console.log('[AssistantItem] 复制助手信息:', _assistantAddInfo)
+              const response = await helperApi.add(_assistantAddInfo)
+              console.log('[AssistantItem] 复制助手API响应:', response)
 
-                if (response && response.Code === 0) {
-                  console.log('[AssistantItem] 删除助手成功')
-                  onDelete(assistant)
+              if (response && response.Code === 0) {
+                console.log('[AssistantItem] 复制助手成功:', _assistant)
+                addAssistant(_assistant)
+                onSwitch(_assistant)
 
-                  window.message.success({
-                    content: response.Msg || t('assistants.delete.success'),
-                    key: 'delete-assistant'
-                  })
-                } else {
-                  console.error('[AssistantItem] 删除助手失败:', response)
+                window.message.success({
+                  content: response.Msg,
+                  key: 'duplicate-assistant'
+                })
+              } else {
+                console.error('[AssistantItem] 复制助手失败:', response)
+                window.message.error({
+                  content: response.Msg,
+                  key: 'duplicate-assistant'
+                })
+              }
+            } catch (error) {
+              console.error('[AssistantItem] 复制助手出错:', error)
+              window.message.error({
+                content: t(`复制助手出错:${error}`),
+                key: 'duplicate-assistant'
+              })
+            }
+          }
+        },
+        // {
+        //   label: t('assistants.clear.title'),
+        //   key: 'clear',
+        //   icon: <MinusCircleOutlined />,
+        //   onClick: () => {
+        //     window.modal.confirm({
+        //       title: t('assistants.clear.title'),
+        //       content: t('assistants.clear.content'),
+        //       centered: true,
+        //       okButtonProps: { danger: true },
+        //       onOk: () => {
+        //         console.log('[AssistantItem] Clear all topics for assistant:', assistant)
+        //         removeAllTopics()
+        //       } // 使用当前助手的removeAllTopics
+        //     })
+        //   }
+        // },
+        {
+          label: t('assistants.save.title'),
+          key: 'save-to-agent',
+          icon: <SaveOutlined />,
+          onClick: async () => {
+            const agent = omit(assistant, ['model', 'emoji'])
+            agent.id = uuid()
+            agent.type = 'agent'
+            console.log('[AssistantItem] Save assistant to agent:', agent)
+            addAgent(agent)
+            window.message.success({
+              content: t('assistants.save.success'),
+              key: 'save-to-agent'
+            })
+          }
+        },
+        { type: 'divider' },
+        {
+          label: t('common.delete'),
+          key: 'delete',
+          icon: <DeleteOutlined />,
+          danger: true,
+          onClick: () => {
+            window.modal.confirm({
+              title: t('assistants.delete.title'),
+              content: t('assistants.delete.content'),
+              centered: true,
+              okButtonProps: { danger: true },
+              onOk: async () => {
+                try {
+                  console.log('[AssistantItem] 准备删除助手:', assistant)
+                  const response = await helperApi.delete({ uid: assistant.uid })
+                  console.log('[AssistantItem] 删除助手API响应:', response)
+
+                  if (response && response.Code === 0) {
+                    console.log('[AssistantItem] 删除助手成功')
+                    onDelete(assistant)
+
+                    window.message.success({
+                      content: response.Msg || t('assistants.delete.success'),
+                      key: 'delete-assistant'
+                    })
+                  } else {
+                    console.error('[AssistantItem] 删除助手失败:', response)
+                    window.message.error({
+                      content: response.Msg || t('assistants.delete.error'),
+                      key: 'delete-assistant'
+                    })
+                  }
+                } catch (error) {
+                  console.error('[AssistantItem] 删除助手出错:', error)
                   window.message.error({
-                    content: response.Msg || t('assistants.delete.error'),
+                    content: t(`assistants.delete.error: ${error}`),
                     key: 'delete-assistant'
                   })
                 }
-              } catch (error) {
-                console.error('[AssistantItem] 删除助手出错:', error)
-                window.message.error({
-                  content: t(`assistants.delete.error: ${error}`),
-                  key: 'delete-assistant'
-                })
               }
-            }
-          })
+            })
+          }
         }
-      }
-    ],
+      ]
+      // 根据管理员权限返回不同的菜单项
+      return isAdmin ? [...baseMenuItems, ...adminMenuItems] : baseMenuItems
+    },
     [addAgent, addAssistant, onSwitch, removeAllTopics, t, onDelete]
   )
 

@@ -1,8 +1,9 @@
 import { isMac } from '@renderer/config/constant'
 import { useSettings } from '@renderer/hooks/useSettings'
+import { Tooltip } from 'antd'
 import { FC, PropsWithChildren } from 'react'
+import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-
 type Props = PropsWithChildren & JSX.IntrinsicElements['div']
 
 export const Navbar: FC<Props> = ({ children, ...props }) => {
@@ -19,7 +20,22 @@ export const Navbar: FC<Props> = ({ children, ...props }) => {
 }
 
 export const NavbarLeft: FC<Props> = ({ children, ...props }) => {
-  return <NavbarLeftContainer {...props}>{children}</NavbarLeftContainer>
+  const { t } = useTranslation()
+  // return <NavbarLeftContainer {...props}>{children}</NavbarLeftContainer>
+  return (
+    <NavbarLeftContainer {...props}>
+      {React.Children.map(children, (child, index) => {
+        if (index === 1) {
+          return (
+            <Tooltip title={t('新建话题')} placement="left">
+              {child}
+            </Tooltip>
+          )
+        }
+        return child
+      })}
+    </NavbarLeftContainer>
+  )
 }
 
 export const NavbarCenter: FC<Props> = ({ children, ...props }) => {

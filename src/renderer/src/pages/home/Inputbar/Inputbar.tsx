@@ -706,7 +706,9 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic }) => {
                   disabled={files.length > 0}
                 />
               )}
-              <AttachmentButton model={model} files={files} setFiles={setFiles} ToolbarButton={ToolbarButton} />
+              {isAdmin && (
+                <AttachmentButton model={model} files={files} setFiles={setFiles} ToolbarButton={ToolbarButton} />
+              )}
               <Tooltip placement="top" title={t('chat.input.new.context', { Command: newContextShortcut })} arrow>
                 <ToolbarButton type="text" onClick={onNewContext}>
                   <PicCenterOutlined />
