@@ -3,6 +3,8 @@ import { http } from './request'
 // 用户相关类型定义
 export interface MemberParams {
   name?: string // 用户名称，查询时可选
+  pageSize?: number // 每页条数，查询时可选
+  pageNum?: number // 当前页码，查询时可选
 }
 
 export interface MemberData {

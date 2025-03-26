@@ -40,7 +40,7 @@ class HttpRequest {
         if (Code === 0) {
           return response.data
         }
-        return Promise.reject(new Error(Msg))
+        return Promise.reject(Msg)
       },
       (error) => {
         return handleApiError(error)

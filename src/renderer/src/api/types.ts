@@ -17,6 +17,7 @@ export interface LoginResponseData<T = any> {
   Code: number
   Data: T
   Msg: string // token值
+  token: string // token值
 }
 
 // 退出登录请求参数类型

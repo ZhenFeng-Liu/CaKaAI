@@ -1,5 +1,6 @@
 import { EyeInvisibleOutlined, EyeOutlined, LockOutlined, UserOutlined } from '@ant-design/icons'
 import { userApi } from '@renderer/api/user'
+import logoImage from '@renderer/assets/images/logo.png'
 import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 import { Button, Checkbox, Form, Input, message } from 'antd'
 import { FC, useEffect, useState } from 'react'
@@ -35,7 +36,7 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
       console.log('[LoginPage] 登录响应', response)
       if (response.Code === 0) {
         // 获取token
-        localStorage.setItem('token', response.Msg)
+        localStorage.setItem('token', response.token)
         localStorage.setItem('tavily_api_key', response.Data?.netKey || '')
         try {
           message.loading('正在获取用户信息...', 0.5) // 添加加载提示
@@ -98,6 +99,7 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
         }
       } else {
         // 根据不同的错误码显示不同的错误信息
+        console.log('登录失败:', response)
         if (response.Code === 1) {
           message.error({
             content: response.Msg || '账号或密码错误',
@@ -110,10 +112,10 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
           })
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login failed:', error)
       message.error({
-        content: '账号或密码错误或者网络异常，请检查网络连接后重试',
+        content: error || '账号或密码错误或者网络异常，请检查网络连接后重试',
         duration: 3
       })
     } finally {
@@ -135,7 +137,9 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
 
       <LoginCard>
         <LogoContainer>
-          <LogoIcon>C</LogoIcon>
+          <LogoIcon>
+            <img src={logoImage} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          </LogoIcon>
           <LogoText>CaKaAI</LogoText>
         </LogoContainer>
         <WelcomeText>欢迎使用 CaKaAI 智能助手</WelcomeText>

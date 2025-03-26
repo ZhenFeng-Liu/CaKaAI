@@ -56,7 +56,7 @@ const KnowledgePage: FC = () => {
         }
         const response = await knowledgeApi.addKnowledgeBase(data)
 
-        if (response.Code === 0 && response.Data) {
+        if (response.Code === 0) {
           console.log('知识库添加成功:', response.Data)
 
           // 更新知识库ID为后端返回的ID
@@ -67,6 +67,8 @@ const KnowledgePage: FC = () => {
 
           // 设置选中的知识库
           setSelectedBase(updatedBase)
+          // 刷新知识库列表
+          fetchKnowledgeBases()
         } else {
           console.error('知识库添加失败:', response.Msg)
         }

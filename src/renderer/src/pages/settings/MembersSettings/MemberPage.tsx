@@ -2,7 +2,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { memberApi, MemberData } from '@renderer/api/member'
 import { roleApi } from '@renderer/api/role'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
-import { Button, Checkbox, Form, Input, Modal, Radio, Select, Space, Table } from 'antd'
+import { Button, Checkbox, Form, Input, Modal, Pagination, Radio, Select, Space, Table } from 'antd'
 import { message } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -126,15 +126,31 @@ const MemberPage: FC = () => {
       )
     }
   ]
-
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0
+  })
   // 获取会员列表
-  const fetchMemberList = async (params?: { name?: string; enable?: number }) => {
+  const fetchMemberList = async (params?: { name?: string; enable?: number; pageNum?: number; pageSize?: number }) => {
     try {
       setLoading(true)
-      const response: any = await memberApi.query(params || {})
+      const queryParams = {
+        name: params?.name || searchName,
+        enable: params?.enable !== undefined ? params.enable : selectedStatus,
+        pageNum: params?.pageNum || pagination.current,
+        pageSize: params?.pageSize || pagination.pageSize
+      }
+      const response: any = await memberApi.query(queryParams)
       if (response.Data.records) {
         const tableData = response.Data.records.map(convertMemberData)
         setRoleList(tableData)
+        // 更新分页信息
+        setPagination({
+          ...pagination,
+          current: queryParams.pageNum,
+          total: response.iRows || 0 // 使用接口返回的总记录数
+        })
       }
     } catch (error) {
       message.error('获取会员列表失败')
@@ -142,7 +158,15 @@ const MemberPage: FC = () => {
       setLoading(false)
     }
   }
+  // 处理分页变化
+  const handlePageChange = (page: number) => {
+    fetchMemberList({ pageNum: page })
+  }
 
+  // 处理每页条数变化
+  const handlePageSizeChange = (current: number, size: number) => {
+    fetchMemberList({ pageNum: 1, pageSize: size })
+  }
   // 获取角色列表
   const fetchRoleList = async () => {
     try {
@@ -263,7 +287,8 @@ const MemberPage: FC = () => {
     setSearchName(value)
     fetchMemberList({
       name: value,
-      enable: selectedStatus !== undefined ? Number(selectedStatus) : undefined
+      enable: selectedStatus !== undefined ? Number(selectedStatus) : undefined,
+      pageNum: 1 // 搜索时重置到第一页
     })
   }
 
@@ -272,7 +297,8 @@ const MemberPage: FC = () => {
     setSelectedStatus(status)
     fetchMemberList({
       name: searchName,
-      enable: status
+      enable: status,
+      pageNum: 1 // 筛选时重置到第一页
     })
   }
 
@@ -280,7 +306,11 @@ const MemberPage: FC = () => {
   const handleReset = () => {
     setSearchName('')
     setSelectedStatus(undefined)
-    fetchMemberList()
+    fetchMemberList({
+      name: '',
+      enable: undefined,
+      pageNum: 1 // 重置时回到第一页
+    })
   }
 
   // 处理修改提交
@@ -407,6 +437,16 @@ const MemberPage: FC = () => {
           loading={loading}
           scroll={{ x: 'max-content' }}
         />
+        <PaginationContainer>
+          <Pagination
+            current={pagination.current}
+            pageSize={pagination.pageSize}
+            total={pagination.total}
+            onChange={handlePageChange}
+            onShowSizeChange={handlePageSizeChange}
+            showTotal={(total) => `共 ${total} 条记录`}
+          />
+        </PaginationContainer>
       </ContentContainer>
 
       {/* 添加/修改角色弹窗 */}
@@ -634,4 +674,11 @@ const SearchArea = styled.div`
   gap: 8px;
 `
 
+// 添加分页容器样式
+const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding: 0 16px 16px 0;
+`
 export default MemberPage

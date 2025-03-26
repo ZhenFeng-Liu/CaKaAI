@@ -3,7 +3,7 @@ import { menuApi } from '@renderer/api/menu'
 import { roleApi, RoleMenuButtonParams } from '@renderer/api/role'
 import { AddRoleParams, RoleData } from '@renderer/api/role'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
-import { Button, Checkbox, Form, Input, message, Modal, Radio, Space, Table, Tooltip } from 'antd'
+import { Button, Checkbox, Form, Input, message, Modal, Pagination, Radio, Space, Table, Tooltip } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -90,14 +90,25 @@ const RolePage: FC = () => {
       )
     }
   ]
-
-  const fetchRoleList = async (name?: string) => {
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0
+  })
+  const fetchRoleList = async (name?: string, page = pagination.current, pageSize = pagination.pageSize) => {
     try {
       setLoading(true)
-      const response: any = await roleApi.query({ name })
+      const response: any = await roleApi.query({ name, pageNum: page, pageSize })
       if (response.Data?.records) {
         const tableData = response.Data.records.map(convertRoleData)
         setRoleList(tableData)
+
+        // 更新分页信息
+        setPagination({
+          ...pagination,
+          current: page,
+          total: response.iRows || 0 // 使用接口返回的总记录数
+        })
       }
     } catch (error) {
       message.error('获取角色列表失败')
@@ -363,16 +374,31 @@ const RolePage: FC = () => {
     setSelectedRole(null)
     setIsModalVisible(true)
   }
-
+  // 处理分页变化
+  const handlePageChange = (page: number, pageSize?: number) => {
+    fetchRoleList(searchName, page, pageSize)
+  }
+  // 处理每页条数变化
+  const handlePageSizeChange = (current: number, size: number) => {
+    fetchRoleList(searchName, 1, size)
+  }
   // 重置搜索
   const handleReset = () => {
     setSearchName('')
-    fetchRoleList()
+    setPagination({
+      ...pagination,
+      current: 1
+    })
+    fetchRoleList('', 1, pagination.pageSize)
   }
 
   const handleSearch = (value: string) => {
     setSearchName(value)
-    fetchRoleList(value)
+    setPagination({
+      ...pagination,
+      current: 1
+    })
+    fetchRoleList(value, 1, pagination.pageSize)
   }
 
   return (
@@ -405,6 +431,16 @@ const RolePage: FC = () => {
           loading={loading}
           scroll={{ x: 'max-content' }}
         />
+        <PaginationContainer>
+          <Pagination
+            current={pagination.current}
+            pageSize={pagination.pageSize}
+            total={pagination.total}
+            onChange={handlePageChange}
+            onShowSizeChange={handlePageSizeChange}
+            showTotal={(total) => `共 ${total} 条记录`}
+          />
+        </PaginationContainer>
       </ContentContainer>
 
       {/* 添加/修改角色弹窗 */}
@@ -556,5 +592,11 @@ const SearchArea = styled.div`
   display: flex;
   gap: 8px;
 `
-
+// 添加分页容器样式
+const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding: 0 16px 16px 0;
+`
 export default RolePage
