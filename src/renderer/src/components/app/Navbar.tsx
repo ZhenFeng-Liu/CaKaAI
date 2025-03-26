@@ -25,9 +25,23 @@ export const NavbarLeft: FC<Props> = ({ children, ...props }) => {
 export const NavbarCenter: FC<Props> = ({ children, ...props }) => {
   return <NavbarCenterContainer {...props}>{children}</NavbarCenterContainer>
 }
-
+import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
+import React from 'react' // 添加这行
 export const NavbarRight: FC<Props> = ({ children, ...props }) => {
-  return <NavbarRightContainer {...props}>{children}</NavbarRightContainer>
+  console.log('props', props)
+  console.log('children', children)
+  // return <NavbarRightContainer {...props}>{children}</NavbarRightContainer>
+  const { isAdmin } = useAdminCheck()
+
+  return (
+    <NavbarRightContainer {...props}>
+      {React.Children.map(children, (child, index) => {
+        // 如果不是管理员且是第一个子元素，则不显示
+        if (!isAdmin && index === 0) return null
+        return child
+      })}
+    </NavbarRightContainer>
+  )
 }
 
 const NavbarContainer = styled.div`

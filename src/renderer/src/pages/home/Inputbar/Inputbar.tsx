@@ -13,6 +13,7 @@ import {
 import TranslateButton from '@renderer/components/TranslateButton'
 import { isVisionModel, isWebSearchModel } from '@renderer/config/models'
 import db from '@renderer/databases'
+import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 import { useAssistant } from '@renderer/hooks/useAssistant'
 import { modelGenerating, useRuntime } from '@renderer/hooks/useRuntime'
 import { useMessageStyle, useSettings } from '@renderer/hooks/useSettings'
@@ -620,7 +621,7 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic }) => {
       }
     })
   }
-
+  const { isAdmin } = useAdminCheck()
   return (
     <Container onDragOver={handleDragOver} onDrop={handleDrop} className="inputbar">
       <NarrowLayout style={{ width: '100%' }}>
@@ -670,11 +671,13 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic }) => {
                   <FormOutlined />
                 </ToolbarButton>
               </Tooltip>
-              <MentionModelsButton
-                mentionModels={mentionModels}
-                onMentionModel={onMentionModel}
-                ToolbarButton={ToolbarButton}
-              />
+              {isAdmin && (
+                <MentionModelsButton
+                  mentionModels={mentionModels}
+                  onMentionModel={onMentionModel}
+                  ToolbarButton={ToolbarButton}
+                />
+              )}
               <Tooltip placement="top" title={t('chat.input.web_search')} arrow>
                 <ToolbarButton type="text" onClick={onEnableWebSearch}>
                   <GlobalOutlined

@@ -19,7 +19,7 @@ import { useShortcut } from '@renderer/hooks/useShortcuts'
 import { NavbarIcon } from '@renderer/pages/home/Navbar'
 import KnowledgeSearchPopup from '@renderer/pages/knowledge/components/KnowledgeSearchPopup'
 import { KnowledgeBase } from '@renderer/types'
-import { Dropdown, Empty, MenuProps } from 'antd'
+import { Dropdown, Empty, MenuProps, message } from 'antd'
 import { FC, useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -75,7 +75,34 @@ const KnowledgePage: FC = () => {
       }
     }
   }
+  const fetchKnowledgeBases = async () => {
+    try {
+      const response = await knowledgeApi.getKnowledgeBases({})
+      console.log('知识库API数据:', response)
 
+      if (response.Code === 0 && response.Data?.records) {
+        // 处理API返回的数据
+        const knowledgeBases = response.Data.records.map((base: any) => ({
+          // id: base.id,
+          // name: base.name,
+          // model: base.model,
+          // dimensions: base.dimensions,
+          // items: base.items,
+          // created_at: base.created_at,
+          // updated_at: base.updated_at,
+          // version: base.version,
+          // uid: base.uid
+          ...base
+        }))
+
+        // 更新知识库列表状态
+        console.log('处理后的知识库数据:', knowledgeBases)
+        updateKnowledgeBases(knowledgeBases)
+      }
+    } catch (error) {
+      console.error('获取知识库数据失败:', error)
+    }
+  }
   useEffect(() => {
     // 检查当前选中的知识库是否还存在于知识库列表中
     const hasSelectedBase = bases.find((base) => base.id === selectedBase?.id)
@@ -87,35 +114,6 @@ const KnowledgePage: FC = () => {
 
   // 在组件内部添加
   useEffect(() => {
-    const fetchKnowledgeBases = async () => {
-      try {
-        const response = await knowledgeApi.getKnowledgeBases({})
-        console.log('知识库API数据:', response)
-
-        if (response.Code === 0 && response.Data?.records) {
-          // 处理API返回的数据
-          const knowledgeBases = response.Data.records.map((base: any) => ({
-            // id: base.id,
-            // name: base.name,
-            // model: base.model,
-            // dimensions: base.dimensions,
-            // items: base.items,
-            // created_at: base.created_at,
-            // updated_at: base.updated_at,
-            // version: base.version,
-            // uid: base.uid
-            ...base
-          }))
-
-          // 更新知识库列表状态
-          console.log('处理后的知识库数据:', knowledgeBases)
-          updateKnowledgeBases(knowledgeBases)
-        }
-      } catch (error) {
-        console.error('获取知识库数据失败:', error)
-      }
-    }
-
     fetchKnowledgeBases()
   }, [])
   const getMenuItems = useCallback(
@@ -132,7 +130,21 @@ const KnowledgePage: FC = () => {
               defaultValue: base.name || ''
             })
             if (name && base.name !== name) {
-              renameKnowledgeBase(base.id, name)
+              // renameKnowledgeBase(base.id, name)
+              try {
+                const response = await knowledgeApi.updateKnowledgeBase({ uid: base.uid, name })
+
+                if (response.Code === 0) {
+                  message.success(t('知识库重命名成功'))
+                  // 刷新知识库列表
+                  fetchKnowledgeBases()
+                } else {
+                  message.error(response.Msg || t('知识库重命名失败'))
+                }
+              } catch (error) {
+                console.error('知识库重命名失败:', error)
+                message.error(t('知识库重命名失败'))
+              }
             }
           }
         },
@@ -152,9 +164,24 @@ const KnowledgePage: FC = () => {
             window.modal.confirm({
               title: t('knowledge.delete_confirm'),
               centered: true,
-              onOk: () => {
-                setSelectedBase(undefined)
-                deleteKnowledgeBase(base.id)
+              onOk: async () => {
+                // setSelectedBase(undefined)
+                // deleteKnowledgeBase(base.id)
+                console.log('删除知识库', base)
+                try {
+                  const response = await knowledgeApi.deleteKnowledgeBase({ uid: base.uid })
+
+                  if (response.Code === 0) {
+                    message.success(t('删除知识库成功'))
+                    // 刷新知识库列表
+                    fetchKnowledgeBases()
+                  } else {
+                    message.error(response.Msg || t('删除知识库失败'))
+                  }
+                } catch (error) {
+                  console.error('删除知识库失败:', error)
+                  message.error(t('删除知识库失败'))
+                }
               }
             })
           }

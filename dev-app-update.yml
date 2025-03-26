@@ -5,4 +5,5 @@
 # repo: cherry-studio
 # owner: kangfenmao
 provider: generic
-url: http://192.168.0.123:9019
+#url: http://192.168.0.123:9019  # 远程服务器地址
+url: http://192.168.0.121:8800  # 本地测试服务器地址

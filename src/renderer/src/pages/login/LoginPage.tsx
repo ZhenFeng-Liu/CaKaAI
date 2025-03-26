@@ -1,9 +1,9 @@
 import { EyeInvisibleOutlined, EyeOutlined, LockOutlined, UserOutlined } from '@ant-design/icons'
 import { userApi } from '@renderer/api/user'
+import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 import { Button, Checkbox, Form, Input, message } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import styled, { keyframes } from 'styled-components'
-
 interface LoginForm {
   username: string
   password: string
@@ -18,7 +18,7 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
   const [form] = Form.useForm<LoginForm>()
   const [loading, setLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
-
+  const { checkIsAdmin } = useAdminCheck() // 添加这行
   useEffect(() => {
     setMounted(true)
     return () => setMounted(false)
@@ -43,10 +43,14 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
           const userInfoResponse = await userApi.getUserInfo(response.Data.uid)
           if (userInfoResponse.Code === 0) {
             // 判断并打印是否为超级管理员
-            const isAdmin = userInfoResponse.Data?.records[0]?.roleList[0]?.admin === 1
-            console.log('[LoginPage] 当前用户是否为超级管理员:', isAdmin)
+            // const isAdmin = userInfoResponse.Data?.records[0]?.roleList[0]?.admin === 1
+            // console.log('[LoginPage] 当前用户是否为超级管理员:', isAdmin)
             const userInfo = userInfoResponse.Data?.records[0]
             console.log('原始用户信息', userInfo)
+
+            // 使用 hook 检查管理员权限
+            checkIsAdmin(userInfo)
+
             // 提取权限信息
             const menuPermissions =
               userInfo.roleList?.reduce(
@@ -67,7 +71,7 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
             // 存储用户信息和权限
             localStorage.setItem('userInfo', JSON.stringify(userInfo))
             localStorage.setItem('menuPermissions', JSON.stringify(uniqueMenus))
-            localStorage.setItem('isAdmin', String(isAdmin))
+            // localStorage.setItem('isAdmin', String(isAdmin))
             // 使用更友好的成功提示
             message.success({
               content: `欢迎回来，${userInfo.name || '用户'}`,

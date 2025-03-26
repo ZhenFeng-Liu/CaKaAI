@@ -1,5 +1,6 @@
 import { BarsOutlined, SettingOutlined } from '@ant-design/icons'
 import AddAssistantPopup from '@renderer/components/Popups/AddAssistantPopup'
+import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 import { useAssistants, useDefaultAssistant } from '@renderer/hooks/useAssistant'
 import { useSettings } from '@renderer/hooks/useSettings'
 import { useShowTopics } from '@renderer/hooks/useStore'
@@ -35,7 +36,7 @@ const HomeTabs: FC<Props> = ({ activeAssistant, activeTopic, setActiveAssistant,
   const { toggleShowTopics } = useShowTopics()
 
   const { t } = useTranslation()
-
+  const { isAdmin } = useAdminCheck()
   const borderStyle = '0.5px solid var(--color-border)'
   const border =
     position === 'left' ? { borderRight: borderStyle } : { borderLeft: borderStyle, borderTopLeftRadius: 0 }
@@ -107,7 +108,7 @@ const HomeTabs: FC<Props> = ({ activeAssistant, activeTopic, setActiveAssistant,
                 value: 'topic',
                 icon: <BarsOutlined />
               },
-              {
+              isAdmin && {
                 label: t('settings.title'),
                 value: 'settings',
                 icon: <SettingOutlined />

@@ -8,6 +8,7 @@ import {
 import { isMac } from '@renderer/config/constant'
 import { AppLogo, isLocalAi, UserAvatar } from '@renderer/config/env'
 import { useTheme } from '@renderer/context/ThemeProvider'
+import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 import useAvatar from '@renderer/hooks/useAvatar'
 import { useMinapps } from '@renderer/hooks/useMinapps'
 import { usePermissions } from '@renderer/hooks/usePermissions'
@@ -36,7 +37,7 @@ const Sidebar: FC = () => {
   const { windowStyle, sidebarIcons } = useSettings()
   const { theme, toggleTheme } = useTheme()
   const { pinned } = useMinapps()
-
+  const { isAdmin } = useAdminCheck()
   const onEditUser = () => UserPopup.show()
 
   const macTransparentWindow = isMac && windowStyle === 'transparent'
@@ -100,19 +101,21 @@ const Sidebar: FC = () => {
             )}
           </Icon>
         </Tooltip>
-        <Tooltip title={t('settings.title')} mouseEnterDelay={0.8} placement="right">
-          <StyledLink
-            onClick={async () => {
-              if (minappShow) {
-                await MinApp.close()
-              }
-              await to(isLocalAi ? '/settings/assistant' : '/settings/provider')
-            }}>
-            <Icon className={pathname.startsWith('/settings') && !minappShow ? 'active' : ''}>
-              <i className="iconfont icon-setting" />
-            </Icon>
-          </StyledLink>
-        </Tooltip>
+        {isAdmin && (
+          <Tooltip title={t('settings.title')} mouseEnterDelay={0.8} placement="right">
+            <StyledLink
+              onClick={async () => {
+                if (minappShow) {
+                  await MinApp.close()
+                }
+                await to(isLocalAi ? '/settings/assistant' : '/settings/provider')
+              }}>
+              <Icon className={pathname.startsWith('/settings') && !minappShow ? 'active' : ''}>
+                <i className="iconfont icon-setting" />
+              </Icon>
+            </StyledLink>
+          </Tooltip>
+        )}
       </Menus>
     </Container>
   )
