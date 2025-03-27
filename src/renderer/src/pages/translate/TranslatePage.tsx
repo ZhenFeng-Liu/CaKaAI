@@ -11,6 +11,7 @@ import CopyIcon from '@renderer/components/Icons/CopyIcon'
 import { isLocalAi } from '@renderer/config/env'
 import { translateLanguageOptions } from '@renderer/config/translate'
 import db from '@renderer/databases'
+import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 import { useDefaultModel } from '@renderer/hooks/useAssistant'
 import { fetchTranslate } from '@renderer/services/ApiService'
 import { getDefaultTranslateAssistant } from '@renderer/services/AssistantService'
@@ -25,7 +26,6 @@ import { FC, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
-
 let _text = ''
 let _result = ''
 let _targetLanguage = 'english'
@@ -41,7 +41,7 @@ const TranslatePage: FC = () => {
   const [historyDrawerVisible, setHistoryDrawerVisible] = useState(false)
   const contentContainerRef = useRef<HTMLDivElement>(null)
   const textAreaRef = useRef<TextAreaRef>(null)
-
+  const { isAdmin } = useAdminCheck()
   const translateHistory = useLiveQuery(() => db.translate_history.orderBy('createdAt').reverse().toArray(), [])
 
   _text = text
@@ -247,7 +247,7 @@ const TranslatePage: FC = () => {
                 disabled
                 options={[{ label: t('translate.any.language'), value: 'any' }]}
               />
-              <SettingButton />
+              {isAdmin && <SettingButton />}
             </Flex>
 
             <Tooltip

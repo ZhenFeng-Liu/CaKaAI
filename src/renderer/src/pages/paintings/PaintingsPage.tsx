@@ -70,8 +70,9 @@ const IMAGE_SIZES = [
 ]
 
 let _painting: Painting
-
+import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 const PaintingsPage: FC = () => {
+  const { isAdmin } = useAdminCheck()
   const { t } = useTranslation()
   const { paintings, addPainting, removePainting, updatePainting } = usePaintings()
   const [painting, setPainting] = useState<Painting>(_painting || paintings[0])
@@ -307,14 +308,18 @@ const PaintingsPage: FC = () => {
       </Navbar>
       <ContentContainer id="content-container">
         <LeftContainer>
-          <SettingTitle style={{ marginBottom: 5 }}>{t('common.provider')}</SettingTitle>
-          <Select
-            value={siliconProvider.id}
-            disabled={true}
-            options={[{ label: t(`provider.${siliconProvider.id}`), value: siliconProvider.id }]}
-          />
-          <SettingTitle style={{ marginBottom: 5, marginTop: 15 }}>{t('common.model')}</SettingTitle>
-          <Select value={painting.model} options={modelOptions} onChange={onSelectModel} />
+          {isAdmin && (
+            <>
+              <SettingTitle style={{ marginBottom: 5 }}>{t('common.provider')}</SettingTitle>
+              <Select
+                value={siliconProvider.id}
+                disabled={true}
+                options={[{ label: t(`provider.${siliconProvider.id}`), value: siliconProvider.id }]}
+              />
+              <SettingTitle style={{ marginBottom: 5, marginTop: 15 }}>{t('common.model')}</SettingTitle>
+              <Select value={painting.model} options={modelOptions} onChange={onSelectModel} />
+            </>
+          )}
           <SettingTitle style={{ marginBottom: 5, marginTop: 15 }}>{t('paintings.image.size')}</SettingTitle>
           <Radio.Group
             value={painting.imageSize}

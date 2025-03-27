@@ -379,7 +379,7 @@ const RolePage: FC = () => {
     fetchRoleList(searchName, page, pageSize)
   }
   // 处理每页条数变化
-  const handlePageSizeChange = (current: number, size: number) => {
+  const handlePageSizeChange = (size: number) => {
     fetchRoleList(searchName, 1, size)
   }
   // 重置搜索

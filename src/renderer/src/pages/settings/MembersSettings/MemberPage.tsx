@@ -164,7 +164,7 @@ const MemberPage: FC = () => {
   }
 
   // 处理每页条数变化
-  const handlePageSizeChange = (current: number, size: number) => {
+  const handlePageSizeChange = (size: number) => {
     fetchMemberList({ pageNum: 1, pageSize: size })
   }
   // 获取角色列表
@@ -608,7 +608,27 @@ const MemberPage: FC = () => {
           </Form.Item> */}
 
           <Form.Item label="分配角色" name="newRole" rules={[{ required: true, message: '请选择要分配的角色' }]}>
-            <Select mode="multiple" placeholder="请选择角色" style={{ width: '100%' }} options={roles} />
+            <Select
+              mode="multiple"
+              placeholder="请选择角色"
+              style={{ width: '100%' }}
+              options={roles}
+              onDeselect={(value, option) => {
+                // 如果尝试取消选择默认角色，则阻止操作
+                if (option.label === '默认角色') {
+                  // 获取当前选中的值
+                  const currentValues = assignRoleForm.getFieldValue('newRole') || []
+                  // 确保默认角色仍在选中列表中
+                  if (!currentValues.includes(value)) {
+                    // 将默认角色重新添加到选中列表
+                    assignRoleForm.setFieldValue('newRole', [...currentValues, value])
+                  }
+                  message.warning('默认角色不能被移除')
+                  return false
+                }
+                return true
+              }}
+            />
           </Form.Item>
         </Form>
       </Modal>

@@ -698,7 +698,7 @@ const Inputbar: FC<Props> = ({ assistant: _assistant, setActiveTopic }) => {
                   </ToolbarButton>
                 </Popconfirm>
               </Tooltip>
-              {showKnowledgeIcon && (
+              {showKnowledgeIcon && isAdmin && (
                 <KnowledgeBaseButton
                   selectedBases={selectedKnowledgeBases}
                   onSelect={handleKnowledgeBaseSelect}
