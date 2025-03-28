@@ -98,11 +98,13 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
   }
 
   const handleDrop = async (files: File[]) => {
+    console.log('[KnowledgeContent] Dropped files:', files)
     if (disabled) {
       return
     }
 
     if (files) {
+      console.log('[KnowledgeContent] Dropped files:', files)
       const _files: FileType[] = files
         .map((file) => ({
           id: file.name,
@@ -116,9 +118,10 @@ const KnowledgeContent: FC<KnowledgeContentProps> = ({ selectedBase }) => {
           created_at: new Date()
         }))
         .filter(({ ext }) => fileTypes.includes(ext))
-      console.debug('[KnowledgeContent] Uploading files:', _files, files)
+      console.log('[KnowledgeContent] Uploading files:', _files, files)
       // 上传文件到本地或服务器
       const uploadedFiles = await FileManager.uploadFiles(_files)
+      console.log('uploadedFiles:', uploadedFiles)
       // 将文件添加到前端知识库
       addFiles(uploadedFiles)
 

@@ -21,7 +21,6 @@ export default defineConfig({
           '@llm-tools/embedjs-loader-pdf',
           '@llm-tools/embedjs-loader-sitemap',
           '@llm-tools/embedjs-libsql',
-          '@llm-tools/embedjs-qdrant',
           '@llm-tools/embedjs-loader-image'
         ]
       }),
@@ -36,8 +35,7 @@ export default defineConfig({
     },
     build: {
       rollupOptions: {
-        // external: ['@libsql/client']
-        external: ['@qdrant/client']
+        external: ['@libsql/client']
       }
     }
   },

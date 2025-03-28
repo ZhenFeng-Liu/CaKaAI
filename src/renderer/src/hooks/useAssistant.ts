@@ -40,10 +40,16 @@ export function useAssistants() {
     },
     removeAssistant: (id: string) => {
       console.log('[useAssistants] removeAssistant:', id)
-      dispatch(removeAssistant({ id }))
       const assistant = assistants.find((a) => a.id === id)
+      // 先删除相关的 topics
       const topics = assistant?.topics || []
       topics.forEach(({ id }) => TopicManager.removeTopic(id))
+      // 然后更新 redux store
+      dispatch(removeAssistant({ id }))
+      console.log(
+        '[useAssistants] after remove:',
+        assistants.filter((a) => a.id !== id)
+      )
     }
   }
 }

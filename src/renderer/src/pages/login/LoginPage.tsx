@@ -1,7 +1,8 @@
 import { EyeInvisibleOutlined, EyeOutlined, LockOutlined, UserOutlined } from '@ant-design/icons'
 import { userApi } from '@renderer/api/user'
 import logoImage from '@renderer/assets/images/logo.png'
-import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
+// import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
+import useUserInfo from '@renderer/hooks/useUserInfo'
 import { Button, Checkbox, Form, Input, message } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import styled, { keyframes } from 'styled-components'
@@ -19,7 +20,8 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
   const [form] = Form.useForm<LoginForm>()
   const [loading, setLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const { checkIsAdmin } = useAdminCheck() // 添加这行
+  // const { checkIsAdmin } = useAdminCheck() // 添加这行
+  const { fetchAndProcessUserInfo } = useUserInfo()
   useEffect(() => {
     setMounted(true)
     return () => setMounted(false)
@@ -38,64 +40,77 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
         // 获取token
         localStorage.setItem('token', response.token)
         localStorage.setItem('tavily_api_key', response.Data?.netKey || '')
+        // try {
+        //   message.loading('正在获取用户信息...', 0.5) // 添加加载提示
+        //   // 获取最新的用户信息
+        //   const userInfoResponse = await userApi.getUserInfo(response.Data.uid)
+        //   if (userInfoResponse.Code === 0) {
+        //     // 判断并打印是否为超级管理员
+        //     // const isAdmin = userInfoResponse.Data?.records[0]?.roleList[0]?.admin === 1
+        //     // console.log('[LoginPage] 当前用户是否为超级管理员:', isAdmin)
+        //     const userInfo = userInfoResponse.Data?.records[0]
+        //     console.log('原始用户信息', userInfo)
+        //     console.log('原始用户信息', userInfoResponse.Data)
+
+        //     // 使用 hook 检查管理员权限
+        //     checkIsAdmin(userInfo)
+
+        //     // 提取权限信息
+        //     const menuPermissions =
+        //       userInfo.roleList?.reduce(
+        //         (acc, role) => {
+        //           const roleMenus =
+        //             role.menuList?.map((menu) => ({
+        //               menu: menu,
+        //               buttons: menu.buttonList || []
+        //             })) || []
+        //           return [...acc, ...roleMenus]
+        //         },
+        //         [] as Array<{ menu: any; buttons: any[] }>
+        //       ) || []
+
+        //     // 使用 Map 去重，以 menu.uid 为 key
+        //     const uniqueMenus = Array.from(new Map(menuPermissions.map((item) => [item.menu.uid, item])).values())
+        //     console.log('处理后的权限信息', uniqueMenus)
+        //     // 存储用户信息和权限
+        //     localStorage.setItem('userInfo', JSON.stringify(userInfo))
+        //     localStorage.setItem('menuPermissions', JSON.stringify(uniqueMenus))
+        //     // localStorage.setItem('isAdmin', String(isAdmin))
+        //     // 使用更友好的成功提示
+        //     message.success({
+        //       content: `欢迎回来，${userInfo.name || '用户'}`,
+        //       duration: 2
+        //     })
+        //     // 登录成功后跳转到首页
+        //     window.location.href = '/#/' // 使用 hash 路由跳转到首页
+        //     // 直接更新认证状态，触发路由更新
+        //     setIsAuthenticated(true)
+        //   } else {
+        //     message.error({
+        //       content: '获取用户信息失败，请重试',
+        //       duration: 3
+        //     })
+        //     return
+        //   }
+        // } catch (error) {
+        //   console.error('获取用户信息失败:', error)
+        //   message.error({
+        //     content: '获取用户信息失败，请检查网络连接',
+        //     duration: 3
+        //   })
+        //   return
+        // }
+        // 替换原来的用户信息获取逻辑
         try {
-          message.loading('正在获取用户信息...', 0.5) // 添加加载提示
-          // 获取最新的用户信息
-          const userInfoResponse = await userApi.getUserInfo(response.Data.uid)
-          if (userInfoResponse.Code === 0) {
-            // 判断并打印是否为超级管理员
-            // const isAdmin = userInfoResponse.Data?.records[0]?.roleList[0]?.admin === 1
-            // console.log('[LoginPage] 当前用户是否为超级管理员:', isAdmin)
-            const userInfo = userInfoResponse.Data?.records[0]
-            console.log('原始用户信息', userInfo)
-
-            // 使用 hook 检查管理员权限
-            checkIsAdmin(userInfo)
-
-            // 提取权限信息
-            const menuPermissions =
-              userInfo.roleList?.reduce(
-                (acc, role) => {
-                  const roleMenus =
-                    role.menuList?.map((menu) => ({
-                      menu: menu,
-                      buttons: menu.buttonList || []
-                    })) || []
-                  return [...acc, ...roleMenus]
-                },
-                [] as Array<{ menu: any; buttons: any[] }>
-              ) || []
-
-            // 使用 Map 去重，以 menu.uid 为 key
-            const uniqueMenus = Array.from(new Map(menuPermissions.map((item) => [item.menu.uid, item])).values())
-            console.log('处理后的权限信息', uniqueMenus)
-            // 存储用户信息和权限
-            localStorage.setItem('userInfo', JSON.stringify(userInfo))
-            localStorage.setItem('menuPermissions', JSON.stringify(uniqueMenus))
-            // localStorage.setItem('isAdmin', String(isAdmin))
-            // 使用更友好的成功提示
-            message.success({
-              content: `欢迎回来，${userInfo.name || '用户'}`,
-              duration: 2
-            })
-            // 登录成功后跳转到首页
-            window.location.href = '/#/' // 使用 hash 路由跳转到首页
-            // 直接更新认证状态，触发路由更新
-            setIsAuthenticated(true)
-          } else {
-            message.error({
-              content: '获取用户信息失败，请重试',
-              duration: 3
-            })
-            return
-          }
-        } catch (error) {
-          console.error('获取用户信息失败:', error)
-          message.error({
-            content: '获取用户信息失败，请检查网络连接',
-            duration: 3
+          // 使用新的Hook获取用户信息
+          await fetchAndProcessUserInfo(response.Data.uid, {
+            showMessage: true,
+            redirectAfterSuccess: true,
+            redirectUrl: '/#/',
+            setIsAuthenticated
           })
-          return
+        } catch (error) {
+          console.error('登录过程中出错:', error)
         }
       } else {
         // 根据不同的错误码显示不同的错误信息

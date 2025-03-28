@@ -18,11 +18,10 @@ import path from 'node:path'
 
 import { RAGApplication, RAGApplicationBuilder, TextLoader } from '@llm-tools/embedjs'
 import type { ExtractChunkData } from '@llm-tools/embedjs-interfaces'
+import { LibSqlDb } from '@llm-tools/embedjs-libsql'
 import { SitemapLoader } from '@llm-tools/embedjs-loader-sitemap'
 import { WebLoader } from '@llm-tools/embedjs-loader-web'
 import { AzureOpenAiEmbeddings, OpenAiEmbeddings } from '@llm-tools/embedjs-openai'
-// import { LibSqlDb } from '@llm-tools/embedjs-libsql'
-import { QdrantDb } from '@llm-tools/embedjs-qdrant'
 import { addFileLoader } from '@main/loader'
 import { windowService } from '@main/services/WindowService'
 import { getInstanceName } from '@main/utils'
@@ -107,7 +106,7 @@ class KnowledgeService {
   }
 
   private getRagApplication = async ({
-    // id,
+    id,
     model,
     apiKey,
     apiVersion,
@@ -135,13 +134,7 @@ class KnowledgeService {
               batchSize
             })
       )
-      .setVectorDatabase(
-        new QdrantDb({
-          apiKey: '123456789',
-          url: 'http://192.168.0.123:6333/',
-          clusterName: 'star_charts'
-        })
-      )
+      .setVectorDatabase(new LibSqlDb({ path: path.join(this.storageDir, id) }))
       .build()
   }
 

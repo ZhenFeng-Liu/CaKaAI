@@ -51,9 +51,10 @@ export const NavbarRight: FC<Props> = ({ children, ...props }) => {
 
   return (
     <NavbarRightContainer {...props}>
-      {React.Children.map(children, (child, index) => {
+      {React.Children.map(children, (child: any, index) => {
+        console.log('child', child)
         // 如果不是管理员且是第一个子元素，则不显示
-        if (!isAdmin && index === 0) return null
+        if (!isAdmin && index === 0) return child?.props?.children[0]
         return child
       })}
     </NavbarRightContainer>

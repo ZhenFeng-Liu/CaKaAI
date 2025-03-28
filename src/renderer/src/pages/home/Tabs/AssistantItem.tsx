@@ -5,6 +5,7 @@ import CopyIcon from '@renderer/components/Icons/CopyIcon'
 import { useAssistant } from '@renderer/hooks/useAssistant'
 import { modelGenerating } from '@renderer/hooks/useRuntime'
 import { useSettings } from '@renderer/hooks/useSettings'
+// import useUserInfo from '@renderer/hooks/useUserInfo'
 import AssistantSettingsPopup from '@renderer/pages/settings/AssistantSettings'
 import { getDefaultModel, getDefaultTopic } from '@renderer/services/AssistantService'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
@@ -24,14 +25,42 @@ interface AssistantItemProps {
   onCreateDefaultAssistant: () => void
   addAgent: (agent: any) => void
   addAssistant: (assistant: Assistant) => void
+  // ... 现有的 props
+  refreshUserInfo: () => Promise<void>
+  refreshAssistants: () => Promise<void>
 }
 import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
-const AssistantItem: FC<AssistantItemProps> = ({ assistant, isActive, onSwitch, onDelete, addAgent, addAssistant }) => {
+const AssistantItem: FC<AssistantItemProps> = ({
+  assistant,
+  isActive,
+  onSwitch,
+  onDelete,
+  addAgent,
+  addAssistant,
+  // ... 其他 props
+  refreshUserInfo,
+  refreshAssistants
+}) => {
   const { t } = useTranslation()
   const { removeAllTopics } = useAssistant(assistant.id) // 使用当前助手的ID
   const { clickAssistantToShowTopic, topicPosition, showAssistantIcon } = useSettings()
   const defaultModel = getDefaultModel()
   const { isAdmin } = useAdminCheck()
+  // const { fetchAndProcessUserInfo } = useUserInfo()
+  // const refreshUserInfo = async () => {
+  //   // 假设我们已经知道当前用户的uid
+  //   const currentUserUid = JSON.parse(localStorage.getItem('userInfo') || '{}').uid
+
+  //   if (currentUserUid) {
+  //     await fetchAndProcessUserInfo(currentUserUid, {
+  //       showMessage: true,
+  //       redirectAfterSuccess: false,
+  //       onSuccess: (userInfo) => {
+  //         console.log('用户信息已更新', userInfo)
+  //       }
+  //     })
+  //   }
+  // }
   const getMenuItems = useCallback(
     (assistant: Assistant): ItemType[] => {
       const baseMenuItems: ItemType[] = [
@@ -107,6 +136,13 @@ const AssistantItem: FC<AssistantItemProps> = ({ assistant, isActive, onSwitch, 
                   content: response.Msg,
                   key: 'duplicate-assistant'
                 })
+
+                // 刷新用户信息
+                // 延迟执行刷新操作
+                setTimeout(async () => {
+                  await refreshUserInfo()
+                  await refreshAssistants()
+                }, 500)
               } else {
                 console.error('[AssistantItem] 复制助手失败:', response)
                 window.message.error({
@@ -154,6 +190,12 @@ const AssistantItem: FC<AssistantItemProps> = ({ assistant, isActive, onSwitch, 
               content: t('assistants.save.success'),
               key: 'save-to-agent'
             })
+
+            // 刷新用户信息
+            setTimeout(async () => {
+              await refreshUserInfo()
+              // await refreshAssistants()
+            }, 500)
           }
         },
         { type: 'divider' },
@@ -171,7 +213,7 @@ const AssistantItem: FC<AssistantItemProps> = ({ assistant, isActive, onSwitch, 
               onOk: async () => {
                 try {
                   console.log('[AssistantItem] 准备删除助手:', assistant)
-                  const response = await helperApi.delete({ uid: assistant.uid })
+                  const response = await helperApi.delete({ uid: Number(assistant.uid) })
                   console.log('[AssistantItem] 删除助手API响应:', response)
 
                   if (response && response.Code === 0) {
@@ -182,6 +224,13 @@ const AssistantItem: FC<AssistantItemProps> = ({ assistant, isActive, onSwitch, 
                       content: response.Msg || t('assistants.delete.success'),
                       key: 'delete-assistant'
                     })
+
+                    // 刷新用户信息
+                    // 延迟执行刷新操作
+                    setTimeout(async () => {
+                      await refreshUserInfo()
+                      // await refreshAssistants()
+                    }, 500)
                   } else {
                     console.error('[AssistantItem] 删除助手失败:', response)
                     window.message.error({

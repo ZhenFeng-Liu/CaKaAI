@@ -27,9 +27,10 @@ class FileManager {
   }
 
   static async uploadFile(file: FileType): Promise<FileType> {
-    console.debug(`[FileManager] Uploading file: ${JSON.stringify(file)}`)
+    console.log(`[FileManager] Uploading file: ${JSON.stringify(file)}`)
 
     const uploadFile = await window.api.file.upload(file)
+    console.log(`[FileManager] Uploaded file: ${JSON.stringify(uploadFile)}`)
     const fileRecord = await db.files.get(uploadFile.id)
 
     if (fileRecord) {

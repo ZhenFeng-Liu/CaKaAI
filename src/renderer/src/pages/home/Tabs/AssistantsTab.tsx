@@ -1,10 +1,11 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { helperApi } from '@renderer/api/helper'
 import DragableList from '@renderer/components/DragableList'
 import Scrollbar from '@renderer/components/Scrollbar'
 import { useAgents } from '@renderer/hooks/useAgents'
 import { useAssistants } from '@renderer/hooks/useAssistant'
+import useUserInfo from '@renderer/hooks/useUserInfo'
 import { Assistant } from '@renderer/types'
+import { extractUniqueHelpers, getHelpersSummary } from '@renderer/utils/helperUtils'
 import { FC, useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -15,6 +16,9 @@ interface AssistantsTabProps {
   setActiveAssistant: (assistant: Assistant) => void
   onCreateAssistant: () => void
   onCreateDefaultAssistant: () => void
+  // ... 现有的 props
+  refreshUserInfo: () => Promise<void>
+  refreshAssistants: () => Promise<void>
 }
 
 const Assistants: FC<AssistantsTabProps> = ({
@@ -27,34 +31,76 @@ const Assistants: FC<AssistantsTabProps> = ({
   const [dragging, setDragging] = useState(false)
   const { addAgent } = useAgents()
   const { t } = useTranslation()
+  const { fetchAndProcessUserInfo } = useUserInfo()
   console.log('[AssistantsTab666] assistants:', assistants)
-  const [, setIsLoading] = useState(false)
-  // 从API获取助手数据并更新状态
-  useEffect(() => {
-    const fetchAssistantsData = async () => {
+  // const [, setIsLoading] = useState(false)
+  const refreshUserInfo = async () => {
+    // 假设我们已经知道当前用户的uid
+    const currentUserUid = JSON.parse(localStorage.getItem('userInfo') || '{}').uid
+    console.log('currentUserUid:', currentUserUid)
+    if (currentUserUid) {
+      await fetchAndProcessUserInfo(currentUserUid, {
+        showMessage: false,
+        redirectAfterSuccess: false,
+        onSuccess: (userInfo) => {
+          console.log('用户信息已更新', userInfo)
+        }
+      })
+    }
+  }
+
+  const fetchAssistantsData = async () => {
+    console.log(localStorage.getItem('userInfo'))
+    const userInfoStr = localStorage.getItem('userInfo')
+    if (userInfoStr) {
       try {
-        // setIsLoading(true)
-        // 替换为实际的API端点
-        const response = await helperApi.query({})
-        console.log(response.Data.records)
-        const formattedAssistants = response.Data.records.map((record: any) => {
-          return {
-            ...record,
-            settings: {
-              ...(record.settings || {}),
-              streamOutput: record.settings?.streamOutput === 1 ? true : false
-            }
-          }
-        })
-        console.log('formattedAssistants:', formattedAssistants)
-        updateAssistants(formattedAssistants)
+        const userData = JSON.parse(userInfoStr)
+        // 提取并去重助手
+        const uniqueHelpers = extractUniqueHelpers(userData)
+        console.log('去重后的助手列表:', uniqueHelpers)
+        // updateAssistants(uniqueHelpers as unknown as Assistant[])
+        const mergedAssistants = Array.from(
+          new Map(
+            [
+              ...assistants.filter((assistant) => !uniqueHelpers.some((helper) => helper.id === assistant.id)),
+              ...(uniqueHelpers as unknown as Assistant[])
+            ].map((assistant) => [assistant.id, assistant])
+          ).values()
+        )
+        console.log('合并后的助手列表:', mergedAssistants)
+        updateAssistants(mergedAssistants)
+        // 获取简要信息
+        const helpersSummary = getHelpersSummary(uniqueHelpers)
+        console.log('助手简要信息:', helpersSummary)
       } catch (error) {
-        console.error('获取助手数据出错:', error)
-      } finally {
-        setIsLoading(false)
+        console.error('解析用户数据失败:', error)
       }
     }
 
+    // try {
+    //   // setIsLoading(true)
+    //   // 替换为实际的API端点
+    //   const response = await helperApi.query({})
+    //   console.log(response.Data.records)
+    //   const formattedAssistants = response.Data.records.map((record: any) => {
+    //     return {
+    //       ...record,
+    //       settings: {
+    //         ...(record.settings || {}),
+    //         streamOutput: record.settings?.streamOutput === 1 ? true : false
+    //       }
+    //     }
+    //   })
+    //   console.log('formattedAssistants:', formattedAssistants)
+    //   updateAssistants(formattedAssistants)
+    // } catch (error) {
+    //   console.error('获取助手数据出错:', error)
+    // } finally {
+    //   setIsLoading(false)
+    // }
+  }
+  // 从API获取助手数据并更新状态
+  useEffect(() => {
     fetchAssistantsData()
   }, [])
 
@@ -100,6 +146,8 @@ const Assistants: FC<AssistantsTabProps> = ({
               addAssistant(assistant)
             }}
             onCreateDefaultAssistant={onCreateDefaultAssistant}
+            refreshUserInfo={refreshUserInfo} // 传递方法
+            refreshAssistants={fetchAssistantsData} // 传递方法
           />
         )}
       </DragableList>

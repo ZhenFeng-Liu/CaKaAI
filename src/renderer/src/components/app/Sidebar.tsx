@@ -141,7 +141,8 @@ const MainMenus: FC = () => {
     translate: '翻译',
     minapp: '小程序',
     knowledge: '知识库',
-    files: '文件'
+    files: '文件',
+    aiimages: 'AI图像' // 添加这一行
   }
   // 过滤有权限的菜单
   const authorizedIcons = sidebarIcons.visible.filter((icon) => checkMenuPermission(menuPermissionMap[icon]))
@@ -152,7 +153,8 @@ const MainMenus: FC = () => {
     translate: <TranslationOutlined />,
     minapp: <i className="iconfont icon-appstore" />,
     knowledge: <FileSearchOutlined />,
-    files: <FolderOutlined />
+    files: <FolderOutlined />,
+    aiimages: <i className="iconfont icon-image" /> // 添加这一行，使用适当的图标
   }
 
   const pathMap = {
@@ -162,7 +164,8 @@ const MainMenus: FC = () => {
     translate: '/translate',
     minapp: '/apps',
     knowledge: '/knowledge',
-    files: '/files'
+    files: '/files',
+    aiimages: '/aiimages' // 添加这一行
   }
 
   // return sidebarIcons.visible.map((icon) => {

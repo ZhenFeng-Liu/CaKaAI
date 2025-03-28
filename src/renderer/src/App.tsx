@@ -3,6 +3,8 @@ import '@renderer/databases'
 import { knowledgeApi } from '@renderer/api/knowledge'
 import { providerApi } from '@renderer/api/provider'
 import AuthRoute from '@renderer/components/AuthRoute'
+import MinApp from '@renderer/components/MinApp'
+import { AppLogo } from '@renderer/config/env' // 根据实际路径调整
 import { useProviders } from '@renderer/hooks/useProvider'
 import store, { persistor } from '@renderer/store'
 import { Provider as ProviderType } from '@renderer/types'
@@ -21,16 +23,31 @@ import { SyntaxHighlighterProvider } from './context/SyntaxHighlighterProvider'
 import { ThemeProvider } from './context/ThemeProvider'
 import NavigationHandler from './handler/NavigationHandler'
 import AgentsPage from './pages/agents/AgentsPage'
+import AIimagesPage from './pages/aiimages/AIimagesPage'
 import AppsPage from './pages/apps/AppsPage'
 import FilesPage from './pages/files/FilesPage'
 import HomePage from './pages/home/HomePage'
 import KnowledgePage from './pages/knowledge/KnowledgePage'
 import LoginPage from './pages/login/LoginPage'
-import PaintingsPage from './pages/paintings/PaintingsPage'
 import MemberPage from './pages/settings/MembersSettings/MemberPage'
 import RolePage from './pages/settings/MembersSettings/RolePage'
 import SettingsPage from './pages/settings/SettingsPage'
 import TranslatePage from './pages/translate/TranslatePage'
+const AIPainting: FC = () => {
+  // useEffect(() => {
+  //   window.open('http://192.168.0.123:8188', '_blank')
+  // }, [])
+  // return <div>正在跳转...</div>
+  useEffect(() => {
+    MinApp.start({
+      id: 'baidu-sd',
+      name: 'AI 绘画',
+      url: 'http://192.168.0.123:8188',
+      logo: AppLogo // 需要导入 AppLogo 或使用其他合适的图标
+    })
+  }, [])
+  return null
+}
 const MainContent: FC = () => {
   return (
     <>
@@ -71,11 +88,19 @@ const MainContent: FC = () => {
                           </AuthRoute>
                         }
                       />
-                      <Route
+                      {/* <Route
                         path="/paintings"
                         element={
                           <AuthRoute menuName="文生图">
                             <PaintingsPage />
+                          </AuthRoute>
+                        }
+                      /> */}
+                      <Route
+                        path="/paintings"
+                        element={
+                          <AuthRoute menuName="文生图">
+                            <AIPainting />
                           </AuthRoute>
                         }
                       />
@@ -108,6 +133,14 @@ const MainContent: FC = () => {
                         element={
                           <AuthRoute menuName="文件">
                             <FilesPage />
+                          </AuthRoute>
+                        }
+                      />
+                      <Route
+                        path="/aiimages"
+                        element={
+                          <AuthRoute menuName="AI图像">
+                            <AIimagesPage />
                           </AuthRoute>
                         }
                       />
