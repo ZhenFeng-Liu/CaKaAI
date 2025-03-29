@@ -101,7 +101,12 @@ const Assistants: FC<AssistantsTabProps> = ({
   }
   // 从API获取助手数据并更新状态
   useEffect(() => {
-    fetchAssistantsData()
+    const init = async () => {
+      await refreshUserInfo()
+      await fetchAssistantsData()
+    }
+
+    init()
   }, [])
 
   // 监听助手创建事件

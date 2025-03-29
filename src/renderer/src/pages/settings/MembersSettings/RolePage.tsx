@@ -1,4 +1,4 @@
-import { ExclamationCircleOutlined } from '@ant-design/icons'
+import { ExclamationCircleOutlined, RollbackOutlined } from '@ant-design/icons'
 import { menuApi } from '@renderer/api/menu'
 import { roleApi, RoleMenuButtonParams } from '@renderer/api/role'
 import { AddRoleParams, RoleData } from '@renderer/api/role'
@@ -6,8 +6,8 @@ import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
 import { Button, Checkbox, Form, Input, message, Modal, Pagination, Radio, Space, Table, Tooltip } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-
 interface TableRoleData {
   key: string
   roleName: string
@@ -400,7 +400,13 @@ const RolePage: FC = () => {
     })
     fetchRoleList(value, 1, pagination.pageSize)
   }
+  // ... 现有代码 ...
+  const navigate = useNavigate()
 
+  // 返回上一页函数
+  const handleGoBack = () => {
+    navigate(-1)
+  }
   return (
     <Container>
       <Navbar>
@@ -409,6 +415,7 @@ const RolePage: FC = () => {
       <ContentContainer id="content-container">
         <Header>
           <SearchArea>
+            <Button onClick={handleGoBack} icon={<RollbackOutlined />}></Button>
             <Input.Search
               placeholder="请输入角色名称"
               style={{ width: 200 }}
@@ -594,9 +601,13 @@ const SearchArea = styled.div`
 `
 // 添加分页容器样式
 const PaginationContainer = styled.div`
+  position: sticky;
+  // bottom: 16px;
   display: flex;
   justify-content: flex-end;
-  margin-top: 16px;
-  padding: 0 16px 16px 0;
+  padding: 8px 16px;
+  margin-top: auto;
+  background-color: var(--color-background);
+  z-index: 10;
 `
 export default RolePage

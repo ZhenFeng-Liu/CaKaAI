@@ -4,6 +4,7 @@ import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 import { useAssistants, useDefaultAssistant } from '@renderer/hooks/useAssistant'
 import { useSettings } from '@renderer/hooks/useSettings'
 import { useShowTopics } from '@renderer/hooks/useStore'
+import useUserInfo from '@renderer/hooks/useUserInfo'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
 import { Assistant, Topic } from '@renderer/types'
 import { uuid } from '@renderer/utils'
@@ -34,7 +35,7 @@ const HomeTabs: FC<Props> = ({ activeAssistant, activeTopic, setActiveAssistant,
   const { topicPosition } = useSettings()
   const { defaultAssistant } = useDefaultAssistant()
   const { toggleShowTopics } = useShowTopics()
-
+  const { fetchAndProcessUserInfo } = useUserInfo()
   const { t } = useTranslation()
   const { isAdmin } = useAdminCheck()
   const borderStyle = '0.5px solid var(--color-border)'
@@ -63,7 +64,22 @@ const HomeTabs: FC<Props> = ({ activeAssistant, activeTopic, setActiveAssistant,
     addAssistant(assistant)
     setActiveAssistant(assistant)
   }
-
+  // 添加刷新用户信息方法
+  const refreshUserInfo = async () => {
+    const currentUserUid = JSON.parse(localStorage.getItem('userInfo') || '{}').uid
+    if (currentUserUid) {
+      await fetchAndProcessUserInfo(currentUserUid, {
+        showMessage: false,
+        redirectAfterSuccess: false
+      })
+    }
+  }
+  // 添加刷新助手方法
+  const refreshAssistants = async () => {
+    // 实现刷新助手的逻辑
+    // 可以是空函数或简单实现
+    console.log('刷新助手列表')
+  }
   useEffect(() => {
     const unsubscribes = [
       EventEmitter.on(EVENT_NAMES.SHOW_ASSISTANTS, (): any => {
@@ -126,6 +142,8 @@ const HomeTabs: FC<Props> = ({ activeAssistant, activeTopic, setActiveAssistant,
             setActiveAssistant={setActiveAssistant}
             onCreateAssistant={onCreateAssistant}
             onCreateDefaultAssistant={onCreateDefaultAssistant}
+            refreshUserInfo={refreshUserInfo}
+            refreshAssistants={refreshAssistants}
           />
         )}
         {tab === 'topic' && (

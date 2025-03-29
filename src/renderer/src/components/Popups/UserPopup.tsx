@@ -199,6 +199,10 @@ const PopupContainer: React.FC<Props> = ({ resolve }) => {
       localStorage.removeItem('userInfo')
       // 清除本地菜单权限
       localStorage.removeItem('menuPermissions')
+      // 清除本地tavily_api_key
+      localStorage.removeItem('tavily_api_key')
+      // 清除本地isAdmin
+      localStorage.removeItem('isAdmin')
       // 显示成功消息
       message.success('退出登录成功')
 

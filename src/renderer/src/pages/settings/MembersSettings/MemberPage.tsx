@@ -1,4 +1,4 @@
-import { ExclamationCircleOutlined } from '@ant-design/icons'
+import { ExclamationCircleOutlined, RollbackOutlined } from '@ant-design/icons'
 import { memberApi, MemberData } from '@renderer/api/member'
 import { roleApi } from '@renderer/api/role'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
@@ -6,8 +6,8 @@ import { Button, Checkbox, Form, Input, Modal, Pagination, Radio, Select, Space,
 import { message } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-
 interface MemberType {
   key: string
   memberName: string
@@ -318,6 +318,11 @@ const MemberPage: FC = () => {
     try {
       const values = await editForm.validateFields()
       if (currentMember) {
+        // 检查新账号是否与当前账号相同
+        if (values.newAccountNo === currentMember.accountNo) {
+          message.error('新账号不能与当前账号相同')
+          return
+        }
         await memberApi.update({
           uid: currentMember.uid,
           name: values.newAccountNo
@@ -385,7 +390,7 @@ const MemberPage: FC = () => {
       setAddMemberVisible(false)
       fetchMemberList()
     } catch (error) {
-      message.error('添加会员失败')
+      message.error('会员账号已存在，请更改后再试')
     }
   }
 
@@ -397,7 +402,13 @@ const MemberPage: FC = () => {
     })
     setEditModalVisible(true)
   }
+  // ... 现有代码 ...
+  const navigate = useNavigate()
 
+  // 返回上一页函数
+  const handleGoBack = () => {
+    navigate(-1)
+  }
   return (
     <Container>
       <Navbar>
@@ -406,6 +417,8 @@ const MemberPage: FC = () => {
       <ContentContainer id="content-container">
         <Header>
           <SearchArea>
+            <Button onClick={handleGoBack} icon={<RollbackOutlined />}></Button>
+
             <Input
               placeholder="请输入会员姓名"
               value={searchName}
@@ -696,9 +709,13 @@ const SearchArea = styled.div`
 
 // 添加分页容器样式
 const PaginationContainer = styled.div`
+  position: sticky;
+  // bottom: 16px;
   display: flex;
   justify-content: flex-end;
-  margin-top: 16px;
-  padding: 0 16px 16px 0;
+  padding: 8px 16px;
+  margin-top: auto;
+  background-color: var(--color-background);
+  z-index: 10;
 `
 export default MemberPage
