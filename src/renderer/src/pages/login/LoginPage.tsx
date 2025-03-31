@@ -22,6 +22,7 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
   const [mounted, setMounted] = useState(false)
   // const { checkIsAdmin } = useAdminCheck() // 添加这行
   const { fetchAndProcessUserInfo } = useUserInfo()
+
   useEffect(() => {
     setMounted(true)
     return () => setMounted(false)
@@ -105,10 +106,24 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
           // 使用新的Hook获取用户信息
           await fetchAndProcessUserInfo(response.Data.uid, {
             showMessage: true,
-            redirectAfterSuccess: true,
-            redirectUrl: '/#/',
+            redirectAfterSuccess: false, // 修改为false，由我们自己控制重定向
             setIsAuthenticated
           })
+
+          // 设置认证状态
+          setIsAuthenticated(true)
+
+          // 使用更可靠的重定向方法
+          console.log('执行重定向到首页')
+
+          // 先清除可能的历史状态
+          window.history.replaceState(null, '', window.location.origin)
+
+          // 使用延迟确保状态已更新
+          setTimeout(() => {
+            // 使用 window.location.replace 替换当前历史记录
+            window.location.replace(window.location.origin + '/#/')
+          }, 100)
         } catch (error) {
           console.error('登录过程中出错:', error)
         }

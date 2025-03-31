@@ -55,6 +55,9 @@ export const NavbarRight: FC<Props> = ({ children, ...props }) => {
         console.log('child', child)
         // 如果不是管理员且是第一个子元素，则不显示
         if (!isAdmin && index === 0) return child?.props?.children[0]
+
+        // 如果不是管理员且是第二个子元素，则不显示
+        if (!isAdmin && index === 1) return child?.props?.children[1]
         return child
       })}
     </NavbarRightContainer>

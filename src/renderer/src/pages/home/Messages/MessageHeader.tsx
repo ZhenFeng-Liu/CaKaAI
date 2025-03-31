@@ -1,6 +1,6 @@
 import UserPopup from '@renderer/components/Popups/UserPopup'
 import { APP_NAME, AppLogo, isLocalAi } from '@renderer/config/env'
-import { startMinAppById } from '@renderer/config/minapps'
+// import { startMinAppById } from '@renderer/config/minapps'
 import { getModelLogo } from '@renderer/config/models'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import useAvatar from '@renderer/hooks/useAvatar'
@@ -44,7 +44,18 @@ const MessageHeader: FC<Props> = memo(({ assistant, model, message }) => {
       return getModelName(model) || getMessageModelId(message) || ''
     }
 
-    return userName || t('common.you')
+    // return userName || t('common.you')
+    return (
+      userName ||
+      (() => {
+        try {
+          const userInfoStr = localStorage.getItem('userInfo')
+          return userInfoStr ? JSON.parse(userInfoStr).name : t('common.you')
+        } catch (e) {
+          return t('common.you')
+        }
+      })()
+    )
   }, [message, model, t, userName])
 
   const isAssistantMessage = message.role === 'assistant'
@@ -53,9 +64,9 @@ const MessageHeader: FC<Props> = memo(({ assistant, model, message }) => {
   const avatarName = useMemo(() => firstLetter(assistant?.name).toUpperCase(), [assistant?.name])
   const username = useMemo(() => removeLeadingEmoji(getUserName()), [getUserName])
 
-  const showMiniApp = useCallback(() => {
-    showMinappIcon && model?.provider && startMinAppById(model.provider)
-  }, [model?.provider, showMinappIcon])
+  // const showMiniApp = useCallback(() => {
+  //   showMinappIcon && model?.provider && startMinAppById(model.provider)
+  // }, [model?.provider, showMinappIcon])
 
   const avatarStyle: CSSProperties | undefined = isBubbleStyle
     ? {
@@ -77,7 +88,8 @@ const MessageHeader: FC<Props> = memo(({ assistant, model, message }) => {
               border: isLocalAi ? '1px solid var(--color-border-soft)' : 'none',
               filter: theme === 'dark' ? 'invert(0.05)' : undefined
             }}
-            onClick={showMiniApp}>
+            // onClick={showMiniApp}
+          >
             {avatarName}
           </Avatar>
         ) : (

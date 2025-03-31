@@ -15,6 +15,7 @@ import { UploadOutlined } from '@ant-design/icons'
 import SelectModelPopup from '@renderer/components/Popups/SelectModelPopup'
 import TextEditPopup from '@renderer/components/Popups/TextEditPopup'
 import { TranslateLanguageOptions } from '@renderer/config/translate'
+import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 import { modelGenerating } from '@renderer/hooks/useRuntime'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
 import { getMessageTitle, resetAssistantMessage } from '@renderer/services/MessagesService'
@@ -38,7 +39,6 @@ import { isEmpty } from 'lodash'
 import { FC, useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-
 interface Props {
   message: Message
   assistantModel?: Model
@@ -309,7 +309,7 @@ const MessageMenubar: FC<Props> = (props) => {
     },
     [message, onEditMessage]
   )
-
+  const { isAdmin } = useAdminCheck()
   return (
     <MenusBar className={`menubar ${isLastMessage && 'show'}`}>
       {message.role === 'user' && (
@@ -346,7 +346,7 @@ const MessageMenubar: FC<Props> = (props) => {
           </Tooltip>
         </Popconfirm>
       )}
-      {isAssistantMessage && (
+      {isAssistantMessage && isAdmin && (
         <Tooltip title={t('message.mention.title')} mouseEnterDelay={0.8}>
           <ActionButton className="message-action-button" onClick={onMentionModel}>
             <i className="iconfont icon-at" style={{ fontSize: 16 }}></i>
