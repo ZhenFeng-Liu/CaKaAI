@@ -1,27 +1,98 @@
 import { SearchOutlined } from '@ant-design/icons'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
 import { Center } from '@renderer/components/Layout'
+import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 import { useMinapps } from '@renderer/hooks/useMinapps'
 import { Empty, Input } from 'antd'
 import { isEmpty } from 'lodash'
-import React, { FC, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import App from './App'
 
 // 定义应用分类与对应的应用ID
-const APP_CATEGORIES = {
-  AI对话工具: ['doubao', 'deepseek', 'dashscope', 'tencent-yuanbao', 'baidu-ai-chat', 'anthropic', 'openai', 'gemini'],
-  AI图像视频: ['tongyi-wanxiang', 'jimeng', 'leonardo'],
-  AI办公软件: ['moonshot', 'yi', 'wpslingxi'],
-  AI编程工具: ['github-copilot', 'devv', 'coze', 'dify']
+const STATIC_APP_CATEGORIES = {
+  // AI对话工具: ['doubao', 'deepseek', 'dashscope', 'tencent-yuanbao', 'baidu-ai-chat', 'anthropic', 'openai', 'gemini'],
+  // AI图像视频: ['tongyi-wanxiang', 'jimeng', 'leonardo'],
+  // AI办公软件: ['moonshot', 'yi', 'wpslingxi', 'xmind'],
+  // AI编程工具: ['github-copilot', 'devv', 'coze', 'dify']
 }
+// 解析用户信息和应用列表
+const getUserApps = () => {
+  try {
+    const userInfoStr = localStorage.getItem('userInfo')
+    if (!userInfoStr) return []
+
+    const userInfo = JSON.parse(userInfoStr)
+    // 获取用户角色列表中的第一个角色
+    const role = userInfo.roleList?.[0]
+    if (!role) return []
+
+    // 获取菜单列表中的"小程序"菜单
+    const appMenu = role.menuList?.find((menu) => menu.menu === '小程序')
+    if (!appMenu || !appMenu.buttonList) return []
+
+    // 返回按钮列表
+    return appMenu.buttonList.filter((button) => button.enable === 1)
+  } catch (error) {
+    console.error('解析用户应用列表失败:', error)
+    return []
+  }
+}
+
+// 获取用户应用列表
+const userApps = getUserApps()
+console.log('用户应用列表:', userApps)
+
+// 根据用户应用列表生成动态的APP_CATEGORIES
+const generateDynamicCategories = (apps) => {
+  const dynamicCategories = {}
+
+  // 遍历用户应用，按info(分类)进行分组
+  apps.forEach((app) => {
+    if (app.info) {
+      if (!dynamicCategories[app.info]) {
+        dynamicCategories[app.info] = []
+      }
+      // 使用应用名称作为ID，因为用户应用可能没有ID
+      dynamicCategories[app.info].push(app.name.toLowerCase())
+    }
+  })
+
+  // 如果没有任何分类，使用静态分类
+  if (Object.keys(dynamicCategories).length === 0) {
+    return STATIC_APP_CATEGORIES
+  }
+
+  return dynamicCategories
+}
+
+// 生成动态分类
+const APP_CATEGORIES = generateDynamicCategories(userApps)
+console.log('动态应用分类:', APP_CATEGORIES)
 
 const AppsPage: FC = () => {
   const { t } = useTranslation()
   const [search, setSearch] = useState('')
   const { minapps } = useMinapps()
+  const { isAdmin } = useAdminCheck()
+
+  // 将用户应用列表和动态分类的获取移到组件内部
+  const [, setUserApps] = useState([])
+  const [appCategories, setAppCategories] = useState<Record<string, string[]>>(STATIC_APP_CATEGORIES)
+
+  // 使用useEffect在组件挂载和页面切换时获取用户应用列表
+  useEffect(() => {
+    const apps = getUserApps()
+    console.log('用户应用列表:', apps)
+    setUserApps(apps)
+
+    // 生成动态分类
+    const dynamicCategories = generateDynamicCategories(apps)
+    console.log('动态应用分类:', dynamicCategories)
+    setAppCategories(dynamicCategories)
+  }, []) // 空依赖数组表示仅在组件挂载时执行一次
 
   const filteredApps = search
     ? minapps.filter(
@@ -34,7 +105,7 @@ const AppsPage: FC = () => {
     const categorized: Record<string, typeof filteredApps> = {}
 
     // 初始化分类
-    Object.keys(APP_CATEGORIES).forEach((category) => {
+    Object.keys(appCategories).forEach((category) => {
       categorized[category] = []
     })
 
@@ -43,17 +114,52 @@ const AppsPage: FC = () => {
       let assigned = false
 
       // 尝试将应用分配到相应类别
-      for (const [category, appIds] of Object.entries(APP_CATEGORIES)) {
-        // 精准匹配应用ID
-        if (app.id && appIds.includes(app.id as string)) {
+      // for (const [category, appIds] of Object.entries(APP_CATEGORIES)) {
+      //   // 精准匹配应用ID
+      //   if (app.id && appIds.includes(app.id as string)) {
+      //     categorized[category].push(app)
+      //     assigned = true
+      //     break
+      //   }
+      // }
+
+      // 1. 首先尝试通过ID精确匹配
+      // if (app.id && appIdToCategoryMap[app.id as string]) {
+      //   const category = appIdToCategoryMap[app.id as string]
+      //   categorized[category].push(app)
+      //   assigned = true
+      // }
+      // // 2. 然后尝试通过名称匹配用户自定义分类
+      // else if (app.name && userCategoryMap[app.name.toLowerCase()]) {
+      //   const category = userCategoryMap[app.name.toLowerCase()]
+      //   if (!categorized[category]) {
+      //     categorized[category] = []
+      //   }
+      //   categorized[category].push(app)
+      //   assigned = true
+      // }
+
+      // 遍历所有分类
+      for (const [category, appIds] of Object.entries(appCategories)) {
+        // 尝试通过ID匹配
+        // 添加类型断言，确保TypeScript知道appIds是字符串数组
+        const appIdList = appIds as string[]
+        if (app.id && appIdList.includes(app.id as string)) {
+          categorized[category].push(app)
+          assigned = true
+          break
+        }
+
+        // 尝试通过名称匹配
+        if (app.name && appIdList.includes(app.name.toLowerCase())) {
           categorized[category].push(app)
           assigned = true
           break
         }
       }
-
-      // 如果没有匹配的类别，创建"其他"类别
-      if (!assigned) {
+      // 如果没有匹配的类别，创建"其他"类别(仅管理员可见)
+      // 添加管理员判断
+      if (!assigned && isAdmin) {
         if (!categorized['其他']) {
           categorized['其他'] = []
         }

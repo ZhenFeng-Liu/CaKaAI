@@ -39,6 +39,7 @@ import TiangongAiLogo from '@renderer/assets/images/apps/tiangong.png?url'
 import WanZhiAppLogo from '@renderer/assets/images/apps/wanzhi.jpg?url'
 import WPSLingXiLogo from '@renderer/assets/images/apps/wpslingxi.webp?url'
 import XiaoYiAppLogo from '@renderer/assets/images/apps/xiaoyi.webp?url'
+import XmindLogo from '@renderer/assets/images/apps/Xmind.png?url'
 import YouLogo from '@renderer/assets/images/apps/you.jpg?url'
 import TencentYuanbaoAppLogo from '@renderer/assets/images/apps/yuanbao.webp?url'
 import YuewenAppLogo from '@renderer/assets/images/apps/yuewen.png?url'
@@ -417,6 +418,13 @@ export const DEFAULT_MIN_APPS: MinAppType[] = [
     name: '即梦AI',
     logo: JimengLogo,
     url: 'https://jimeng.jianying.com/',
+    bodered: true
+  },
+  {
+    id: 'xmind',
+    name: 'Xmind.ai',
+    logo: XmindLogo,
+    url: 'https://xmind.ai/',
     bodered: true
   }
 ]

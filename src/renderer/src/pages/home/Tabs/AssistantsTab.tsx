@@ -52,6 +52,9 @@ const Assistants: FC<AssistantsTabProps> = ({
   const fetchAssistantsData = async () => {
     console.log(localStorage.getItem('userInfo'))
     const userInfoStr = localStorage.getItem('userInfo')
+    // 过滤出默认助手
+    const defaultAssistants = assistants.filter((assistant) => assistant.id === 'default')
+    console.log('defaultAssistants:', defaultAssistants)
     if (userInfoStr) {
       try {
         const userData = JSON.parse(userInfoStr)
@@ -68,7 +71,11 @@ const Assistants: FC<AssistantsTabProps> = ({
           ).values()
         )
         console.log('合并后的助手列表:', mergedAssistants)
-        updateAssistants(mergedAssistants)
+        if (uniqueHelpers.length > 0) {
+          updateAssistants(mergedAssistants)
+        } else {
+          updateAssistants(defaultAssistants)
+        }
         // 获取简要信息
         const helpersSummary = getHelpersSummary(uniqueHelpers)
         console.log('助手简要信息:', helpersSummary)

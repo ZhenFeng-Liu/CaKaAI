@@ -460,7 +460,14 @@ export const SYSTEM_MODELS: Record<string, Model[]> = {
       group: '嵌入模型'
     }
   ],
-  ollama: [],
+  ollama: [
+    {
+      id: 'deepseek-r1:14b',
+      provider: 'ollama',
+      name: 'deepseek-r1:14b',
+      group: 'deepseek-ai'
+    }
+  ],
   lmstudio: [],
   silicon: [
     {

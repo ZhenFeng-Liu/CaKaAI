@@ -22,9 +22,11 @@ export interface LlmState {
 }
 
 const initialState: LlmState = {
-  defaultModel: SYSTEM_MODELS.silicon[1],
-  topicNamingModel: SYSTEM_MODELS.silicon[2],
-  translateModel: SYSTEM_MODELS.silicon[3],
+  // 将默认模型从 SYSTEM_MODELS.silicon[1] 更改为您想要的模型
+  // 例如，更改为 SYSTEM_MODELS.silicon[0] 或其他提供商的模型
+  defaultModel: SYSTEM_MODELS.ollama[0], // deepseek-r1:14b | Ollama
+  topicNamingModel: SYSTEM_MODELS.ollama[0], // deepseek-r1:14b | Ollama
+  translateModel: SYSTEM_MODELS.silicon[1], // deepseek-ai/DeepSeek-V3 | 硅基流动
   providers: [
     {
       id: 'silicon',
@@ -94,7 +96,7 @@ const initialState: LlmState = {
       apiHost: 'http://localhost:11434',
       models: SYSTEM_MODELS.ollama,
       isSystem: true,
-      enabled: false
+      enabled: true
     },
     {
       id: 'lmstudio',
@@ -430,17 +432,17 @@ const initialState: LlmState = {
   ],
   settings: {
     ollama: {
-      keepAliveTime: 0
+      keepAliveTime: 30000
     },
     lmstudio: {
-      keepAliveTime: 0
+      keepAliveTime: 30000
     }
   }
 }
 
 const getIntegratedInitialState = () => {
   const model = JSON.parse(import.meta.env.VITE_RENDERER_INTEGRATED_MODEL)
-
+  console.log('model', model)
   return {
     defaultModel: model,
     topicNamingModel: model,
@@ -458,10 +460,10 @@ const getIntegratedInitialState = () => {
     ],
     settings: {
       ollama: {
-        keepAliveTime: 3600
+        keepAliveTime: 30000
       },
       lmstudio: {
-        keepAliveTime: 3600
+        keepAliveTime: 30000
       }
     }
   } as LlmState
