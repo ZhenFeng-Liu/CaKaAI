@@ -66,9 +66,9 @@ const Assistants: FC<AssistantsTabProps> = ({
         const mergedAssistants = Array.from(
           new Map(
             [
-              ...assistants.filter((assistant) => !uniqueHelpers.some((helper) => helper.id === assistant.id)),
+              // ...assistants.filter((assistant) => !uniqueHelpers.some((helper: any) => helper.uid === assistant.uid)),
               ...(uniqueHelpers as unknown as Assistant[])
-            ].map((assistant) => [assistant.id, assistant])
+            ].map((assistant) => [assistant.uid, assistant])
           ).values()
         )
         console.log('合并后的助手列表:', mergedAssistants)

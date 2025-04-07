@@ -79,7 +79,7 @@ const HeaderNavbar: FC<Props> = ({ activeAssistant }) => {
             style={{ marginRight: 10, cursor: 'pointer' }}
             className="nodrag"
             onClick={() => AssistantSettingsPopup.show({ assistant })}>
-            {assistant.name}
+            {/* {assistant.name} */}
           </TitleText>
           <SelectModelButton assistant={assistant} />
         </HStack>

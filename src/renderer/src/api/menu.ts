@@ -45,7 +45,7 @@ export const menuApi = {
       label: item.menu,
       enable: item.enable === 1,
       buttons:
-        item.buttonList?.[0]?.map((btn) => ({
+        item.Buttons.map((btn: any) => ({
           key: btn.uid,
           label: btn.name,
           enable: btn.enable === 1,

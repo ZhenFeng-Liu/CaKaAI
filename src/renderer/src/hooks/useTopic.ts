@@ -11,13 +11,13 @@ let _activeTopic: Topic
 
 export function useActiveTopic(_assistant: Assistant, topic?: Topic) {
   const { assistant } = useAssistant(_assistant.id)
-  const [activeTopic, setActiveTopic] = useState(topic || _activeTopic || assistant?.topics[0])
+  const [activeTopic, setActiveTopic] = useState(topic || _activeTopic || assistant?.topics?.[0])
 
   _activeTopic = activeTopic
 
   useEffect(() => {
     // activeTopic not in assistant.topics
-    if (assistant && !find(assistant.topics, { id: activeTopic?.id })) {
+    if (assistant?.topics && !find(assistant.topics, { id: activeTopic?.id })) {
       setActiveTopic(assistant.topics[0])
     }
   }, [activeTopic?.id, assistant])
@@ -26,17 +26,17 @@ export function useActiveTopic(_assistant: Assistant, topic?: Topic) {
 }
 
 export function useTopic(assistant: Assistant, topicId?: string) {
-  return assistant?.topics.find((topic) => topic.id === topicId)
+  return assistant?.topics?.find((topic) => topic.id === topicId)
 }
 
 export function getTopic(assistant: Assistant, topicId: string) {
-  return assistant?.topics.find((topic) => topic.id === topicId)
+  return assistant?.topics?.find((topic) => topic.id === topicId)
 }
 
 export async function getTopicById(topicId: string) {
   const assistants = store.getState().assistants.assistants
   const topics = assistants.map((assistant) => assistant.topics).flat()
-  const topic = topics.find((topic) => topic.id === topicId)
+  const topic = topics.find((topic) => topic?.id === topicId)
   const messages = await TopicManager.getTopicMessages(topicId)
   return { ...topic, messages } as Topic
 }

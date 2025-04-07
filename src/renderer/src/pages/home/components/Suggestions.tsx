@@ -27,7 +27,7 @@ const Suggestions: FC<Props> = ({ assistant, messages }) => {
       role: 'user',
       content: s.content,
       assistantId: assistant.id,
-      topicId: assistant.topics[0].id || uuid(),
+      topicId: assistant.topics?.[0]?.id || uuid(),
       createdAt: dayjs().format('YYYY-MM-DD HH:mm:ss'),
       type: 'text',
       status: 'success'

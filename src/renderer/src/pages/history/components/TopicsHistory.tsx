@@ -24,11 +24,11 @@ const TopicsHistory: React.FC<Props> = ({ keywords, onClick, onSearch, ...props 
   const topics = orderBy(assistants.map((assistant) => assistant.topics).flat(), 'createdAt', 'desc')
 
   const filteredTopics = topics.filter((topic) => {
-    return topic.name.toLowerCase().includes(keywords.toLowerCase())
+    return topic?.name.toLowerCase().includes(keywords.toLowerCase())
   })
 
   const groupedTopics = groupBy(filteredTopics, (topic) => {
-    return dayjs(topic.createdAt).format('MM/DD')
+    return dayjs(topic?.createdAt).format('MM/DD')
   })
 
   if (isEmpty(filteredTopics)) {
@@ -53,13 +53,13 @@ const TopicsHistory: React.FC<Props> = ({ keywords, onClick, onSearch, ...props 
             <Divider style={{ margin: '5px 0' }} />
             {items.map((topic) => (
               <TopicItem
-                key={topic.id}
+                key={topic?.id}
                 onClick={async () => {
-                  const _topic = await getTopicById(topic.id)
+                  const _topic = await getTopicById(topic?.id || '')
                   onClick(_topic)
                 }}>
-                <TopicName>{topic.name.substring(0, 50)}</TopicName>
-                <TopicDate>{dayjs(topic.updatedAt).format('HH:mm')}</TopicDate>
+                <TopicName>{topic?.name.substring(0, 50)}</TopicName>
+                <TopicDate>{dayjs(topic?.updatedAt).format('HH:mm')}</TopicDate>
               </TopicItem>
             ))}
           </ListItem>

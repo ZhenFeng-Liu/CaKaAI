@@ -20,7 +20,7 @@ interface Props {
 
 const AgentCard: FC<Props> = ({ agent, onClick, contextMenu, menuItems }) => {
   const emoji = agent.emoji || getLeadingEmoji(agent.name)
-  const prompt = (agent.description || agent.prompt).substring(0, 100).replace(/\\n/g, '')
+  const prompt = (agent.description || agent.prompt || '').substring(0, 100).replace(/\\n/g, '')
   const content = (
     <Container onClick={onClick}>
       {emoji && <BannerBackground className="banner-background">{emoji}</BannerBackground>}

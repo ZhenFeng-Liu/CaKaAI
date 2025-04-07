@@ -65,7 +65,7 @@ const assistantsSlice = createSlice({
         assistant.id === action.payload.assistantId
           ? {
               ...assistant,
-              topics: uniqBy([topic, ...assistant.topics], 'id')
+              topics: uniqBy([topic, ...(assistant.topics || [])], 'id')
             }
           : assistant
       )
@@ -75,7 +75,7 @@ const assistantsSlice = createSlice({
         assistant.id === action.payload.assistantId
           ? {
               ...assistant,
-              topics: assistant.topics.filter(({ id }) => id !== action.payload.topic.id)
+              topics: assistant.topics?.filter(({ id }) => id !== action.payload.topic.id) || []
             }
           : assistant
       )
@@ -87,7 +87,7 @@ const assistantsSlice = createSlice({
         assistant.id === action.payload.assistantId
           ? {
               ...assistant,
-              topics: assistant.topics.map((topic) => (topic.id === newTopic.id ? newTopic : topic))
+              topics: assistant.topics?.map((topic) => (topic.id === newTopic.id ? newTopic : topic)) || []
             }
           : assistant
       )
@@ -105,7 +105,7 @@ const assistantsSlice = createSlice({
     removeAllTopics: (state, action: PayloadAction<{ assistantId: string }>) => {
       state.assistants = state.assistants.map((assistant) => {
         if (assistant.id === action.payload.assistantId) {
-          assistant.topics.forEach((topic) => TopicManager.removeTopic(topic.id))
+          assistant.topics?.forEach((topic) => TopicManager.removeTopic(topic.id))
           return {
             ...assistant,
             topics: [getDefaultTopic(assistant.id)]

@@ -74,12 +74,15 @@ const Topics: FC<Props> = ({ assistant: _assistant, activeTopic, setActiveTopic 
   const handleConfirmDelete = useCallback(
     async (topic: Topic, e: React.MouseEvent) => {
       e.stopPropagation()
-      if (assistant.topics.length === 1) {
+      if (assistant.topics?.length === 1) {
         return onClearMessages(topic)
       }
       await modelGenerating()
-      const index = findIndex(assistant.topics, (t) => t.id === topic.id)
-      setActiveTopic(assistant.topics[index + 1 === assistant.topics.length ? index - 1 : index + 1])
+      const index = findIndex(assistant.topics || [], (t) => t.id === topic.id)
+      const nextTopic = assistant.topics?.[index + 1 === assistant.topics?.length ? index - 1 : index + 1]
+      if (nextTopic) {
+        setActiveTopic(nextTopic)
+      }
       removeTopic(topic)
       setDeletingTopicId(null)
     },
@@ -97,8 +100,11 @@ const Topics: FC<Props> = ({ assistant: _assistant, activeTopic, setActiveTopic 
   const onDeleteTopic = useCallback(
     async (topic: Topic) => {
       await modelGenerating()
-      const index = findIndex(assistant.topics, (t) => t.id === topic.id)
-      setActiveTopic(assistant.topics[index + 1 === assistant.topics.length ? index - 1 : index + 1])
+      const index = findIndex(assistant.topics || [], (t) => t.id === topic.id)
+      const nextTopic = assistant.topics?.[index + 1 === assistant.topics?.length ? index - 1 : index + 1]
+      if (nextTopic) {
+        setActiveTopic(nextTopic)
+      }
       removeTopic(topic)
     },
     [assistant.topics, removeTopic, setActiveTopic]
@@ -107,8 +113,11 @@ const Topics: FC<Props> = ({ assistant: _assistant, activeTopic, setActiveTopic 
   const onMoveTopic = useCallback(
     async (topic: Topic, toAssistant: Assistant) => {
       await modelGenerating()
-      const index = findIndex(assistant.topics, (t) => t.id === topic.id)
-      setActiveTopic(assistant.topics[index + 1 === assistant.topics.length ? 0 : index + 1])
+      const index = findIndex(assistant.topics || [], (t) => t.id === topic.id)
+      const nextTopic = assistant.topics?.[index + 1 === assistant.topics?.length ? 0 : index + 1]
+      if (nextTopic) {
+        setActiveTopic(nextTopic)
+      }
       moveTopic(topic, toAssistant)
     },
     [assistant.topics, moveTopic, setActiveTopic]
@@ -257,7 +266,7 @@ const Topics: FC<Props> = ({ assistant: _assistant, activeTopic, setActiveTopic 
         }
       ]
 
-      if (assistants.length > 1 && assistant.topics.length > 1) {
+      if (assistants.length > 1 && (assistant.topics?.length || 0) > 1) {
         menus.push({
           label: t('chat.topics.move_to'),
           key: 'move',
@@ -272,7 +281,7 @@ const Topics: FC<Props> = ({ assistant: _assistant, activeTopic, setActiveTopic 
         })
       }
 
-      if (assistant.topics.length > 1 && !topic.pinned) {
+      if ((assistant.topics?.length || 0) > 1 && !topic.pinned) {
         menus.push({ type: 'divider' })
         menus.push({
           label: t('common.delete'),
@@ -290,7 +299,7 @@ const Topics: FC<Props> = ({ assistant: _assistant, activeTopic, setActiveTopic 
 
   return (
     <Container right={topicPosition === 'right'} className="topics-tab">
-      <DragableList list={assistant.topics} onUpdate={updateTopics}>
+      <DragableList list={assistant.topics || []} onUpdate={updateTopics}>
         {(topic) => {
           const isActive = topic.id === activeTopic?.id
           const topicName = topic.name.replace('`', '')

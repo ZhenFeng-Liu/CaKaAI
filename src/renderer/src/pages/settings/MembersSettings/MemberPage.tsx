@@ -35,6 +35,7 @@ interface PermissionModule {
 }
 
 const convertMemberData = (data: MemberData): MemberType => ({
+  ...data,
   key: String(data.uid),
   memberName: data.name,
   accountNo: data.name,
@@ -248,17 +249,21 @@ const MemberPage: FC = () => {
   }
 
   // 分配角色
-  const handleAssignRole = (record: MemberType) => {
+  const handleAssignRole = (record: any) => {
     setCurrentMember(record)
     console.log('分配角色', record)
     // 从角色名称字符串中提取角色ID
     const currentRoleNames = record.roleName ? record.roleName.split('，') : []
-    const currentRoleIds = roles.filter((role) => currentRoleNames.includes(role.label)).map((role) => role.value)
-
+    console.log('currentRoleNames', currentRoleNames)
+    // const currentRoleIds = roles.filter((role) => currentRoleNames.includes(role.label)).map((role) => role.value)
+    // console.log('currentRoleIds', currentRoleIds)
+    // 直接使用 Roles 数组数据
+    const currentRoleIds = record.Roles?.map((role: any) => role.name) || []
+    console.log('currentRoleIds', currentRoleIds)
     assignRoleForm.setFieldsValue({
       memberName: record.memberName,
       currentRole: record.roleName,
-      newRole: currentRoleIds // 设置默认选中的角色ID
+      newRole: currentRoleIds // 直接使用角色ID数组
     })
     setAssignRoleVisible(true)
   }
@@ -271,7 +276,7 @@ const MemberPage: FC = () => {
 
       await memberApi.assignRole({
         userId: currentMember.uid,
-        roleIdStr: values.newRole.join(';') // 使用分号连接多个角色ID
+        roleIds: values.newRole.map(Number) // 确保所有元素都是number类型
       })
 
       message.success('角色分配成功')

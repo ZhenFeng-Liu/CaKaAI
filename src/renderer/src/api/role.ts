@@ -46,8 +46,8 @@ export interface DeleteRoleParams {
 
 export interface RoleMenuButtonParams {
   roleId: number // 角色ID
-  menuIdStr: string // 菜单ID，用分号字符串拼接
-  buttonIdStr: string // 按钮ID数组，用分号字符串拼接
+  menuIds: number[] // 菜单ID，用分号字符串拼接
+  buttonIds: number[] // 按钮ID数组，用分号字符串拼接
 }
 
 // 角色相关 API 请求
@@ -74,6 +74,6 @@ export const roleApi = {
 
   // 角色菜单按钮授权
   rolemenubutton: (params: RoleMenuButtonParams) => {
-    return http.post('/RoleMenuButton/AssignMenuButton', params)
+    return http.post('/Role/AssignMenuButton', params)
   }
 }

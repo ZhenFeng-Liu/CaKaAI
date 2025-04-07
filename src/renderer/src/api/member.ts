@@ -37,7 +37,7 @@ export interface DeleteMemberParams {
 // 添加分配角色参数接口
 export interface AssignRoleParams {
   userId: number
-  roleIdStr: string
+  roleIds: number[]
 }
 
 // 用户相关 API 请求
@@ -64,6 +64,6 @@ export const memberApi = {
 
   // 分配角色
   assignRole: (params: AssignRoleParams) => {
-    return http.post('/UserRole/AssignRole', params)
+    return http.post('/Role/AssignToUser', params)
   }
 }

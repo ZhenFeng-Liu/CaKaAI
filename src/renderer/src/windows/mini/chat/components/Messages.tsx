@@ -32,7 +32,7 @@ const Messages: FC<Props> = ({ assistant, route }) => {
   const onSendMessage = useCallback(
     async (message: Message) => {
       setMessages((prev) => {
-        const assistantMessage = getAssistantMessage({ assistant, topic: assistant.topics[0] })
+        const assistantMessage = getAssistantMessage({ assistant, topic: assistant.topics?.[0] as any })
         const messages = prev.concat([message, assistantMessage])
         return messages
       })

@@ -308,14 +308,17 @@ const RolePage: FC = () => {
       if (response.Data) {
         const currentPermissions = {}
         const modulePermissions = {}
-        response.Data[0].Menus.forEach((perm) => {
-          // console.log('获取当前角色的权限perm', perm)
+        response.Data[0].Menus.forEach((perm: any) => {
+          console.log('获取当前角色的权限perm', perm)
           // 在菜单数据中找到对应的菜单项
-          const menuItem = menuData.find((item) => item.label === perm.menu)
-          // console.log('获取当前角色的权限menuItem', menuItem)
+          const menuItem = menuData.find((item: any) => {
+            console.log('获取当前角色的权限item', item)
+            return item.label === perm.menu
+          })
+          console.log('获取当前角色的权限menuItem', menuItem)
           if (menuItem) {
             // 将每个模块的按钮ID数组存储到对应的模块ID下
-            const buttonIds = perm.Buttons?.map((btn) => Number(btn.uid)) || []
+            const buttonIds = perm.Buttons?.map((btn: any) => Number(btn.uid)) || []
             currentPermissions[menuItem.key] = buttonIds
 
             // 检查是否所有可用按钮都被选中
@@ -352,12 +355,11 @@ const RolePage: FC = () => {
       // 准备接口所需的参数
       const params: RoleMenuButtonParams = {
         roleId: selectedRole.uid,
-        menuIdStr: permissionsData.map(([moduleId]) => moduleId).join(';'),
-        buttonIdStr: permissionsData
+        menuIds: permissionsData.map(([moduleId]) => Number(moduleId)),
+        buttonIds: permissionsData
           .map(([, buttonIds]) => buttonIds as number[])
-          .filter((buttonIds) => buttonIds.length > 0) // 过滤掉空数组
-          .map((buttonIds) => buttonIds.join(';'))
-          .join(';')
+          .flat()
+          .filter((id) => id !== undefined)
       }
 
       // 调用授权接口

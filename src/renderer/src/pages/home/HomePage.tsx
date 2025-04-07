@@ -25,14 +25,14 @@ const HomePage: FC = () => {
   const { showAssistants, showTopics, topicPosition } = useSettings()
 
   _activeAssistant = activeAssistant
-
+  console.log('activeAssistant', activeAssistant)
   useEffect(() => {
     NavigationService.setNavigate(navigate)
   }, [navigate])
 
   useEffect(() => {
-    state?.assistant && setActiveAssistant(state?.assistant)
-    state?.topic && setActiveTopic(state?.topic)
+    // state?.assistant && setActiveAssistant(state?.assistant)
+    // state?.topic && setActiveTopic(state?.topic)
   }, [state])
 
   useEffect(() => {
@@ -64,7 +64,7 @@ const HomePage: FC = () => {
           setActiveAssistant={setActiveAssistant}
         /> */}
         <iframe
-          src="http://192.168.0.123/chat/D300HR446DKg0ML1"
+          src={activeAssistant?.url || 'about:blank'}
           style={{ width: '100%', height: '100%' }}
           frameBorder="0"
           allow="microphone"></iframe>

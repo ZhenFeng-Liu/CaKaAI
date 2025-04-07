@@ -57,7 +57,7 @@ interface Helper {
  * @returns 去重后的助手列表
  */
 export const extractUniqueHelpers = (userData: any): Helper[] => {
-  if (!userData || !userData.roleList || !Array.isArray(userData.roleList)) {
+  if (!userData || !userData.Roles || !Array.isArray(userData.Roles)) {
     console.warn('无效的用户数据或角色列表')
     return []
   }
@@ -67,19 +67,18 @@ export const extractUniqueHelpers = (userData: any): Helper[] => {
     const allHelpers: Helper[] = []
 
     // 遍历所有角色
-    userData.roleList.forEach((role) => {
-      if (role.helperList && Array.isArray(role.helperList)) {
+    userData.Roles.forEach((role) => {
+      if (role.Helpers && Array.isArray(role.Helpers)) {
         // 将当前角色的助手列表添加到总列表中
         // 转换助手数据并添加到列表中
-        const convertedHelpers = role.helperList.map((helper: any) => ({
+        const convertedHelpers = role.Helpers.map((helper: any) => ({
           ...helper,
-          settings: {
-            ...(helper.settings || {}),
-            streamOutput: helper.settings?.streamOutput === 1 ? true : false
-            // hideMessages: helper.settings?.hideMessages === 1 ? true : false,
-            // enableMaxTokens: helper.settings?.enableMaxTokens === 1 ? true : false
-          }
+          topics: helper.Topics || [],
+          id: helper.uid.toString(),
+          type: 'assistant',
+          settings: {}
         }))
+        console.log('转换后的助手列表:', convertedHelpers)
         allHelpers.push(...convertedHelpers)
       }
     })
@@ -87,9 +86,9 @@ export const extractUniqueHelpers = (userData: any): Helper[] => {
     // 使用Map基于id去重
     const uniqueHelpersMap = new Map<string, Helper>()
 
-    allHelpers.forEach((helper) => {
-      if (helper && helper.id) {
-        uniqueHelpersMap.set(helper.id, helper)
+    allHelpers.forEach((helper: any) => {
+      if (helper && helper.uid) {
+        uniqueHelpersMap.set(helper.uid, helper)
       }
     })
 
