@@ -173,8 +173,9 @@ const MemberPage: FC = () => {
     try {
       const response: any = await roleApi.query({})
       if (response.Data) {
-        const roleOptions = response.Data.map((role) => ({
-          value: String(role.uid),
+        console.log('response.Data', response.Data)
+        const roleOptions = response.Data.map((role: any) => ({
+          value: role.uid,
           label: role.name,
           disabled: role.enable !== 1
         }))
@@ -252,13 +253,9 @@ const MemberPage: FC = () => {
   const handleAssignRole = (record: any) => {
     setCurrentMember(record)
     console.log('分配角色', record)
-    // 从角色名称字符串中提取角色ID
-    const currentRoleNames = record.roleName ? record.roleName.split('，') : []
-    console.log('currentRoleNames', currentRoleNames)
-    // const currentRoleIds = roles.filter((role) => currentRoleNames.includes(role.label)).map((role) => role.value)
-    // console.log('currentRoleIds', currentRoleIds)
+
     // 直接使用 Roles 数组数据
-    const currentRoleIds = record.Roles?.map((role: any) => role.name) || []
+    const currentRoleIds = record.Roles?.map((role: any) => role.uid) || []
     console.log('currentRoleIds', currentRoleIds)
     assignRoleForm.setFieldsValue({
       memberName: record.memberName,
