@@ -1,14 +1,14 @@
 import '@renderer/databases'
 
-import { knowledgeApi } from '@renderer/api/knowledge'
-import { providerApi } from '@renderer/api/provider'
+// import { knowledgeApi } from '@renderer/api/knowledge'
+// import { providerApi } from '@renderer/api/provider'
 import AuthRoute from '@renderer/components/AuthRoute'
 import MinApp from '@renderer/components/MinApp'
 import { AppLogo } from '@renderer/config/env' // 根据实际路径调整
-import { useProviders } from '@renderer/hooks/useProvider'
+// import { useProviders } from '@renderer/hooks/useProvider'
 import store, { persistor } from '@renderer/store'
-import { Provider as ProviderType } from '@renderer/types'
-import { uuid } from '@renderer/utils'
+// import { Provider as ProviderType } from '@renderer/types'
+// import { uuid } from '@renderer/utils'
 import { message } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import { Provider as ReduxProvider } from 'react-redux'
@@ -51,7 +51,7 @@ const AIPainting: FC = () => {
 const MainContent: FC = () => {
   return (
     <>
-      <AppDataInitializer />
+      {/* <AppDataInitializer /> */}
       <StyleSheetManager>
         <ThemeProvider>
           <AntdProvider>
@@ -159,56 +159,56 @@ const MainContent: FC = () => {
   )
 }
 
-function AppDataInitializer() {
-  const { updateProviders } = useProviders()
-  const [, setKnowledgeBases] = useState([])
-  useEffect(() => {
-    // 预加载知识库数据
-    const fetchKnowledgeBases = async () => {
-      try {
-        const response = await knowledgeApi.getKnowledgeBases({})
-        if (response.Code === 0 && response.Data) {
-          const knowledgeData = response.Data.records || []
-          setKnowledgeBases(knowledgeData)
-          console.log('知识库数据已预加载')
-        }
-      } catch (error) {
-        console.error('预加载知识库数据失败:', error)
-      }
-    }
-    // 预加载 Provider 数据
-    const fetchProviders = async () => {
-      try {
-        const response = await providerApi.query({})
+// function AppDataInitializer() {
+//   const { updateProviders } = useProviders()
+//   const [, setKnowledgeBases] = useState([])
+//   useEffect(() => {
+//     // 预加载知识库数据
+//     const fetchKnowledgeBases = async () => {
+//       try {
+//         const response = await knowledgeApi.getKnowledgeBases({})
+//         if (response.Code === 0 && response.Data) {
+//           const knowledgeData = response.Data.records || []
+//           setKnowledgeBases(knowledgeData)
+//           console.log('知识库数据已预加载')
+//         }
+//       } catch (error) {
+//         console.error('预加载知识库数据失败:', error)
+//       }
+//     }
+//     // 预加载 Provider 数据
+//     const fetchProviders = async () => {
+//       try {
+//         const response = await providerApi.query({})
 
-        if (response.Code === 0 && response.Data) {
-          // 转换API数据结构为Provider类型
-          const providerData = response.Data.records.map((item) => ({
-            id: item?.id || uuid(),
-            name: item?.name || '',
-            type: item?.type || '',
-            apiKey: item?.apiKey || '',
-            apiHost: item?.apiHost || '',
-            models: item?.modelList || [],
-            enabled: item?.enabled !== undefined ? Boolean(item.enabled) : true,
-            isSystem: item?.isSystem !== undefined ? Boolean(item.isSystem) : false
-          })) as ProviderType[]
+//         if (response.Code === 0 && response.Data) {
+//           // 转换API数据结构为Provider类型
+//           const providerData = response.Data.records.map((item) => ({
+//             id: item?.id || uuid(),
+//             name: item?.name || '',
+//             type: item?.type || '',
+//             apiKey: item?.apiKey || '',
+//             apiHost: item?.apiHost || '',
+//             models: item?.modelList || [],
+//             enabled: item?.enabled !== undefined ? Boolean(item.enabled) : true,
+//             isSystem: item?.isSystem !== undefined ? Boolean(item.isSystem) : false
+//           })) as ProviderType[]
 
-          // 更新providers数据
-          updateProviders(providerData)
-          console.log('提供商数据已预加载')
-        }
-      } catch (error) {
-        console.error('预加载提供商数据失败:', error)
-      }
-    }
+//           // 更新providers数据
+//           updateProviders(providerData)
+//           console.log('提供商数据已预加载')
+//         }
+//       } catch (error) {
+//         console.error('预加载提供商数据失败:', error)
+//       }
+//     }
 
-    // 用户登录后执行所有预加载
-    Promise.all([fetchProviders(), fetchKnowledgeBases()]).catch((error) => console.error('数据预加载失败:', error))
-  }, [])
+//     // 用户登录后执行所有预加载
+//     Promise.all([fetchProviders(), fetchKnowledgeBases()]).catch((error) => console.error('数据预加载失败:', error))
+//   }, [])
 
-  return null // 这是一个纯逻辑组件，不渲染任何UI
-}
+//   return null // 这是一个纯逻辑组件，不渲染任何UI
+// }
 
 function App(): JSX.Element {
   const [isAuthenticated, setIsAuthenticated] = useState(false)

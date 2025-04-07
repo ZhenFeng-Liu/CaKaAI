@@ -39,7 +39,7 @@ export const menuApi = {
    * 将原始菜单数据转换为更易用的格式
    * @param menuData 原始菜单数据
    */
-  transformMenuData: (menuData: MenuItem[]) => {
+  transformMenuData: (menuData: any) => {
     return menuData.map((item) => ({
       key: item.uid,
       label: item.menu,

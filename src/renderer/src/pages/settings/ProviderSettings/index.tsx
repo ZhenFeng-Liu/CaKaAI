@@ -1,13 +1,17 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import { DragDropContext, Draggable, Droppable, DropResult } from '@hello-pangea/dnd'
-import { providerApi } from '@renderer/api/provider'
+// import { providerApi } from '@renderer/api/provider'
 import Scrollbar from '@renderer/components/Scrollbar'
 import { getProviderLogo } from '@renderer/config/providers'
 import { useAllProviders, useProviders } from '@renderer/hooks/useProvider'
 import { Provider } from '@renderer/types'
 import { droppableReorder, generateColorFromChar, getFirstCharacter, uuid } from '@renderer/utils'
 import { Avatar, Button, Dropdown, Input, MenuProps, Tag } from 'antd'
-import { FC, useEffect, useState } from 'react'
+import {
+  FC,
+  // useEffect,
+  useState
+} from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
@@ -37,37 +41,37 @@ const ProvidersList: FC = () => {
   const [searchText, setSearchText] = useState<string>('')
   const [dragging, setDragging] = useState(false)
 
-  useEffect(() => {
-    const fetchProvider = async () => {
-      try {
-        const response = await providerApi.query({})
+  // useEffect(() => {
+  //   const fetchProvider = async () => {
+  //     try {
+  //       const response = await providerApi.query({})
 
-        if (response.Code === 0 && response.Data) {
-          console.log('response', response)
-          // 转换并更新数据
-          updateProviders(mapApiResponseToProviders(response.Data.records))
-          // 转换API数据结构为Provider类型
-          // const providerData = response.Data.records.map((item) => ({
-          //   id: item?.id || uuid(),
-          //   name: item?.name || '',
-          //   type: item?.type || '',
-          //   apiKey: item?.apiKey || '',
-          //   apiHost: item?.apiHost || '',
-          //   models: item?.modelList || [],
-          //   enabled: item?.enabled !== undefined ? Boolean(item.enabled) : true,
-          //   isSystem: item?.isSystem !== undefined ? Boolean(item.isSystem) : false
-          // })) as Provider[]
-          // console.log('providerData', providerData)
-          // 更新providers数据
-          // updateProviders(providerData)
-        }
-      } catch (error) {
-        console.error('获取提供商失败:', error)
-      }
-    }
+  //       if (response.Code === 0 && response.Data) {
+  //         console.log('response', response)
+  //         // 转换并更新数据
+  //         updateProviders(mapApiResponseToProviders(response.Data.records))
+  //         // 转换API数据结构为Provider类型
+  //         // const providerData = response.Data.records.map((item) => ({
+  //         //   id: item?.id || uuid(),
+  //         //   name: item?.name || '',
+  //         //   type: item?.type || '',
+  //         //   apiKey: item?.apiKey || '',
+  //         //   apiHost: item?.apiHost || '',
+  //         //   models: item?.modelList || [],
+  //         //   enabled: item?.enabled !== undefined ? Boolean(item.enabled) : true,
+  //         //   isSystem: item?.isSystem !== undefined ? Boolean(item.isSystem) : false
+  //         // })) as Provider[]
+  //         // console.log('providerData', providerData)
+  //         // 更新providers数据
+  //         // updateProviders(providerData)
+  //       }
+  //     } catch (error) {
+  //       console.error('获取提供商失败:', error)
+  //     }
+  //   }
 
-    fetchProvider()
-  }, [])
+  //   fetchProvider()
+  // }, [])
 
   const onDragEnd = (result: DropResult) => {
     setDragging(false)

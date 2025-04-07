@@ -7,7 +7,7 @@ import { FC, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
-// import Chat from './Chat'
+import Chat from './Chat'
 import Navbar from './Navbar'
 import HomeTabs from './Tabs'
 
@@ -57,17 +57,12 @@ const HomePage: FC = () => {
             position="left"
           />
         )}
-        {/* <Chat
+        <Chat
           assistant={activeAssistant}
           activeTopic={activeTopic}
           setActiveTopic={setActiveTopic}
           setActiveAssistant={setActiveAssistant}
-        /> */}
-        <iframe
-          src="http://192.168.0.123/chat/D300HR446DKg0ML1"
-          style={{ width: '100%', height: '100%' }}
-          frameBorder="0"
-          allow="microphone"></iframe>
+        />
       </ContentContainer>
     </Container>
   )

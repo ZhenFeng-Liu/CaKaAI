@@ -45,9 +45,9 @@ export const useUserInfo = () => {
 
       // 获取最新的用户信息
       const userInfoResponse = await userApi.getUserInfo(uid)
-
+      console.log('用户信息', userInfoResponse)
       if (userInfoResponse.Code === 0) {
-        const userInfo = userInfoResponse.Data?.records[0]
+        const userInfo = userInfoResponse.Data[0]
         console.log('原始用户信息', userInfo)
         console.log('原始用户信息', userInfoResponse.Data)
 
@@ -60,12 +60,12 @@ export const useUserInfo = () => {
 
         // 提取权限信息
         const menuPermissions =
-          userInfo.roleList?.reduce(
+          userInfo.Roles?.reduce(
             (acc, role) => {
               const roleMenus =
-                role.menuList?.map((menu) => ({
+                role.Menus?.map((menu) => ({
                   menu: menu,
-                  buttons: menu.buttonList || []
+                  buttons: menu.Buttons || []
                 })) || []
               return [...acc, ...roleMenus]
             },

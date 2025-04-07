@@ -1,6 +1,6 @@
-import { BarsOutlined, SettingOutlined } from '@ant-design/icons'
+// import { BarsOutlined, SettingOutlined } from '@ant-design/icons'
 import AddAssistantPopup from '@renderer/components/Popups/AddAssistantPopup'
-import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
+// import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 import { useAssistants, useDefaultAssistant } from '@renderer/hooks/useAssistant'
 import { useSettings } from '@renderer/hooks/useSettings'
 import { useShowTopics } from '@renderer/hooks/useStore'
@@ -8,9 +8,8 @@ import useUserInfo from '@renderer/hooks/useUserInfo'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
 import { Assistant, Topic } from '@renderer/types'
 import { uuid } from '@renderer/utils'
-import { Segmented as AntSegmented, SegmentedProps } from 'antd'
 import { FC, useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+// import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import Assistants from './AssistantsTab'
@@ -36,8 +35,8 @@ const HomeTabs: FC<Props> = ({ activeAssistant, activeTopic, setActiveAssistant,
   const { defaultAssistant } = useDefaultAssistant()
   const { toggleShowTopics } = useShowTopics()
   const { fetchAndProcessUserInfo } = useUserInfo()
-  const { t } = useTranslation()
-  const { isAdmin } = useAdminCheck()
+  // const { t } = useTranslation()
+  // const { isAdmin } = useAdminCheck()
   const borderStyle = '0.5px solid var(--color-border)'
   const border =
     position === 'left' ? { borderRight: borderStyle } : { borderLeft: borderStyle, borderTopLeftRadius: 0 }
@@ -48,11 +47,11 @@ const HomeTabs: FC<Props> = ({ activeAssistant, activeTopic, setActiveAssistant,
 
   const showTab = !(position === 'left' && topicPosition === 'right')
 
-  const assistantTab = {
-    label: t('assistants.abbr'),
-    value: 'assistants',
-    icon: <i className="iconfont icon-business-smart-assistant" />
-  }
+  // const assistantTab = {
+  //   label: t('assistants.abbr'),
+  //   value: 'assistants',
+  //   icon: <i className="iconfont icon-business-smart-assistant" />
+  // }
 
   const onCreateAssistant = async () => {
     const assistant = await AddAssistantPopup.show()
@@ -112,7 +111,7 @@ const HomeTabs: FC<Props> = ({ activeAssistant, activeTopic, setActiveAssistant,
 
   return (
     <Container style={border} className="home-tabs">
-      {showTab && (
+      {/* {showTab && (
         <Segmented
           value={tab}
           style={{ borderRadius: 16, paddingTop: 10, margin: '0 10px', gap: 2 }}
@@ -134,7 +133,7 @@ const HomeTabs: FC<Props> = ({ activeAssistant, activeTopic, setActiveAssistant,
           onChange={(value) => setTab(value as 'topic' | 'settings')}
           block
         />
-      )}
+      )} */}
       <TabContent className="home-tabs-content">
         {tab === 'assistants' && (
           <Assistants
@@ -177,59 +176,59 @@ const TabContent = styled.div`
   overflow-x: hidden;
 `
 
-const Segmented = styled(AntSegmented)`
-  &.ant-segmented {
-    background-color: transparent;
-    border-radius: 0 !important;
-    border-bottom: 0.5px solid var(--color-border);
-    padding-bottom: 10px;
-  }
-  .ant-segmented-item {
-    overflow: hidden;
-    transition: none !important;
-    height: 34px;
-    line-height: 34px;
-    background-color: transparent;
-    user-select: none;
-    border-radius: var(--list-item-border-radius);
-    box-shadow: none;
-  }
-  .ant-segmented-item-selected {
-    background-color: var(--color-background-soft);
-    border: 0.5px solid var(--color-border);
-    transition: none !important;
-  }
-  .ant-segmented-item-label {
-    align-items: center;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    font-size: 13px;
-    height: 100%;
-  }
-  .iconfont {
-    font-size: 13px;
-    margin-left: -2px;
-  }
-  .anticon-setting {
-    font-size: 12px;
-  }
-  .icon-business-smart-assistant {
-    margin-right: -2px;
-  }
-  .ant-segmented-item-icon + * {
-    margin-left: 4px;
-  }
-  .ant-segmented-thumb {
-    transition: none !important;
-    background-color: var(--color-background-soft);
-    border: 0.5px solid var(--color-border);
-    border-radius: var(--list-item-border-radius);
-    box-shadow: none;
-  }
-  /* These styles ensure the same appearance as before */
-  border-radius: 0;
-  box-shadow: none;
-`
+// const Segmented = styled(AntSegmented)`
+//   &.ant-segmented {
+//     background-color: transparent;
+//     border-radius: 0 !important;
+//     border-bottom: 0.5px solid var(--color-border);
+//     padding-bottom: 10px;
+//   }
+//   .ant-segmented-item {
+//     overflow: hidden;
+//     transition: none !important;
+//     height: 34px;
+//     line-height: 34px;
+//     background-color: transparent;
+//     user-select: none;
+//     border-radius: var(--list-item-border-radius);
+//     box-shadow: none;
+//   }
+//   .ant-segmented-item-selected {
+//     background-color: var(--color-background-soft);
+//     border: 0.5px solid var(--color-border);
+//     transition: none !important;
+//   }
+//   .ant-segmented-item-label {
+//     align-items: center;
+//     display: flex;
+//     flex-direction: row;
+//     justify-content: center;
+//     font-size: 13px;
+//     height: 100%;
+//   }
+//   .iconfont {
+//     font-size: 13px;
+//     margin-left: -2px;
+//   }
+//   .anticon-setting {
+//     font-size: 12px;
+//   }
+//   .icon-business-smart-assistant {
+//     margin-right: -2px;
+//   }
+//   .ant-segmented-item-icon + * {
+//     margin-left: 4px;
+//   }
+//   .ant-segmented-thumb {
+//     transition: none !important;
+//     background-color: var(--color-background-soft);
+//     border: 0.5px solid var(--color-border);
+//     border-radius: var(--list-item-border-radius);
+//     box-shadow: none;
+//   }
+//   /* These styles ensure the same appearance as before */
+//   border-radius: 0;
+//   box-shadow: none;
+// `
 
 export default HomeTabs

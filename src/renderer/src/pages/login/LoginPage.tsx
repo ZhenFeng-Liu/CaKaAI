@@ -39,7 +39,7 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
       console.log('[LoginPage] 登录响应', response)
       if (response.Code === 0) {
         // 获取token
-        localStorage.setItem('token', response.token)
+        localStorage.setItem('token', response.token || response.Data.token)
         localStorage.setItem('tavily_api_key', response.Data?.netKey || '')
         // try {
         //   message.loading('正在获取用户信息...', 0.5) // 添加加载提示

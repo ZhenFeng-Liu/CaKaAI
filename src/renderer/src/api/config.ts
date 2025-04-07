@@ -2,8 +2,8 @@ import { message } from 'antd'
 
 // API 配置
 export const API_CONFIG = {
-  BASE_URL: 'http://192.168.0.123:9019/ServCaka', // 正式环境
-  // BASE_URL: 'http://192.168.0.111:9019/ServCaka', // 本地环境
+  // BASE_URL: 'http://192.168.0.123:9019/ServCaka', // 正式环境
+  BASE_URL: 'http://192.168.0.111:9019/ServCaka', // 本地环境
   TIMEOUT: 10000
 }
 

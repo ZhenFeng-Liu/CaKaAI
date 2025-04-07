@@ -3,7 +3,7 @@ import { providerApi } from '@renderer/api/provider'
 import { TopView } from '@renderer/components/TopView'
 import { Provider, ProviderType } from '@renderer/types'
 import { Divider, Form, Input, message, Modal, Select } from 'antd'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 interface Props {
   provider?: Provider
@@ -15,7 +15,10 @@ const PopupContainer: React.FC<Props> = ({ provider, resolve }) => {
   const [name, setName] = useState(provider?.name || '')
   const [type, setType] = useState(provider?.type || 1)
   const [loading, setLoading] = useState(false)
-  const [providerTypes, setProviderTypes] = useState<{ label: string; value: string }[]>([
+  const [
+    providerTypes
+    // setProviderTypes
+  ] = useState<{ label: string; value: string }[]>([
     // { label: 'OpenAI', value: 'openai' },
     // { label: 'Gemini', value: 'gemini' },
     // { label: 'Anthropic', value: 'anthropic' },
@@ -24,26 +27,26 @@ const PopupContainer: React.FC<Props> = ({ provider, resolve }) => {
   const { t } = useTranslation()
 
   // 获取支持的提供商类型列表
-  useEffect(() => {
-    const fetchProviderTypes = async () => {
-      try {
-        const response = await providerApi.getProviderTypes({})
+  // useEffect(() => {
+  //   const fetchProviderTypes = async () => {
+  //     try {
+  //       const response = await providerApi.getProviderTypes({})
 
-        if (response.Code === 0 && response.Data) {
-          setProviderTypes(
-            response.Data?.records.map((item: any) => ({
-              label: item.provider,
-              value: item.uid
-            }))
-          )
-        }
-      } catch (error) {
-        console.error('获取提供商类型失败:', error)
-      }
-    }
+  //       if (response.Code === 0 && response.Data) {
+  //         setProviderTypes(
+  //           response.Data?.records.map((item: any) => ({
+  //             label: item.provider,
+  //             value: item.uid
+  //           }))
+  //         )
+  //       }
+  //     } catch (error) {
+  //       console.error('获取提供商类型失败:', error)
+  //     }
+  //   }
 
-    fetchProviderTypes()
-  }, [])
+  //   fetchProviderTypes()
+  // }, [])
 
   const onOk = async () => {
     if (name.trim().length === 0) return

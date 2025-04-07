@@ -7,11 +7,14 @@ export type Assistant = {
   uid?: string
   id: string
   name: string
-  prompt: string
+  prompt?: string
   knowledge_bases?: KnowledgeBase[]
-  topics: Topic[]
-  type: string
+  topics?: Topic[]
+  type?: string
   emoji?: string
+  url?: string
+  user_uid?: string
+  user_name?: string
   description?: string
   model?: Model
   defaultModel?: Model

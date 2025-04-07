@@ -99,8 +99,8 @@ const RolePage: FC = () => {
     try {
       setLoading(true)
       const response: any = await roleApi.query({ name, pageNum: page, pageSize })
-      if (response.Data?.records) {
-        const tableData = response.Data.records.map(convertRoleData)
+      if (response.Data) {
+        const tableData = response.Data.map(convertRoleData)
         setRoleList(tableData)
 
         // 更新分页信息
@@ -122,9 +122,10 @@ const RolePage: FC = () => {
   const fetchMenuData = async () => {
     try {
       const response = await menuApi.query()
-      if (response.Code === 0 && response.Data?.records) {
+      console.log('菜单数据', response)
+      if (response.Code === 0 && response.Data) {
         // 使用 transformMenuData 转换数据
-        const transformedData = menuApi.transformMenuData(response.Data.records)
+        const transformedData = menuApi.transformMenuData(response.Data)
         console.log('菜单数据:', transformedData)
         setMenuData(transformedData)
       }
@@ -304,17 +305,17 @@ const RolePage: FC = () => {
 
     try {
       const response: any = await roleApi.query({ name: record.roleName })
-      if (response.Data?.records?.[0]?.menuList) {
+      if (response.Data) {
         const currentPermissions = {}
         const modulePermissions = {}
-        response.Data.records[0].menuList.forEach((perm) => {
+        response.Data[0].Menus.forEach((perm) => {
           // console.log('获取当前角色的权限perm', perm)
           // 在菜单数据中找到对应的菜单项
           const menuItem = menuData.find((item) => item.label === perm.menu)
           // console.log('获取当前角色的权限menuItem', menuItem)
           if (menuItem) {
             // 将每个模块的按钮ID数组存储到对应的模块ID下
-            const buttonIds = perm.buttonList?.map((btn) => Number(btn.uid)) || []
+            const buttonIds = perm.Buttons?.map((btn) => Number(btn.uid)) || []
             currentPermissions[menuItem.key] = buttonIds
 
             // 检查是否所有可用按钮都被选中

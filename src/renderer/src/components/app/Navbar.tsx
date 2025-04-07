@@ -1,8 +1,8 @@
 import { isMac } from '@renderer/config/constant'
 import { useSettings } from '@renderer/hooks/useSettings'
-import { Tooltip } from 'antd'
+// import { Tooltip } from 'antd'
 import { FC, PropsWithChildren } from 'react'
-import { useTranslation } from 'react-i18next'
+// import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 type Props = PropsWithChildren & JSX.IntrinsicElements['div']
 
@@ -20,17 +20,18 @@ export const Navbar: FC<Props> = ({ children, ...props }) => {
 }
 
 export const NavbarLeft: FC<Props> = ({ children, ...props }) => {
-  const { t } = useTranslation()
+  // const { t } = useTranslation()
   // return <NavbarLeftContainer {...props}>{children}</NavbarLeftContainer>
   return (
     <NavbarLeftContainer {...props}>
       {React.Children.map(children, (child, index) => {
         if (index === 1) {
-          return (
-            <Tooltip title={t('新建话题')} placement="left">
-              {child}
-            </Tooltip>
-          )
+          // return (
+          //   <Tooltip title={t('新建话题')} placement="left">
+          //     {child}
+          //   </Tooltip>
+          // )
+          return null
         }
         return child
       })}
@@ -41,30 +42,30 @@ export const NavbarLeft: FC<Props> = ({ children, ...props }) => {
 export const NavbarCenter: FC<Props> = ({ children, ...props }) => {
   return <NavbarCenterContainer {...props}>{children}</NavbarCenterContainer>
 }
-import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
+// import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 import React from 'react' // 添加这行
 export const NavbarRight: FC<Props> = ({ children, ...props }) => {
   console.log('props', props)
   console.log('children', children)
   // return <NavbarRightContainer {...props}>{children}</NavbarRightContainer>
-  const { isAdmin } = useAdminCheck()
+  // const { isAdmin } = useAdminCheck()
 
   return (
     <NavbarRightContainer {...props}>
       {React.Children.map(children, (child: any, index) => {
         console.log('child', child)
         // 如果不是管理员且是第一个子元素，则不显示
-        if (!isAdmin && index === 0) return child?.props?.children[0]
+        if (index === 0) return child?.props?.children[0]
 
         // 如果不是管理员且是第二个子元素，则不显示
         // if (!isAdmin && index === 1) return child?.props?.children[1]
         // 如果不是管理员且是第二个子元素，则排除第四个元素，显示其他元素
-        if (!isAdmin && index === 1) {
+        if (index === 1) {
           // 确保child和child.props.children存在
           if (child?.props?.children) {
             // 将children转换为数组，并过滤掉第四个元素(索引为3)
             const filteredChildren = React.Children.toArray(child.props.children).filter(
-              (_, childIndex) => childIndex !== 3
+              (_, childIndex) => childIndex !== 1 && childIndex !== 2 && childIndex !== 3
             )
 
             // 创建一个新的React元素，包含过滤后的子元素

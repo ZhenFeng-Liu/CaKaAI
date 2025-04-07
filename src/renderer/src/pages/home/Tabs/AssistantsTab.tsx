@@ -1,6 +1,7 @@
 import { PlusOutlined } from '@ant-design/icons'
 import DragableList from '@renderer/components/DragableList'
 import Scrollbar from '@renderer/components/Scrollbar'
+import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 import { useAgents } from '@renderer/hooks/useAgents'
 import { useAssistants } from '@renderer/hooks/useAssistant'
 import useUserInfo from '@renderer/hooks/useUserInfo'
@@ -131,6 +132,7 @@ const Assistants: FC<AssistantsTabProps> = ({
     },
     [assistants, removeAssistant, setActiveAssistant, onCreateDefaultAssistant]
   )
+  const { isAdmin } = useAdminCheck()
   return (
     <Container className="assistants-tab">
       <DragableList
@@ -163,8 +165,8 @@ const Assistants: FC<AssistantsTabProps> = ({
           />
         )}
       </DragableList>
-      {!dragging && (
-        <AssistantAddItem onClick={onCreateAssistant} style={{ display: 'none' }}>
+      {isAdmin && !dragging && (
+        <AssistantAddItem onClick={onCreateAssistant}>
           <AssistantName>
             <PlusOutlined style={{ color: 'var(--color-text-2)', marginRight: 4 }} />
             {t('chat.add.assistant.title')}

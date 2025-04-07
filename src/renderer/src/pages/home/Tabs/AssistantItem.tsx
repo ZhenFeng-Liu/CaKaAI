@@ -1,19 +1,16 @@
-import { DeleteOutlined, EditOutlined, MinusCircleOutlined, SaveOutlined } from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { helperApi } from '@renderer/api/helper'
 import ModelAvatar from '@renderer/components/Avatar/ModelAvatar'
-import CopyIcon from '@renderer/components/Icons/CopyIcon'
 import { useAssistant } from '@renderer/hooks/useAssistant'
 import { modelGenerating } from '@renderer/hooks/useRuntime'
 import { useSettings } from '@renderer/hooks/useSettings'
 // import useUserInfo from '@renderer/hooks/useUserInfo'
 import AssistantSettingsPopup from '@renderer/pages/settings/AssistantSettings'
-import { getDefaultModel, getDefaultTopic } from '@renderer/services/AssistantService'
+import { getDefaultModel } from '@renderer/services/AssistantService'
 import { EVENT_NAMES, EventEmitter } from '@renderer/services/EventService'
 import { Assistant } from '@renderer/types'
-import { uuid } from '@renderer/utils'
 import { Dropdown } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
-import { omit } from 'lodash'
 import { FC, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -38,8 +35,8 @@ const AssistantItem: FC<AssistantItemProps> = ({
   addAgent,
   addAssistant,
   // ... 其他 props
-  refreshUserInfo,
-  refreshAssistants
+  refreshUserInfo
+  // refreshAssistants
 }) => {
   const { t } = useTranslation()
   const { removeAllTopics } = useAssistant(assistant.id) // 使用当前助手的ID
@@ -65,23 +62,23 @@ const AssistantItem: FC<AssistantItemProps> = ({
     (assistant: Assistant): ItemType[] => {
       const baseMenuItems: ItemType[] = [
         // 基础菜单项，所有用户都可以看到
-        {
-          label: t('assistants.clear.title'),
-          key: 'clear',
-          icon: <MinusCircleOutlined />,
-          onClick: () => {
-            window.modal.confirm({
-              title: t('assistants.clear.title'),
-              content: t('assistants.clear.content'),
-              centered: true,
-              okButtonProps: { danger: true },
-              onOk: () => {
-                console.log('[AssistantItem] Clear all topics for assistant:', assistant)
-                removeAllTopics()
-              } // 使用当前助手的removeAllTopics
-            })
-          }
-        }
+        // {
+        //   label: t('assistants.clear.title'),
+        //   key: 'clear',
+        //   icon: <MinusCircleOutlined />,
+        //   onClick: () => {
+        //     window.modal.confirm({
+        //       title: t('assistants.clear.title'),
+        //       content: t('assistants.clear.content'),
+        //       centered: true,
+        //       okButtonProps: { danger: true },
+        //       onOk: () => {
+        //         console.log('[AssistantItem] Clear all topics for assistant:', assistant)
+        //         removeAllTopics()
+        //       } // 使用当前助手的removeAllTopics
+        //     })
+        //   }
+        // }
       ]
       const adminMenuItems: ItemType[] = [
         {
@@ -93,72 +90,72 @@ const AssistantItem: FC<AssistantItemProps> = ({
             AssistantSettingsPopup.show({ assistant })
           }
         },
-        {
-          label: t('assistants.copy.title'),
-          key: 'duplicate',
-          icon: <CopyIcon />,
-          onClick: async () => {
-            try {
-              const _assistant: Assistant = { ...assistant, id: uuid(), topics: [getDefaultTopic(assistant.id)] }
-              console.log('[AssistantItem] 准备复制助手:', _assistant)
-              // 构建符合API要求的参数对象
-              const _assistantAddInfo = {
-                id: _assistant.id,
-                name: _assistant.name || '',
-                emoji: _assistant.emoji || '',
-                prompt: _assistant.prompt || '',
-                topics: _assistant.topics, // 保留原始的topics
-                type: 'assistant',
-                knowledge_uid: _assistant?.knowledge_bases?.[0]?.uid || null,
-                model_uid: _assistant.model?.uid || _assistant.default_model_uid || null,
-                default_model_uid: _assistant.defaultModel?.uid || null,
-                settings: _assistant.settings || {
-                  temperature: 1,
-                  contextCount: 5,
-                  enableMaxTokens: false,
-                  maxTokens: 0,
-                  streamOutput: true,
-                  hideMessages: false,
-                  customParameters: []
-                },
-                messages: _assistant.messages || []
-              }
-              console.log('[AssistantItem] 复制助手信息:', _assistantAddInfo)
-              const response = await helperApi.add(_assistantAddInfo)
-              console.log('[AssistantItem] 复制助手API响应:', response)
+        // {
+        //   label: t('assistants.copy.title'),
+        //   key: 'duplicate',
+        //   icon: <CopyIcon />,
+        //   onClick: async () => {
+        //     try {
+        //       const _assistant: Assistant = { ...assistant, id: uuid(), topics: [getDefaultTopic(assistant.id)] }
+        //       console.log('[AssistantItem] 准备复制助手:', _assistant)
+        //       // 构建符合API要求的参数对象
+        //       const _assistantAddInfo = {
+        //         id: _assistant.id,
+        //         name: _assistant.name || '',
+        //         emoji: _assistant.emoji || '',
+        //         prompt: _assistant.prompt || '',
+        //         topics: _assistant.topics, // 保留原始的topics
+        //         type: 'assistant',
+        //         knowledge_uid: _assistant?.knowledge_bases?.[0]?.uid || null,
+        //         model_uid: _assistant.model?.uid || _assistant.default_model_uid || null,
+        //         default_model_uid: _assistant.defaultModel?.uid || null,
+        //         settings: _assistant.settings || {
+        //           temperature: 1,
+        //           contextCount: 5,
+        //           enableMaxTokens: false,
+        //           maxTokens: 0,
+        //           streamOutput: true,
+        //           hideMessages: false,
+        //           customParameters: []
+        //         },
+        //         messages: _assistant.messages || []
+        //       }
+        //       console.log('[AssistantItem] 复制助手信息:', _assistantAddInfo)
+        //       const response = await helperApi.add(_assistantAddInfo)
+        //       console.log('[AssistantItem] 复制助手API响应:', response)
 
-              if (response && response.Code === 0) {
-                console.log('[AssistantItem] 复制助手成功:', _assistant)
-                addAssistant(_assistant)
-                onSwitch(_assistant)
+        //       if (response && response.Code === 0) {
+        //         console.log('[AssistantItem] 复制助手成功:', _assistant)
+        //         addAssistant(_assistant)
+        //         onSwitch(_assistant)
 
-                window.message.success({
-                  content: response.Msg,
-                  key: 'duplicate-assistant'
-                })
+        //         window.message.success({
+        //           content: response.Msg,
+        //           key: 'duplicate-assistant'
+        //         })
 
-                // 刷新用户信息
-                // 延迟执行刷新操作
-                setTimeout(async () => {
-                  await refreshUserInfo()
-                  await refreshAssistants()
-                }, 500)
-              } else {
-                console.error('[AssistantItem] 复制助手失败:', response)
-                window.message.error({
-                  content: response.Msg,
-                  key: 'duplicate-assistant'
-                })
-              }
-            } catch (error) {
-              console.error('[AssistantItem] 复制助手出错:', error)
-              window.message.error({
-                content: t(`复制助手出错:${error}`),
-                key: 'duplicate-assistant'
-              })
-            }
-          }
-        },
+        //         // 刷新用户信息
+        //         // 延迟执行刷新操作
+        //         setTimeout(async () => {
+        //           await refreshUserInfo()
+        //           await refreshAssistants()
+        //         }, 500)
+        //       } else {
+        //         console.error('[AssistantItem] 复制助手失败:', response)
+        //         window.message.error({
+        //           content: response.Msg,
+        //           key: 'duplicate-assistant'
+        //         })
+        //       }
+        //     } catch (error) {
+        //       console.error('[AssistantItem] 复制助手出错:', error)
+        //       window.message.error({
+        //         content: t(`复制助手出错:${error}`),
+        //         key: 'duplicate-assistant'
+        //       })
+        //     }
+        //   }
+        // },
         // {
         //   label: t('assistants.clear.title'),
         //   key: 'clear',
@@ -176,28 +173,28 @@ const AssistantItem: FC<AssistantItemProps> = ({
         //     })
         //   }
         // },
-        {
-          label: t('assistants.save.title'),
-          key: 'save-to-agent',
-          icon: <SaveOutlined />,
-          onClick: async () => {
-            const agent = omit(assistant, ['model', 'emoji'])
-            agent.id = uuid()
-            agent.type = 'agent'
-            console.log('[AssistantItem] Save assistant to agent:', agent)
-            addAgent(agent)
-            window.message.success({
-              content: t('assistants.save.success'),
-              key: 'save-to-agent'
-            })
+        // {
+        //   label: t('assistants.save.title'),
+        //   key: 'save-to-agent',
+        //   icon: <SaveOutlined />,
+        //   onClick: async () => {
+        //     const agent = omit(assistant, ['model', 'emoji'])
+        //     agent.id = uuid()
+        //     agent.type = 'agent'
+        //     console.log('[AssistantItem] Save assistant to agent:', agent)
+        //     addAgent(agent)
+        //     window.message.success({
+        //       content: t('assistants.save.success'),
+        //       key: 'save-to-agent'
+        //     })
 
-            // 刷新用户信息
-            setTimeout(async () => {
-              await refreshUserInfo()
-              // await refreshAssistants()
-            }, 500)
-          }
-        },
+        //     // 刷新用户信息
+        //     setTimeout(async () => {
+        //       await refreshUserInfo()
+        //       // await refreshAssistants()
+        //     }, 500)
+        //   }
+        // },
         { type: 'divider' },
         {
           label: t('common.delete'),
@@ -267,7 +264,8 @@ const AssistantItem: FC<AssistantItemProps> = ({
   }, [clickAssistantToShowTopic, onSwitch, assistant, topicPosition])
 
   const assistantName = assistant.name || t('chat.default.name')
-  const fullAssistantName = assistant.emoji ? `${assistant.emoji} ${assistantName}` : assistantName
+  // const fullAssistantName = assistant.emoji ? `${assistant.emoji} ${assistantName}` : assistantName
+  const fullAssistantName = assistantName
 
   return (
     <Dropdown menu={{ items: getMenuItems(assistant) }} trigger={['contextMenu']}>
@@ -276,11 +274,11 @@ const AssistantItem: FC<AssistantItemProps> = ({
           {showAssistantIcon && <ModelAvatar model={assistant.model || defaultModel} size={22} />}
           <AssistantName className="text-nowrap">{showAssistantIcon ? assistantName : fullAssistantName}</AssistantName>
         </AssistantNameRow>
-        {isActive && (
+        {/* {isActive && (
           <MenuButton onClick={() => EventEmitter.emit(EVENT_NAMES.SWITCH_TOPIC_SIDEBAR)}>
             <TopicCount className="topics-count">{assistant.topics.length}</TopicCount>
           </MenuButton>
-        )}
+        )} */}
       </Container>
     </Dropdown>
   )
@@ -324,32 +322,32 @@ const AssistantNameRow = styled.div`
 
 const AssistantName = styled.div``
 
-const MenuButton = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  min-width: 22px;
-  height: 22px;
-  min-width: 22px;
-  min-height: 22px;
-  border-radius: 11px;
-  position: absolute;
-  background-color: var(--color-background);
-  right: 9px;
-  top: 6px;
-  padding: 0 5px;
-  border: 0.5px solid var(--color-border);
-`
+// const MenuButton = styled.div`
+//   display: flex;
+//   flex-direction: row;
+//   justify-content: center;
+//   align-items: center;
+//   min-width: 22px;
+//   height: 22px;
+//   min-width: 22px;
+//   min-height: 22px;
+//   border-radius: 11px;
+//   position: absolute;
+//   background-color: var(--color-background);
+//   right: 9px;
+//   top: 6px;
+//   padding: 0 5px;
+//   border: 0.5px solid var(--color-border);
+// `
 
-const TopicCount = styled.div`
-  color: var(--color-text);
-  font-size: 10px;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-`
+// const TopicCount = styled.div`
+//   color: var(--color-text);
+//   font-size: 10px;
+//   border-radius: 10px;
+//   display: flex;
+//   flex-direction: row;
+//   justify-content: center;
+//   align-items: center;
+// `
 
 export default AssistantItem

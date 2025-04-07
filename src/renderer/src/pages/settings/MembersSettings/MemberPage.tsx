@@ -142,8 +142,8 @@ const MemberPage: FC = () => {
         pageSize: params?.pageSize || pagination.pageSize
       }
       const response: any = await memberApi.query(queryParams)
-      if (response.Data.records) {
-        const tableData = response.Data.records.map(convertMemberData)
+      if (response.Data) {
+        const tableData = response.Data.map(convertMemberData)
         setRoleList(tableData)
         // 更新分页信息
         setPagination({
@@ -171,8 +171,8 @@ const MemberPage: FC = () => {
   const fetchRoleList = async () => {
     try {
       const response: any = await roleApi.query({})
-      if (response.Data?.records) {
-        const roleOptions = response.Data.records.map((role) => ({
+      if (response.Data) {
+        const roleOptions = response.Data.map((role) => ({
           value: String(role.uid),
           label: role.name,
           disabled: role.enable !== 1
@@ -250,7 +250,7 @@ const MemberPage: FC = () => {
   // 分配角色
   const handleAssignRole = (record: MemberType) => {
     setCurrentMember(record)
-
+    console.log('分配角色', record)
     // 从角色名称字符串中提取角色ID
     const currentRoleNames = record.roleName ? record.roleName.split('，') : []
     const currentRoleIds = roles.filter((role) => currentRoleNames.includes(role.label)).map((role) => role.value)
