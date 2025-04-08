@@ -18,6 +18,7 @@ export interface LoginResponseData<T = any> {
   Data: T
   Msg: string // token值
   token: string // token值
+  Apikey: string // Apikey值
 }
 
 // 退出登录请求参数类型

@@ -25,16 +25,28 @@ const getUserApps = () => {
     if (!userInfoStr) return []
 
     const userInfo = JSON.parse(userInfoStr)
-    // 获取用户角色列表中的第一个角色
-    const role = userInfo.roleList?.[0]
-    if (!role) return []
+    // 获取用户的所有角色
+    const roles = userInfo.Roles || []
+    if (roles.length === 0) return []
 
-    // 获取菜单列表中的"小程序"菜单
-    const appMenu = role.menuList?.find((menu) => menu.menu === '小程序')
-    if (!appMenu || !appMenu.buttonList) return []
+    // 获取所有角色的小程序按钮列表
+    const allApps = roles.reduce((apps: any[], role) => {
+      // 从每个角色的 Menus 中找到"小程序"菜单
+      const appMenu = role.Menus?.find((menu) => menu.menu === '小程序')
+      if (appMenu?.Buttons) {
+        // 过滤已启用的按钮
+        const enabledButtons = appMenu.Buttons.filter((button) => button.enable === 1)
+        // 合并到应用列表中，避免重复
+        enabledButtons.forEach((button) => {
+          if (!apps.some((app) => app.uid === button.uid)) {
+            apps.push(button)
+          }
+        })
+      }
+      return apps
+    }, [])
 
-    // 返回按钮列表
-    return appMenu.buttonList.filter((button) => button.enable === 1)
+    return allApps
   } catch (error) {
     console.error('解析用户应用列表失败:', error)
     return []

@@ -1,14 +1,14 @@
-import { PlusOutlined } from '@ant-design/icons'
+// import { PlusOutlined } from '@ant-design/icons'
 import DragableList from '@renderer/components/DragableList'
 import Scrollbar from '@renderer/components/Scrollbar'
-import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
+// import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 import { useAgents } from '@renderer/hooks/useAgents'
 import { useAssistants } from '@renderer/hooks/useAssistant'
 import useUserInfo from '@renderer/hooks/useUserInfo'
 import { Assistant } from '@renderer/types'
-import { extractUniqueHelpers, getHelpersSummary } from '@renderer/utils/helperUtils'
+import { extractUniqueHelpers } from '@renderer/utils/helperUtils'
 import { FC, useCallback, useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+// import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 import AssistantItem from './AssistantItem'
@@ -25,13 +25,13 @@ interface AssistantsTabProps {
 const Assistants: FC<AssistantsTabProps> = ({
   activeAssistant,
   setActiveAssistant,
-  onCreateAssistant,
+  // onCreateAssistant,
   onCreateDefaultAssistant
 }) => {
   const { assistants, removeAssistant, addAssistant, updateAssistants } = useAssistants()
   const [dragging, setDragging] = useState(false)
   const { addAgent } = useAgents()
-  const { t } = useTranslation()
+  // const { t } = useTranslation()
   const { fetchAndProcessUserInfo } = useUserInfo()
   console.log('[AssistantsTab666] assistants:', assistants)
   // const [, setIsLoading] = useState(false)
@@ -72,14 +72,14 @@ const Assistants: FC<AssistantsTabProps> = ({
           ).values()
         )
         console.log('合并后的助手列表:', mergedAssistants)
-        if (uniqueHelpers.length > 0) {
-          updateAssistants(mergedAssistants)
-        } else {
-          updateAssistants(defaultAssistants)
+        // 更新助手列表
+        const finalAssistants = uniqueHelpers.length > 0 ? mergedAssistants : defaultAssistants
+        updateAssistants(finalAssistants)
+
+        // 如果当前没有选中的助手，自动选中第一个
+        if (finalAssistants.length > 0 && (!activeAssistant || !activeAssistant.id)) {
+          setActiveAssistant(finalAssistants[0])
         }
-        // 获取简要信息
-        const helpersSummary = getHelpersSummary(uniqueHelpers)
-        console.log('助手简要信息:', helpersSummary)
       } catch (error) {
         console.error('解析用户数据失败:', error)
       }
@@ -132,7 +132,7 @@ const Assistants: FC<AssistantsTabProps> = ({
     },
     [assistants, removeAssistant, setActiveAssistant, onCreateDefaultAssistant]
   )
-  const { isAdmin } = useAdminCheck()
+  // const { isAdmin } = useAdminCheck()
   return (
     <Container className="assistants-tab">
       <DragableList
@@ -165,14 +165,14 @@ const Assistants: FC<AssistantsTabProps> = ({
           />
         )}
       </DragableList>
-      {isAdmin && !dragging && (
+      {/* {isAdmin && !dragging && (
         <AssistantAddItem onClick={onCreateAssistant}>
           <AssistantName>
             <PlusOutlined style={{ color: 'var(--color-text-2)', marginRight: 4 }} />
             {t('chat.add.assistant.title')}
           </AssistantName>
         </AssistantAddItem>
-      )}
+      )} */}
       <div style={{ minHeight: 10 }}></div>
     </Container>
   )
@@ -186,36 +186,36 @@ const Container = styled(Scrollbar)`
   user-select: none;
 `
 
-const AssistantAddItem = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 7px 12px;
-  position: relative;
-  margin: 0 10px;
-  padding-right: 35px;
-  font-family: Ubuntu;
-  border-radius: var(--list-item-border-radius);
-  border: 0.5px solid transparent;
-  cursor: pointer;
+// const AssistantAddItem = styled.div`
+//   display: flex;
+//   flex-direction: row;
+//   justify-content: space-between;
+//   padding: 7px 12px;
+//   position: relative;
+//   margin: 0 10px;
+//   padding-right: 35px;
+//   font-family: Ubuntu;
+//   border-radius: var(--list-item-border-radius);
+//   border: 0.5px solid transparent;
+//   cursor: pointer;
 
-  &:hover {
-    background-color: var(--color-background-soft);
-  }
+//   &:hover {
+//     background-color: var(--color-background-soft);
+//   }
 
-  &.active {
-    background-color: var(--color-background-soft);
-    border: 0.5px solid var(--color-border);
-  }
-`
+//   &.active {
+//     background-color: var(--color-background-soft);
+//     border: 0.5px solid var(--color-border);
+//   }
+// `
 
-const AssistantName = styled.div`
-  color: var(--color-text);
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  font-size: 13px;
-`
+// const AssistantName = styled.div`
+//   color: var(--color-text);
+//   display: -webkit-box;
+//   -webkit-line-clamp: 1;
+//   -webkit-box-orient: vertical;
+//   overflow: hidden;
+//   font-size: 13px;
+// `
 
 export default Assistants

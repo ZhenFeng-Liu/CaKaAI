@@ -41,6 +41,7 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
         // 获取token
         localStorage.setItem('token', response.token || response.Data.token)
         localStorage.setItem('tavily_api_key', response.Data?.netKey || '')
+        localStorage.setItem('Apikey', response?.Apikey || '')
         // try {
         //   message.loading('正在获取用户信息...', 0.5) // 添加加载提示
         //   // 获取最新的用户信息

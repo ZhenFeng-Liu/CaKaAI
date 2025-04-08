@@ -2,11 +2,15 @@ import {
   FileSearchOutlined,
   FolderOutlined,
   PictureOutlined,
-  QuestionCircleOutlined,
+  // QuestionCircleOutlined,
   TranslationOutlined
 } from '@ant-design/icons'
 import { isMac } from '@renderer/config/constant'
-import { AppLogo, isLocalAi, UserAvatar } from '@renderer/config/env'
+import {
+  // AppLogo,
+  isLocalAi,
+  UserAvatar
+} from '@renderer/config/env'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 import useAvatar from '@renderer/hooks/useAvatar'
@@ -50,14 +54,14 @@ const Sidebar: FC = () => {
     navigate(path)
   }
 
-  const onOpenDocs = () => {
-    MinApp.start({
-      id: 'docs',
-      name: t('docs.title'),
-      url: 'https://docs.cherry-ai.com/',
-      logo: AppLogo
-    })
-  }
+  // const onOpenDocs = () => {
+  //   MinApp.start({
+  //     id: 'docs',
+  //     name: t('docs.title'),
+  //     url: 'https://docs.cherry-ai.com/',
+  //     logo: AppLogo
+  //   })
+  // }
 
   return (
     <Container
@@ -85,7 +89,7 @@ const Sidebar: FC = () => {
         )}
       </MainMenusContainer>
       <Menus>
-        {isAdmin && (
+        {/* {isAdmin && (
           <Tooltip title={t('docs.title')} mouseEnterDelay={0.8} placement="right">
             <Icon
               onClick={onOpenDocs}
@@ -93,7 +97,7 @@ const Sidebar: FC = () => {
               <QuestionCircleOutlined />
             </Icon>
           </Tooltip>
-        )}
+        )} */}
         <Tooltip title={t('settings.theme.title')} mouseEnterDelay={0.8} placement="right">
           <Icon onClick={() => toggleTheme()}>
             {theme === 'dark' ? (
