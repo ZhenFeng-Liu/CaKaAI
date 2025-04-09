@@ -1,8 +1,9 @@
 import { ExclamationCircleOutlined, RollbackOutlined } from '@ant-design/icons'
-import { memberApi } from '@renderer/api/member'
+// import { memberApi } from '@renderer/api/member'
+import { helperApi } from '@renderer/api/helper'
 import { roleApi } from '@renderer/api/role'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
-import { Button, Checkbox, Form, Input, Modal, Pagination, Radio, Select, Space, Table } from 'antd'
+import { Button, Checkbox, Form, Input, Modal, Pagination, Select, Space, Table } from 'antd'
 import { message } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -38,7 +39,7 @@ const convertMemberData = (data: any): MemberType => ({
   ...data,
   key: String(data.uid),
   memberName: data.name,
-  accountNo: data.name,
+  accountNo: data.url,
   roleName: data.Roles?.map((role: any) => role.name).join('，') || '',
   status: data.exited === 0 ? '在职' : '离职',
   accountStatus: data.enable === 1 ? '启用' : '禁用',
@@ -46,7 +47,7 @@ const convertMemberData = (data: any): MemberType => ({
   psw: data.psw
 })
 
-const MemberPage: FC = () => {
+const AssistantPage: FC = () => {
   const { t } = useTranslation()
   // const [selectedRole, setSelectedRole] = useState<string>()
   const [isModalVisible, setIsModalVisible] = useState(false)
@@ -86,27 +87,17 @@ const MemberPage: FC = () => {
   // 表格列定义
   const columns = [
     {
-      title: '会员姓名',
+      title: '助手名称',
       dataIndex: 'memberName',
       key: 'memberName'
     },
     {
-      title: '登录账号',
+      title: '助手链接',
       dataIndex: 'accountNo',
       key: 'accountNo'
     },
     {
-      title: '分配角色',
-      dataIndex: 'roleName',
-      key: 'roleName'
-    },
-    // {
-    //   title: '在职状态',
-    //   dataIndex: 'status',
-    //   key: 'status'
-    // },
-    {
-      title: '账号状态',
+      title: '助手状态',
       dataIndex: 'accountStatus',
       key: 'accountStatus'
     },
@@ -116,12 +107,15 @@ const MemberPage: FC = () => {
       render: (_: any, record: MemberType) => (
         <Space size="middle">
           <a onClick={() => handleEdit(record)}>修改</a>
-          <a onClick={() => handleResetPassword(record)}>重置密码</a>
-          <a onClick={() => handleAssignRole(record)}>分配角色</a>
+          {/* <a onClick={() => handleResetPassword(record)}>重置密码</a> */}
+          {/* <a onClick={() => handleAssignRole(record)}>分配角色</a> */}
           <a
             onClick={() => handleDisableAccount(record)}
             style={{ color: record.accountStatus === '启用' ? '#ff4d4f' : '#1890ff' }}>
             {record.accountStatus === '启用' ? '禁用' : '启用'}
+          </a>
+          <a onClick={() => handleDelete(record)} style={{ color: '#ff4d4f' }}>
+            删除
           </a>
         </Space>
       )
@@ -142,7 +136,8 @@ const MemberPage: FC = () => {
         pageNum: params?.pageNum || pagination.current,
         pageSize: params?.pageSize || pagination.pageSize
       }
-      const response: any = await memberApi.query(queryParams)
+      const response: any = await helperApi.query(queryParams)
+      console.log('获取助手列表response', response)
       if (response.Data) {
         const tableData = response.Data.map(convertMemberData)
         setRoleList(tableData)
@@ -201,33 +196,55 @@ const MemberPage: FC = () => {
     }
   }, [isModalVisible])
 
-  // 处理表单提交
+  // 修改处理函数
+  const handleEdit = (record: MemberType) => {
+    setCurrentMember(record)
+    // 设置表单初始值
+    form.setFieldsValue({
+      memberName: record.memberName,
+      accountNo: record.accountNo
+    })
+    setIsModalVisible(true)
+  }
+
+  // 修改 handleSubmit 函数
   const handleSubmit = async () => {
     try {
-      // const values = await form.validateFields()
+      const values = await form.validateFields()
       if (currentMember) {
-        // TODO: 调用修改 API
+        // 修改助手
+        await helperApi.update({
+          uid: currentMember.uid,
+          name: values.memberName,
+          url: values.accountNo
+        })
         message.success('修改成功')
       } else {
-        // TODO: 调用新增 API
+        // 添加助手
+        await helperApi.add({
+          name: values.memberName,
+          url: values.accountNo
+        })
         message.success('添加成功')
       }
       setIsModalVisible(false)
+      fetchMemberList() // 刷新列表
     } catch (error) {
       console.error('表单验证失败:', error)
+      message.error('操作失败，请检查输入内容')
     }
   }
 
   // 重置密码
-  const handleResetPassword = (record: MemberType) => {
-    setCurrentMember(record)
-    console.log(record)
-    resetPasswordForm.setFieldsValue({
-      currentPassword: record.psw,
-      newPassword: ''
-    })
-    setResetPasswordVisible(true)
-  }
+  // const handleResetPassword = (record: MemberType) => {
+  //   setCurrentMember(record)
+  //   console.log(record)
+  //   resetPasswordForm.setFieldsValue({
+  //     currentPassword: record.psw,
+  //     newPassword: ''
+  //   })
+  //   setResetPasswordVisible(true)
+  // }
 
   // 处理重置密码提交
   const handleResetPasswordSubmit = async () => {
@@ -235,7 +252,7 @@ const MemberPage: FC = () => {
       const values = await resetPasswordForm.validateFields()
       if (!currentMember) return
 
-      await memberApi.update({
+      await helperApi.update({
         uid: currentMember.uid,
         name: currentMember.accountNo,
         psw: values.newPassword
@@ -250,39 +267,39 @@ const MemberPage: FC = () => {
   }
 
   // 分配角色
-  const handleAssignRole = (record: any) => {
-    setCurrentMember(record)
-    console.log('分配角色', record)
+  // const handleAssignRole = (record: any) => {
+  //   setCurrentMember(record)
+  //   console.log('分配角色', record)
 
-    // 直接使用 Roles 数组数据
-    const currentRoleIds = record.Roles?.map((role: any) => role.uid) || []
-    console.log('currentRoleIds', currentRoleIds)
-    assignRoleForm.setFieldsValue({
-      memberName: record.memberName,
-      currentRole: record.roleName,
-      newRole: currentRoleIds // 直接使用角色ID数组
-    })
-    setAssignRoleVisible(true)
-  }
+  //   // 直接使用 Roles 数组数据
+  //   const currentRoleIds = record.Roles?.map((role: any) => role.uid) || []
+  //   console.log('currentRoleIds', currentRoleIds)
+  //   assignRoleForm.setFieldsValue({
+  //     memberName: record.memberName,
+  //     currentRole: record.roleName,
+  //     newRole: currentRoleIds // 直接使用角色ID数组
+  //   })
+  //   setAssignRoleVisible(true)
+  // }
 
   // 处理分配角色提交
-  const handleAssignRoleSubmit = async () => {
-    try {
-      const values = await assignRoleForm.validateFields()
-      if (!currentMember) return
+  // const handleAssignRoleSubmit = async () => {
+  //   try {
+  //     const values = await assignRoleForm.validateFields()
+  //     if (!currentMember) return
 
-      await memberApi.assignRole({
-        userId: currentMember.uid,
-        roleIds: values.newRole.map(Number) // 确保所有元素都是number类型
-      })
+  //     await helperApi.assignRole({
+  //       userId: currentMember.uid,
+  //       roleIds: values.newRole.map(Number) // 确保所有元素都是number类型
+  //     })
 
-      message.success('角色分配成功')
-      setAssignRoleVisible(false)
-      fetchMemberList() // 刷新会员列表
-    } catch (error) {
-      message.error('角色分配失败')
-    }
-  }
+  //     message.success('角色分配成功')
+  //     setAssignRoleVisible(false)
+  //     fetchMemberList() // 刷新会员列表
+  //   } catch (error) {
+  //     message.error('角色分配失败')
+  //   }
+  // }
 
   // 搜索功能
   const handleSearch = (value: string) => {
@@ -325,7 +342,7 @@ const MemberPage: FC = () => {
           message.error('新账号不能与当前账号相同')
           return
         }
-        await memberApi.update({
+        await helperApi.update({
           uid: currentMember.uid,
           name: values.newAccountNo
         })
@@ -360,9 +377,9 @@ const MemberPage: FC = () => {
       okButtonProps: { danger: !isEnabling },
       onOk: async () => {
         try {
-          await memberApi.update({
+          await helperApi.update({
             uid: record.uid,
-            name: record.accountNo,
+            // name: record.accountNo,
             enable: isEnabling ? 1 : 0
           })
           message.success(`账号${isEnabling ? '启用' : '禁用'}成功`)
@@ -375,16 +392,22 @@ const MemberPage: FC = () => {
   }
 
   // 处理添加会员
-  const handleAddMember = () => {
-    addMemberForm.resetFields()
-    setAddMemberVisible(true)
+  const handleAdd = () => {
+    setCurrentMember(null)
+    form.resetFields()
+    // 手动设置表单值为空
+    form.setFieldsValue({
+      memberName: '',
+      accountNo: ''
+    })
+    setIsModalVisible(true)
   }
 
   // 处理添加会员提交
   const handleAddMemberSubmit = async () => {
     try {
       const values = await addMemberForm.validateFields()
-      await memberApi.add({
+      await helperApi.add({
         name: values.accountNo,
         psw: values.password
       })
@@ -396,15 +419,27 @@ const MemberPage: FC = () => {
     }
   }
 
-  const handleEdit = (record: MemberType) => {
-    setCurrentMember(record)
-    editForm.setFieldsValue({
-      accountNo: record.accountNo,
-      newAccountNo: ''
+  // 处理删除助手
+  const handleDelete = (record: MemberType) => {
+    Modal.confirm({
+      title: '删除助手',
+      icon: <ExclamationCircleOutlined />,
+      content: '确定要删除该助手吗？',
+      okText: '确定',
+      cancelText: '取消',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await helperApi.delete({ uid: record.uid })
+          message.success('删除成功')
+          fetchMemberList()
+        } catch (error) {
+          message.error('删除失败')
+        }
+      }
     })
-    setEditModalVisible(true)
   }
-  // ... 现有代码 ...
+
   const navigate = useNavigate()
 
   // 返回上一页函数
@@ -414,7 +449,7 @@ const MemberPage: FC = () => {
   return (
     <Container>
       <Navbar>
-        <NavbarCenter style={{ borderRight: 'none' }}>{t('会员列表')}</NavbarCenter>
+        <NavbarCenter style={{ borderRight: 'none' }}>{t('助手列表')}</NavbarCenter>
       </Navbar>
       <ContentContainer id="content-container">
         <Header>
@@ -422,13 +457,13 @@ const MemberPage: FC = () => {
             <Button onClick={handleGoBack} icon={<RollbackOutlined />}></Button>
 
             <Input
-              placeholder="请输入会员姓名"
+              placeholder="请输入助手名称"
               value={searchName}
               onChange={(e) => setSearchName(e.target.value)}
               style={{ width: 200 }}
             />
             <Select
-              placeholder="账号状态"
+              placeholder="助手状态"
               value={selectedStatus}
               onChange={(value: any) => handleStatusChange(value)}
               style={{ width: 200 }}
@@ -439,8 +474,8 @@ const MemberPage: FC = () => {
             <Button onClick={() => handleSearch(searchName)}>查询</Button>
             <Button onClick={handleReset}>重置</Button>
           </SearchArea>
-          <Button type="primary" onClick={handleAddMember}>
-            + 添加会员
+          <Button type="primary" onClick={handleAdd}>
+            + 添加助手
           </Button>
         </Header>
         <Table
@@ -464,50 +499,49 @@ const MemberPage: FC = () => {
         </PaginationContainer>
       </ContentContainer>
 
-      {/* 添加/修改角色弹窗 */}
+      {/* 添加/修改助手弹窗 */}
       <Modal
-        title={currentMember ? '修改会员' : '新增会员'}
+        title={currentMember ? '修改助手' : '新增助手'}
         open={isModalVisible}
         onOk={handleSubmit}
-        onCancel={() => setIsModalVisible(false)}
-        width={600}>
-        <Form form={form} layout="vertical" initialValues={currentMember || {}}>
+        onCancel={() => {
+          setIsModalVisible(false)
+          setCurrentMember(null)
+          form.resetFields()
+        }}
+        width={400}>
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={
+            currentMember
+              ? {
+                  memberName: currentMember.memberName,
+                  accountNo: currentMember.accountNo
+                }
+              : undefined
+          }>
           <Form.Item
-            label="会员姓名"
+            label="助手名称"
             name="memberName"
             rules={[
-              { required: true, message: '请输入会员姓名' },
-              { max: 16, message: '会员姓名不能超过16个字' }
+              { required: true, message: '请输入助手名称' },
+              { max: 50, message: '助手名称不能超过50个字符' }
             ]}>
-            <Input placeholder="请输入会员姓名" />
+            <Input placeholder="请输入助手名称" />
           </Form.Item>
 
           <Form.Item
-            label="登录账号"
+            label="助手链接"
             name="accountNo"
             rules={[
-              { required: true, message: '请输入登录账号' },
-              { pattern: /^[a-zA-Z0-9_]+$/, message: '只能包含字母、数字和下划线' }
+              { required: true, message: '请输入助手链接' },
+              {
+                pattern: /^https?:\/\/.+/,
+                message: '请输入有效的URL地址（以http://或https://开头）'
+              }
             ]}>
-            <Input placeholder="请输入登录账号" disabled={!!currentMember} />
-          </Form.Item>
-
-          <Form.Item label="所属部门" name="departmentNo" rules={[{ required: true, message: '请选择所属部门' }]}>
-            <Select placeholder="请选择所属部门">{/* TODO: 添加部门选项 */}</Select>
-          </Form.Item>
-
-          <Form.Item label="在职状态" name="status" rules={[{ required: true, message: '请选择在职状态' }]}>
-            <Radio.Group>
-              <Radio value="在职">在职</Radio>
-              <Radio value="离职">离职</Radio>
-            </Radio.Group>
-          </Form.Item>
-
-          <Form.Item label="账号状态" name="accountStatus" rules={[{ required: true, message: '请选择账号状态' }]}>
-            <Radio.Group>
-              <Radio value="启用">启用</Radio>
-              <Radio value="禁用">禁用</Radio>
-            </Radio.Group>
+            <Input placeholder="请输入助手链接" />
           </Form.Item>
         </Form>
       </Modal>
@@ -610,7 +644,7 @@ const MemberPage: FC = () => {
       <Modal
         title="分配角色"
         open={assignRoleVisible}
-        onOk={handleAssignRoleSubmit}
+        // onOk={handleAssignRoleSubmit}
         onCancel={() => setAssignRoleVisible(false)}
         width={400}>
         <Form form={assignRoleForm} layout="vertical">
@@ -720,4 +754,4 @@ const PaginationContainer = styled.div`
   background-color: var(--color-background);
   z-index: 10;
 `
-export default MemberPage
+export default AssistantPage

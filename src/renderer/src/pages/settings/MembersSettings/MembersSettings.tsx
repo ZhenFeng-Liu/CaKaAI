@@ -19,6 +19,10 @@ const AboutSettings: FC = () => {
     navigate('/settings/MembersSettings/members') // 跳转到会员列表页面
   }
 
+  const showAssistant = () => {
+    navigate('/settings/MembersSettings/assistant') // 跳转到会员列表页面
+  }
+
   return (
     <SettingContainer theme={theme}>
       <SettingGroup theme={theme}>
@@ -32,6 +36,11 @@ const AboutSettings: FC = () => {
         <SettingRow>
           <SettingRowTitle>{t('会员列表')}</SettingRowTitle>
           <Button onClick={showMembers}>{t('settings.about.website.button')}</Button>
+        </SettingRow>
+        <SettingDivider />
+        <SettingRow>
+          <SettingRowTitle>{t('助手列表')}</SettingRowTitle>
+          <Button onClick={showAssistant}>{t('settings.about.website.button')}</Button>
         </SettingRow>
       </SettingGroup>
     </SettingContainer>

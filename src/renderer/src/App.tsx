@@ -29,10 +29,11 @@ import FilesPage from './pages/files/FilesPage'
 import HomePage from './pages/home/HomePage'
 import KnowledgePage from './pages/knowledge/KnowledgePage'
 import LoginPage from './pages/login/LoginPage'
+// import TranslatePage from './pages/translate/TranslatePage'
+import AssistantPage from './pages/settings/MembersSettings/AssistantPage'
 import MemberPage from './pages/settings/MembersSettings/MemberPage'
 import RolePage from './pages/settings/MembersSettings/RolePage'
 import SettingsPage from './pages/settings/SettingsPage'
-import TranslatePage from './pages/translate/TranslatePage'
 const AIPainting: FC = () => {
   // useEffect(() => {
   //   window.open('http://192.168.0.123:8188', '_blank')
@@ -43,6 +44,21 @@ const AIPainting: FC = () => {
       id: 'baidu-sd',
       name: 'AI 绘画',
       url: 'http://192.168.0.123:8188',
+      logo: AppLogo // 需要导入 AppLogo 或使用其他合适的图标
+    })
+  }, [])
+  return null
+}
+const AITranslation: FC = () => {
+  // useEffect(() => {
+  //   window.open('http://192.168.0.123:8188', '_blank')
+  // }, [])
+  // return <div>正在跳转...</div>
+  useEffect(() => {
+    MinApp.start({
+      id: 'huoshan-translation',
+      name: 'AI 翻译',
+      url: 'https://translate.volcengine.com/',
       logo: AppLogo // 需要导入 AppLogo 或使用其他合适的图标
     })
   }, [])
@@ -108,7 +124,7 @@ const MainContent: FC = () => {
                         path="/translate"
                         element={
                           <AuthRoute menuName="翻译">
-                            <TranslatePage />
+                            <AITranslation />
                           </AuthRoute>
                         }
                       />
@@ -147,6 +163,7 @@ const MainContent: FC = () => {
                       <Route path="/settings/*" element={<SettingsPage />} />
                       <Route path="/settings/MembersSettings/roles" element={<RolePage />} />
                       <Route path="/settings/MembersSettings/members" element={<MemberPage />} />
+                      <Route path="/settings/MembersSettings/assistant" element={<AssistantPage />} />
                     </Routes>
                   </HashRouter>
                 </TopViewContainer>

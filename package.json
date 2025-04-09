@@ -1,6 +1,6 @@
 {
   "name": "CaKaAi",
-  "version": "1.0.15",
+  "version": "1.0.17",
   "private": true,
   "description": "A powerful AI assistant for producer.",
   "main": "./out/main/index.js",

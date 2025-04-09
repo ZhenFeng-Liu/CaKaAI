@@ -306,6 +306,7 @@ const RolePage: FC = () => {
     try {
       const response: any = await roleApi.query({ name: record.roleName })
       if (response.Data) {
+        console.log('获取当前角色的权限response', response)
         const currentPermissions = {}
         const modulePermissions = {}
         response.Data[0].Menus.forEach((perm: any) => {
@@ -511,37 +512,41 @@ const RolePage: FC = () => {
                 dataIndex: 'label',
                 width: '20%',
                 render: (text, record) => (
-                  <Form.Item
-                    noStyle
-                    name={['modulePermissions', record.key]}
-                    valuePropName="checked"
-                    initialValue={false}>
-                    <Checkbox
-                      onChange={(e) => {
-                        // 获取当前模块所有按钮的ID
-                        // const allButtonIds = record.buttons?.map((btn) => Number(btn.key)) || []
-                        // 获取当前表单中该模块的权限值
-                        // const currentPermissions = authForm.getFieldValue(['permissions', record.key]) || []
+                  console.log('获取当前角色的权限record', record),
+                  (
+                    <Form.Item
+                      noStyle
+                      name={['modulePermissions', record.key]}
+                      valuePropName="checked"
+                      initialValue={false}>
+                      <Checkbox
+                        onChange={(e) => {
+                          // 获取当前模块所有按钮的ID
+                          // const allButtonIds = record.buttons?.map((btn) => Number(btn.key)) || []
+                          // 获取当前表单中该模块的权限值
+                          // const currentPermissions = authForm.getFieldValue(['permissions', record.key]) || []
 
-                        // 如果模块被选中，选中所有未禁用的按钮
-                        if (e.target.checked) {
-                          const enabledButtonIds =
-                            record.buttons?.filter((btn) => btn.enable).map((btn) => Number(btn.key)) || []
-                          authForm.setFieldValue(['permissions', record.key], enabledButtonIds)
-                        } else {
-                          // 如果模块被取消选中，清空所有按钮选择
-                          authForm.setFieldValue(['permissions', record.key], [])
-                        }
-                      }}>
-                      {text}
-                    </Checkbox>
-                  </Form.Item>
+                          // 如果模块被选中，选中所有未禁用的按钮
+                          if (e.target.checked) {
+                            const enabledButtonIds =
+                              record.buttons?.filter((btn) => btn.enable).map((btn) => Number(btn.key)) || []
+                            authForm.setFieldValue(['permissions', record.key], enabledButtonIds)
+                          } else {
+                            // 如果模块被取消选中，清空所有按钮选择
+                            authForm.setFieldValue(['permissions', record.key], [])
+                          }
+                        }}>
+                        {text}
+                      </Checkbox>
+                    </Form.Item>
+                  )
                 )
               },
               {
                 title: '功能权限',
                 width: '80%',
                 render: (_, record) => (
+                  // console.log('获取当前角色的权限record', record),
                   <Form.Item noStyle name={['permissions', record.key]} initialValue={[]}>
                     <Checkbox.Group
                       style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}
