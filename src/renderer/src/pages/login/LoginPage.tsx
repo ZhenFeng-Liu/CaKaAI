@@ -1,6 +1,7 @@
 import { EyeInvisibleOutlined, EyeOutlined, LockOutlined, UserOutlined } from '@ant-design/icons'
 import { userApi } from '@renderer/api/user'
-import logoImage from '@renderer/assets/images/logo.png'
+import logoImage from '@renderer/assets/images/0416-logo.png'
+import loginBgImage from '@renderer/assets/images/login-bg.png'
 // import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 import useUserInfo from '@renderer/hooks/useUserInfo'
 import { Button, Checkbox, Form, Input, message } from 'antd'
@@ -156,14 +157,14 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
 
   return (
     <Container $mounted={mounted}>
-      <BackgroundDecoration>
+      {/* <BackgroundDecoration>
         <BackgroundBubble />
         <BackgroundBubble />
         <BackgroundBubble />
         <BackgroundParticle />
         <BackgroundParticle />
         <BackgroundParticle />
-      </BackgroundDecoration>
+      </BackgroundDecoration> */}
       <BackgroundShimmer />
 
       <LoginCard>
@@ -171,27 +172,26 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
           <LogoIcon>
             <img src={logoImage} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </LogoIcon>
-          <LogoText>CaKaAI</LogoText>
+          {/* <LogoText>卡卡</LogoText> */}
         </LogoContainer>
-        <WelcomeText>欢迎使用 CaKaAI 智能助手</WelcomeText>
+        <WelcomeText>欢迎使用CakaAI智能助手</WelcomeText>
+        <SubtitleText>请输入你的账号密码登录使用</SubtitleText>
         <Form form={form} onFinish={onFinish} layout="vertical">
           <FormItemStyled
             name="username"
+            label="账号"
             rules={[{ required: true, message: '请输入账号' }]}
             validateTrigger={['onChange', 'onBlur']}>
-            <StyledInput
-              prefix={<UserOutlined style={{ color: 'var(--color-text-2)' }} />}
-              placeholder="请输入账号"
-              size="large"
-            />
+            <StyledInput prefix={<UserOutlined style={{ color: '#bfbfbf' }} />} placeholder="请输入账号" size="large" />
           </FormItemStyled>
 
           <FormItemStyled
             name="password"
+            label="密码"
             rules={[{ required: true, message: '请输入密码' }]}
             validateTrigger={['onChange', 'onBlur']}>
             <StyledPassword
-              prefix={<LockOutlined style={{ color: 'var(--color-text-2)' }} />}
+              prefix={<LockOutlined style={{ color: '#bfbfbf' }} />}
               placeholder="请输入密码"
               size="large"
               iconRender={(visible) => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />)}
@@ -199,16 +199,17 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
           </FormItemStyled>
 
           <FormItemStyled name="rememberMe" valuePropName="checked">
-            <StyledCheckbox>七天免登录</StyledCheckbox>
+            <StyledCheckbox>7天免登录</StyledCheckbox>
           </FormItemStyled>
 
           <FormItemStyled>
             <LoginButton type="primary" htmlType="submit" loading={loading} block size="large">
-              登录
+              登 录
             </LoginButton>
           </FormItemStyled>
         </Form>
-        <PoweredBy>Powered by CaKaAI © {new Date().getFullYear()}</PoweredBy>
+        <Divider />
+        <PoweredBy>Powered by CakaAI @ {new Date().getFullYear()}</PoweredBy>
       </LoginCard>
     </Container>
   )
@@ -223,37 +224,6 @@ const fadeIn = keyframes`
     opacity: 1;
     transform: translateY(0);
   }
-`
-
-const floatAnimation = keyframes`
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0); }
-`
-
-const pulseAnimation = keyframes`
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-`
-
-const floatingAnimation = keyframes`
-  0% { transform: translateY(0) rotate(0); opacity: 0.6; }
-  50% { transform: translateY(-25px) rotate(5deg); opacity: 0.8; }
-  100% { transform: translateY(0) rotate(0); opacity: 0.6; }
-`
-
-const floatingAnimationAlt = keyframes`
-  0% { transform: translateY(0) rotate(0) scale(1); opacity: 0.5; }
-  33% { transform: translateY(-15px) rotate(3deg) scale(1.05); opacity: 0.7; }
-  66% { transform: translateY(10px) rotate(-2deg) scale(0.95); opacity: 0.6; }
-  100% { transform: translateY(0) rotate(0) scale(1); opacity: 0.5; }
-`
-
-const pulseAnimationSlow = keyframes`
-  0% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.1); opacity: 0.8; }
-  100% { transform: scale(1); opacity: 0.6; }
 `
 
 const shimmerAnimation = keyframes`
@@ -274,6 +244,14 @@ const Container = styled.div<{ $mounted: boolean }>`
   position: relative;
   overflow: hidden;
   -webkit-app-region: drag;
+  background-image: url(${loginBgImage});
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* 调整登录卡片位置 */
+  padding-left: calc(50% + 50px); /* 向右偏移100px */
+  align-items: flex-start;
 
   &::before {
     content: '';
@@ -285,341 +263,213 @@ const Container = styled.div<{ $mounted: boolean }>`
     background: radial-gradient(circle at 30% 30%, #ffffff 0%, #f0f5ff 100%);
     z-index: -1;
   }
+
+  /* 响应式调整 */
+  @media (max-width: 1024px) {
+    padding-left: calc(50% + 50px); /* 中等屏幕偏移减小 */
+  }
+
+  @media (max-width: 768px) {
+    padding-left: 20px; /* 小屏幕恢复居中 */
+    align-items: center;
+  }
 `
 
 const LoginCard = styled.div`
   width: 100%;
-  max-width: 420px;
-  background-color: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(0, 185, 107, 0.05);
-  padding: 45px;
-  animation: ${fadeIn} 0.7s ease-out;
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  max-width: 380px;
+  background-color: #ffffff;
+  border-radius: 24px;
+  box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.12);
+  padding: 25px;
+  animation: ${fadeIn} 0.5s ease-out;
   -webkit-app-region: no-drag;
   z-index: 2;
   position: relative;
-  overflow: hidden;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(
-      to bottom right,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.1) 50%,
-      rgba(255, 255, 255, 0) 100%
-    );
-    transform: rotate(30deg);
-    pointer-events: none;
-  }
 `
 
 const LogoContainer = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 35px;
-  animation: ${floatAnimation} 6s ease-in-out infinite;
+  margin-bottom: 24px;
 `
 
 const LogoIcon = styled.div`
-  width: 54px;
-  height: 54px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, #00a05c 100%);
+  width: 100px;
+  height: 45px;
+  border-radius: 50%;
+  background: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 30px;
-  font-weight: bold;
-  color: white;
-  margin-right: 14px;
-  box-shadow:
-    0 6px 16px rgba(0, 185, 107, 0.3),
-    0 0 0 1px rgba(0, 185, 107, 0.1) inset;
-  position: relative;
+  margin-right: 8px;
   overflow: hidden;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.2) 50%,
-      rgba(255, 255, 255, 0) 100%
-    );
-    animation: ${pulseAnimation} 3s infinite;
-  }
 `
 
-const LogoText = styled.div`
-  font-size: 32px;
-  font-weight: 800;
-  background: linear-gradient(to right, #222222, #555555);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: -0.5px;
-`
+// const LogoText = styled.div`
+//   font-size: 20px;
+//   font-weight: 600;
+//   color: #4a89dc;
+// `
 
 const WelcomeText = styled.div`
-  font-size: 17px;
-  color: #555555;
-  text-align: center;
-  margin-bottom: 35px;
-  font-weight: 500;
-  letter-spacing: 0.2px;
+  font-size: 18px;
+  color: #333333;
+  margin-bottom: 8px;
+  font-weight: 700;
+`
+
+const SubtitleText = styled.div`
+  font-size: 14px;
+  color: #bfbfbf;
+  margin-bottom: 25px;
 `
 
 const StyledInput = styled(Input)`
-  background-color: rgba(249, 250, 251, 0.8);
+  background-color: #ffffff;
   border: 1px solid #e8e8e8;
   color: #333333;
-  border-radius: 10px;
-  height: 52px;
-  transition: all 0.3s ease;
+  border-radius: 8px;
+  height: 44px;
+  transition: all 0.2s ease;
 
-  &:hover {
-    border-color: rgba(0, 185, 107, 0.5);
-    background-color: rgba(249, 250, 251, 1);
-    box-shadow: 0 2px 8px rgba(0, 185, 107, 0.08);
-  }
-
+  &:hover,
   &:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(0, 185, 107, 0.15);
-    background-color: #ffffff;
+    border-color: #1890ff;
+    box-shadow: none;
   }
 
   .ant-input {
     background-color: transparent;
     color: #333333;
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .ant-input-prefix {
-    margin-right: 12px;
-    color: #888888;
-    font-size: 18px;
+    margin-right: 10px;
+    font-size: 16px;
   }
 `
 
 const StyledPassword = styled(Input.Password)`
-  background-color: rgba(249, 250, 251, 0.8);
+  background-color: #ffffff;
   border: 1px solid #e8e8e8;
   color: #333333;
-  border-radius: 10px;
-  height: 52px;
-  transition: all 0.3s ease;
+  border-radius: 8px;
+  height: 44px;
+  transition: all 0.2s ease;
 
-  &:hover {
-    border-color: rgba(0, 185, 107, 0.5);
-    background-color: rgba(249, 250, 251, 1);
-    box-shadow: 0 2px 8px rgba(0, 185, 107, 0.08);
-  }
-
+  &:hover,
   &:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(0, 185, 107, 0.15);
-    background-color: #ffffff;
+    border-color: #1890ff;
+    box-shadow: none;
   }
 
   .ant-input {
     background-color: transparent;
     color: #333333;
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .ant-input-prefix {
-    margin-right: 12px;
-    color: #888888;
-    font-size: 18px;
+    margin-right: 10px;
+    font-size: 16px;
   }
 
   .ant-input-suffix .anticon {
-    color: #888888;
-    font-size: 16px;
+    color: #bfbfbf;
+    font-size: 14px;
   }
 `
 
 const StyledCheckbox = styled(Checkbox)`
   .ant-checkbox-inner {
-    background-color: #ffffff;
     border-color: #d9d9d9;
-    border-radius: 4px;
-    width: 18px;
-    height: 18px;
+    border-radius: 3px;
+    width: 16px;
+    height: 16px;
   }
 
   .ant-checkbox-checked .ant-checkbox-inner {
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
-  }
-
-  .ant-checkbox-wrapper-checked {
-    color: #333333;
+    background-color: #1890ff;
+    border-color: #1890ff;
   }
 
   span {
-    color: #666666;
+    color: #8c8c8c;
     font-size: 14px;
   }
+`
 
-  &:hover .ant-checkbox-inner {
-    border-color: var(--color-primary);
+const FormItemStyled = styled(Form.Item)`
+  margin-bottom: 20px;
+
+  .ant-form-item-label > label {
+    font-size: 15px;
+    font-weight: 500;
+    color: #999999;
+  }
+  .ant-form-item-explain-error {
+    font-size: 13px;
+    margin-top: 5px;
+    color: #ff4d4f;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
   }
 `
 
 const LoginButton = styled(Button)`
-  height: 52px;
+  height: 44px;
   border-radius: 10px;
   font-size: 16px;
-  font-weight: 600;
-  background: linear-gradient(to right, var(--color-primary), #00a05c);
+  font-weight: 700 !important;
+  background: linear-gradient(to right, #29bbff, #9e46ff);
   border: none;
-  box-shadow: 0 4px 12px rgba(0, 185, 107, 0.25);
   margin-top: 15px;
-  transition: all 0.3s ease;
-  letter-spacing: 0.5px;
+  letter-spacing: 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+  /* 确保内部文本也应用粗体 */
+  span {
+    font-weight: 700 !important;
+  }
+
+  /* 增加字体大小以增强可读性 */
+  font-size: 16px;
 
   &:hover,
   &:focus {
-    background: linear-gradient(to right, #00cc76, #00b96b);
-    box-shadow: 0 6px 18px rgba(0, 185, 107, 0.35);
-    transform: translateY(-2px);
+    background: linear-gradient(to right, #20aeff, #8e36ff);
+    box-shadow: 0 6px 15px rgba(78, 99, 255, 0.25);
   }
 
   &:active {
-    transform: translateY(0);
-    box-shadow: 0 4px 8px rgba(0, 185, 107, 0.2);
+    background: linear-gradient(to right, #1a9deb, #7e26f9);
+    box-shadow: 0 4px 8px rgba(78, 99, 255, 0.2);
   }
+`
+
+const Divider = styled.div`
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    rgba(224, 224, 224, 0),
+    rgba(224, 224, 224, 0.7) 30%,
+    rgba(224, 224, 224, 0.8) 50%,
+    rgba(224, 224, 224, 0.7) 90%,
+    rgba(224, 224, 224, 0)
+  );
+  margin: 35px auto 20px;
+  width: 70%;
 `
 
 const PoweredBy = styled.div`
   text-align: center;
-  color: #888888;
-  font-size: 13px;
-  margin-top: 35px;
-  font-weight: 500;
-`
-
-const BackgroundDecoration = styled.div`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  overflow: hidden;
-  z-index: 1;
-  pointer-events: none;
-
-  &::before {
-    content: '';
-    position: absolute;
-    width: 600px;
-    height: 600px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, rgba(0, 185, 107, 0.08) 0%, transparent 70%);
-    top: -300px;
-    right: -200px;
-    opacity: 0.7;
-    animation: ${floatingAnimation} 18s ease-in-out infinite;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    width: 400px;
-    height: 400px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, rgba(0, 185, 107, 0.06) 0%, transparent 70%);
-    bottom: -200px;
-    left: -150px;
-    opacity: 0.6;
-    animation: ${floatingAnimation} 24s ease-in-out infinite reverse;
-  }
-`
-
-const BackgroundBubble = styled.div`
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(0, 185, 107, 0.08) 0%, transparent 70%);
-  animation: ${pulseAnimationSlow} 10s ease-in-out infinite;
-
-  &:nth-child(1) {
-    width: 250px;
-    height: 250px;
-    top: 15%;
-    left: 10%;
-    animation-duration: 15s;
-  }
-
-  &:nth-child(2) {
-    width: 180px;
-    height: 180px;
-    bottom: 20%;
-    right: 15%;
-    background: radial-gradient(circle at 30% 30%, rgba(100, 100, 255, 0.06) 0%, transparent 70%);
-    animation-duration: 12s;
-    animation-delay: 2s;
-  }
-
-  &:nth-child(3) {
-    width: 120px;
-    height: 120px;
-    top: 60%;
-    left: 20%;
-    background: radial-gradient(circle at 30% 30%, rgba(255, 180, 0, 0.05) 0%, transparent 70%);
-    animation-duration: 18s;
-    animation-delay: 1s;
-  }
-`
-
-const BackgroundParticle = styled.div`
-  position: absolute;
-  border-radius: 50%;
-  background-color: rgba(0, 185, 107, 0.15);
-  animation: ${floatingAnimationAlt} 20s ease-in-out infinite;
-
-  &:nth-child(4) {
-    width: 10px;
-    height: 10px;
-    top: 25%;
-    right: 25%;
-    animation-duration: 25s;
-  }
-
-  &:nth-child(5) {
-    width: 15px;
-    height: 15px;
-    bottom: 30%;
-    left: 30%;
-    background-color: rgba(100, 100, 255, 0.1);
-    animation-duration: 30s;
-    animation-delay: 3s;
-  }
-
-  &:nth-child(6) {
-    width: 8px;
-    height: 8px;
-    top: 70%;
-    right: 35%;
-    background-color: rgba(255, 180, 0, 0.1);
-    animation-duration: 22s;
-    animation-delay: 5s;
-  }
+  color: #bfbfbf;
+  font-size: 12px;
+  margin-top: 0; /* 调整为0，因为Divider已经提供了间距 */
 `
 
 const BackgroundShimmer = styled.div`
@@ -638,20 +488,6 @@ const BackgroundShimmer = styled.div`
   animation: ${shimmerAnimation} 30s linear infinite;
   pointer-events: none;
   z-index: 1;
-`
-
-const FormItemStyled = styled(Form.Item)`
-  margin-bottom: 20px;
-
-  .ant-form-item-explain-error {
-    font-size: 13px;
-    margin-top: 5px;
-    color: #ff4d4f;
-  }
-
-  &:last-child {
-    margin-bottom: 0;
-  }
 `
 
 export default LoginPage
