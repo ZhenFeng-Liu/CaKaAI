@@ -3,7 +3,7 @@ import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
 import { Center } from '@renderer/components/Layout'
 import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 import { useMinapps } from '@renderer/hooks/useMinapps'
-import { Empty, Input } from 'antd'
+import { Card, Empty, Input } from 'antd'
 import { isEmpty } from 'lodash'
 import React, { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -239,7 +239,9 @@ const AppsPage: FC = () => {
                 <CategoryTitle>{category}</CategoryTitle>
                 <AppsContainer>
                   {apps.map((app) => (
-                    <App key={app.id} app={app} />
+                    <Card key={app.id} style={{ minWidth: '200px', minHeight: '120px' }} hoverable>
+                      <App key={app.id} app={app} size={40} />
+                    </Card>
                   ))}
                 </AppsContainer>
               </CategorySection>
@@ -265,7 +267,7 @@ const ContentContainer = styled.div`
   justify-content: center;
   height: 100%;
   overflow-y: auto;
-  padding: 50px;
+  padding: 30px;
 `
 
 const AppsContainer = styled.div`
@@ -273,7 +275,7 @@ const AppsContainer = styled.div`
   min-width: 0;
   max-width: 930px;
   width: 100%;
-  grid-template-columns: repeat(auto-fill, 90px);
+  grid-template-columns: repeat(auto-fill, 200px);
   gap: 25px;
   justify-content: center;
 `
@@ -290,6 +292,10 @@ const CategorySection = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
+
+  &:last-child {
+    margin-bottom: 30px;
+  }
 `
 
 const CategoryTitle = styled.h2`

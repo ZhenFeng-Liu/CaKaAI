@@ -9,10 +9,13 @@ import store from '@renderer/store'
 import { setMinappShow } from '@renderer/store/runtime'
 import { MinAppType } from '@renderer/types'
 import { delay } from '@renderer/utils'
-import { Avatar, Drawer } from 'antd'
+import {
+  // Avatar,
+  Drawer
+} from 'antd'
 import { WebviewTag } from 'electron'
 import { useEffect, useRef, useState } from 'react'
-import BeatLoader from 'react-spinners/BeatLoader'
+import DotLoader from 'react-spinners/DotLoader'
 import styled from 'styled-components'
 
 import { TopView } from '../TopView'
@@ -140,8 +143,12 @@ const PopupContainer: React.FC<Props> = ({ app, resolve }) => {
       style={{ marginLeft: 'var(--sidebar-width)' }}>
       {!isReady && (
         <EmptyView>
-          <Avatar src={app.logo} size={80} style={{ border: '1px solid var(--color-border)', marginTop: -150 }} />
-          <BeatLoader color="var(--color-text-2)" size="10" style={{ marginTop: 15 }} />
+          {/* <Avatar src={app.logo} size={80} style={{ border: '1px solid var(--color-border)', marginTop: -150 }} /> */}
+          <DotLoader
+            color="#8F87F1"
+            //  size="0"
+            // style={{ marginTop: 15 }}
+          />
         </EmptyView>
       )}
       {opened && (
