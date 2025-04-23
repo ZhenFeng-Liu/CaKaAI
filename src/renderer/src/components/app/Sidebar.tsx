@@ -289,6 +289,7 @@ const MainMenusContainer = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
+  justify-content: center; // 菜单按钮垂直居中
   overflow: hidden;
 `
 

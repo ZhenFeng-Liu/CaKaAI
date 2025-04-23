@@ -1,3 +1,4 @@
+import { LockOutlined, LogoutOutlined } from '@ant-design/icons' // 修正图标导入路径
 import { memberApi } from '@renderer/api/member' // 添加这一行
 import { userApi } from '@renderer/api/user' // 添加这一行
 import DefaultAvatar from '@renderer/assets/images/avatar.png'
@@ -6,7 +7,7 @@ import { useSettings } from '@renderer/hooks/useSettings'
 import ImageStorage from '@renderer/services/ImageStorage'
 import { useAppDispatch } from '@renderer/store'
 import { setAvatar } from '@renderer/store/runtime'
-import { setUserName } from '@renderer/store/settings'
+// import { setUserName } from '@renderer/store/settings'
 import { compressImage, isEmoji } from '@renderer/utils'
 import { Avatar, Button, Dropdown, Form, Input, message, Modal, Popover, Upload } from 'antd'
 import { useState } from 'react'
@@ -20,6 +21,10 @@ import { TopView } from '../TopView'
 interface Props {
   resolve: (data: any) => void
 }
+
+const PasswordFormContainer = styled.div`
+  padding-top: 20px;
+`
 
 const PopupContainer: React.FC<Props> = ({ resolve }) => {
   const [open, setOpen] = useState(true)
@@ -227,7 +232,9 @@ const PopupContainer: React.FC<Props> = ({ resolve }) => {
   return (
     <>
       <Modal
-        width="300px"
+        style={{
+          minWidth: '380px'
+        }}
         open={open}
         footer={null}
         onOk={onOk}
@@ -266,29 +273,54 @@ const PopupContainer: React.FC<Props> = ({ resolve }) => {
           </VStack>
         </Center>
         <HStack alignItems="center" gap="10px" p="20px">
-          <Input
+          {/* <Input
             placeholder={t('settings.general.user_name.placeholder')}
             value={cachedUserName || userName} // 优先使用缓存中的用户名
             onChange={(e) => dispatch(setUserName(e.target.value.trim()))}
             style={{ flex: 1, textAlign: 'center', width: '100%' }}
             maxLength={30}
             disabled={true} // 始终禁用输入框
-          />
+          /> */}
+          {/* {cachedUserName || userName} */}
+          <div style={{ fontSize: '16px', fontWeight: 500, textAlign: 'center', width: '100%' }}>
+            {cachedUserName || userName}
+          </div>
         </HStack>
-        <HStack justifyContent="center" p="0 20px 20px">
-          <Button type="primary" style={{ width: '100%' }} onClick={() => setPasswordModalVisible(true)}>
+        <HStack justifyContent="center" p="15px 20px 10px">
+          <Button
+            color="primary"
+            variant="filled"
+            style={{
+              width: '100%',
+              background: '#e8f3ff',
+              color: '#3b82f6'
+            }}
+            onClick={() => setPasswordModalVisible(true)}
+            icon={<LockOutlined />}>
             修改密码
           </Button>
         </HStack>
         <HStack justifyContent="center" p="0 20px 20px">
-          <Button type="primary" style={{ width: '100%' }} danger onClick={handleLogout}>
+          <Button
+            color="danger"
+            variant="filled"
+            style={{
+              width: '100%',
+              background: '#ffffff',
+              color: '#3b82f6',
+              border: '1px solid #e8f3ff'
+            }}
+            onClick={handleLogout}
+            icon={<LogoutOutlined />}>
             退出登录
           </Button>
         </HStack>
       </Modal>
       {/* 修改密码弹窗 */}
       <Modal
-        width="300px"
+        style={{
+          minWidth: '380px'
+        }}
         title="修改密码"
         open={passwordModalVisible}
         onCancel={() => {
@@ -297,57 +329,71 @@ const PopupContainer: React.FC<Props> = ({ resolve }) => {
         }}
         footer={null}
         centered>
-        <Form form={form} onFinish={handleChangePassword}>
-          <Form.Item
-            name="oldPassword"
-            rules={[
-              { required: true, message: '请输入旧密码' },
-              { min: 6, message: '密码长度不能少于6位' },
-              {
-                validator: (_, value) => {
-                  if (value === cachedOldPassword) {
-                    return Promise.resolve()
+        <PasswordFormContainer>
+          <Form form={form} onFinish={handleChangePassword} layout="vertical">
+            <Form.Item
+              label="旧密码"
+              name="oldPassword"
+              rules={[
+                { required: true, message: '请输入旧密码' },
+                { min: 6, message: '密码长度不能少于6位' },
+                {
+                  validator: (_, value) => {
+                    if (value === cachedOldPassword) {
+                      return Promise.resolve()
+                    }
+                    return Promise.reject(new Error('旧密码输入错误，请重新输入'))
                   }
-                  return Promise.reject(new Error('旧密码输入错误，请重新输入'))
                 }
-              }
-            ]}>
-            <Input.Password placeholder="请输入旧密码" />
-          </Form.Item>
-          <Form.Item
-            name="newPassword"
-            rules={[
-              { required: true, message: '请输入新密码' },
-              { min: 6, message: '密码长度不能少于6位' },
-              {
-                pattern: /^[a-zA-Z0-9]+$/,
-                message: '密码只能包含大小写英文和数字'
-              }
-            ]}>
-            <Input.Password placeholder="请输入新密码" />
-          </Form.Item>
-          <Form.Item
-            name="confirmPassword"
-            dependencies={['newPassword']}
-            rules={[
-              { required: true, message: '请确认新密码' },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (!value || getFieldValue('newPassword') === value) {
-                    return Promise.resolve()
+              ]}>
+              <Input.Password placeholder="请输入旧密码" />
+            </Form.Item>
+            <Form.Item
+              label="新密码"
+              name="newPassword"
+              rules={[
+                { required: true, message: '请输入新密码' },
+                { min: 6, message: '密码长度不能少于6位' },
+                {
+                  pattern: /^[a-zA-Z0-9]+$/,
+                  message: '密码只能包含大小写英文和数字'
+                }
+              ]}>
+              <Input.Password placeholder="请输入新密码" />
+            </Form.Item>
+            <Form.Item
+              label="确认新密码"
+              name="confirmPassword"
+              dependencies={['newPassword']}
+              rules={[
+                { required: true, message: '请确认新密码' },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue('newPassword') === value) {
+                      return Promise.resolve()
+                    }
+                    return Promise.reject(new Error('两次输入的密码不一致'))
                   }
-                  return Promise.reject(new Error('两次输入的密码不一致'))
-                }
-              })
-            ]}>
-            <Input.Password placeholder="请确认新密码" />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" block>
-              确定
-            </Button>
-          </Form.Item>
-        </Form>
+                })
+              ]}>
+              <Input.Password placeholder="请确认新密码" />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                htmlType="submit"
+                block
+                color="primary"
+                variant="filled"
+                style={{
+                  width: '100%',
+                  background: '#e8f3ff',
+                  color: '#3b82f6'
+                }}>
+                确定
+              </Button>
+            </Form.Item>
+          </Form>
+        </PasswordFormContainer>
       </Modal>
     </>
   )
