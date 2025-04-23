@@ -321,8 +321,12 @@ export class WindowService {
     const isMac = process.platform === 'darwin'
 
     this.miniWindow = new BrowserWindow({
-      width: 500,
-      height: 520,
+      width: 550,
+      height: 400,
+      minWidth: 350,
+      minHeight: 380,
+      maxWidth: 1024,
+      maxHeight: 768,
       show: true,
       autoHideMenuBar: true,
       transparent: isMac,
