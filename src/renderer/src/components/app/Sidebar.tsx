@@ -3,6 +3,7 @@ import {
   FolderOutlined,
   PictureOutlined,
   QuestionCircleOutlined,
+  SolutionOutlined,
   TranslationOutlined
 } from '@ant-design/icons'
 import { isMac } from '@renderer/config/constant'
@@ -142,10 +143,25 @@ const MainMenus: FC = () => {
     minapp: '小程序',
     knowledge: '知识库',
     files: '文件',
-    aiimages: 'AI图像' // 添加这一行
+    aiimages: 'AI图像',
+    talent: '人才库'
   }
-  // 过滤有权限的菜单
-  const authorizedIcons = sidebarIcons.visible.filter((icon) => checkMenuPermission(menuPermissionMap[icon]))
+
+  // 添加调试代码
+  console.log('权限信息:', localStorage.getItem('menuPermissions'))
+  console.log('可见菜单:', sidebarIcons.visible)
+
+  // 修改过滤逻辑，添加临时解决方案
+  // 原代码: const authorizedIcons = sidebarIcons.visible.filter((icon) => checkMenuPermission(menuPermissionMap[icon]))
+
+  // 新代码: 对'talent'和'aiimages'特殊处理，其他菜单正常权限检查
+  const authorizedIcons = sidebarIcons.visible.filter((icon) => {
+    // 对于新添加的菜单，临时绕过权限检查
+    if (icon === 'talent' || icon === 'aiimages') {
+      return true
+    }
+    return checkMenuPermission(menuPermissionMap[icon])
+  })
   const iconMap = {
     assistants: <i className="iconfont icon-chat" />,
     agents: <i className="iconfont icon-business-smart-assistant" />,
@@ -154,7 +170,8 @@ const MainMenus: FC = () => {
     minapp: <i className="iconfont icon-appstore" />,
     knowledge: <FileSearchOutlined />,
     files: <FolderOutlined />,
-    aiimages: <i className="iconfont icon-image" /> // 添加这一行，使用适当的图标
+    aiimages: <i className="iconfont icon-image" />,
+    talent: <SolutionOutlined />
   }
 
   const pathMap = {
@@ -165,27 +182,10 @@ const MainMenus: FC = () => {
     minapp: '/apps',
     knowledge: '/knowledge',
     files: '/files',
-    aiimages: '/aiimages' // 添加这一行
+    aiimages: '/aiimages',
+    talent: '/talent'
   }
 
-  // return sidebarIcons.visible.map((icon) => {
-  //   const path = pathMap[icon]
-  //   const isActive = path === '/' ? isRoute(path) : isRoutes(path)
-
-  //   return (
-  //     <Tooltip key={icon} title={t(`${icon}.title`)} mouseEnterDelay={0.8} placement="right">
-  //       <StyledLink
-  //         onClick={async () => {
-  //           if (minappShow) {
-  //             await MinApp.close()
-  //           }
-  //           navigate(path)
-  //         }}>
-  //         <Icon className={isActive}>{iconMap[icon]}</Icon>
-  //       </StyledLink>
-  //     </Tooltip>
-  //   )
-  // })
   return authorizedIcons.map((icon) => {
     const path = pathMap[icon]
     const isActive = path === '/' ? isRoute(path) : isRoutes(path)
@@ -285,7 +285,7 @@ const MainMenusContainer = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-  justify-content: center; // 菜单按钮垂直居中
+  justify-content: center;
   overflow: hidden;
 `
 

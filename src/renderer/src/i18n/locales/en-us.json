@@ -926,6 +926,12 @@
         "copying_files": "Copying files... {{progress}}%",
         "completed": "Restore completed"
       }
+    },
+    "talent": {
+      "title": "Talent Pool"
+    },
+    "aiimages": {
+      "title": "AI Images"
     }
   }
 }

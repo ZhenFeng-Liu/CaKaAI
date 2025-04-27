@@ -34,6 +34,7 @@ import AssistantPage from './pages/settings/MembersSettings/AssistantPage'
 import MemberPage from './pages/settings/MembersSettings/MemberPage'
 import RolePage from './pages/settings/MembersSettings/RolePage'
 import SettingsPage from './pages/settings/SettingsPage'
+
 const AIPainting: FC = () => {
   // useEffect(() => {
   //   window.open('http://192.168.0.123:8188', '_blank')
@@ -64,6 +65,28 @@ const AITranslation: FC = () => {
   }, [])
   return null
 }
+
+const AITalent: FC = () => {
+  // useEffect(() => {
+  //   window.open('http://192.168.0.123:8188', '_blank')
+  // }, [])
+  // return <div>正在跳转...</div>
+  useEffect(() => {
+    const userInfo = localStorage.getItem('userInfo')
+    if (userInfo) {
+      const userInfoObj = JSON.parse(userInfo)
+      const inputer = userInfoObj.name
+      MinApp.start({
+        id: 'huoshan-talent',
+        name: '人才库',
+        url: `http://192.168.0.245:5173/?inputer=${inputer}`,
+        logo: AppLogo // 需要导入 AppLogo 或使用其他合适的图标
+      })
+    }
+  }, [])
+  return null
+}
+
 const MainContent: FC = () => {
   return (
     <>
@@ -157,6 +180,14 @@ const MainContent: FC = () => {
                         element={
                           <AuthRoute menuName="AI图像">
                             <AIimagesPage />
+                          </AuthRoute>
+                        }
+                      />
+                      <Route
+                        path="/talent"
+                        element={
+                          <AuthRoute menuName="人才库">
+                            <AITalent />
                           </AuthRoute>
                         }
                       />

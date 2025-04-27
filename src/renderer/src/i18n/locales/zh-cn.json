@@ -926,6 +926,12 @@
         "copying_files": "复制文件... {{progress}}%",
         "completed": "恢复完成"
       }
+    },
+    "talent": {
+      "title": "人才库"
+    },
+    "aiimages": {
+      "title": "AI图像"
     }
   }
 }
