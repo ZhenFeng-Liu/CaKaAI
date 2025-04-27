@@ -174,8 +174,8 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
           </LogoIcon>
           {/* <LogoText>卡卡</LogoText> */}
         </LogoContainer>
-        <WelcomeText>欢迎使用CakaAI智能助手</WelcomeText>
-        <SubtitleText>请输入你的账号密码登录使用</SubtitleText>
+        <WelcomeText>和Caka一起开始你的工作</WelcomeText>
+        <SubtitleText>Caka是精通各项技能的领域专家，是你和AI协同办公的最佳帮手</SubtitleText>
         <Form form={form} onFinish={onFinish} layout="vertical">
           <FormItemStyled
             name="username"

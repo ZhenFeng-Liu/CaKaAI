@@ -157,9 +157,9 @@ const MainMenus: FC = () => {
   // 新代码: 对'talent'和'aiimages'特殊处理，其他菜单正常权限检查
   const authorizedIcons = sidebarIcons.visible.filter((icon) => {
     // 对于新添加的菜单，临时绕过权限检查
-    if (icon === 'talent' || icon === 'aiimages') {
-      return true
-    }
+    // if (icon === 'talent' || icon === 'aiimages') {
+    //   return true
+    // }
     return checkMenuPermission(menuPermissionMap[icon])
   })
   const iconMap = {
@@ -329,7 +329,7 @@ const Icon = styled.div`
     border: 0.5px solid var(--color-border);
     .iconfont,
     .anticon {
-      color: var(--color-primary);
+      color: var(--color-icon);
     }
   }
 `

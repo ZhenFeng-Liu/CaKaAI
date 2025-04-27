@@ -1,4 +1,12 @@
-import { SearchOutlined } from '@ant-design/icons'
+import {
+  AppstoreOutlined,
+  BuildOutlined,
+  CodeOutlined,
+  EllipsisOutlined,
+  FileImageOutlined,
+  RobotOutlined,
+  SearchOutlined
+} from '@ant-design/icons'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
 import { Center } from '@renderer/components/Layout'
 import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
@@ -84,6 +92,18 @@ const generateDynamicCategories = (apps) => {
 const APP_CATEGORIES = generateDynamicCategories(userApps)
 console.log('动态应用分类:', APP_CATEGORIES)
 
+// 创建分类图标映射
+const categoryIconMap = {
+  AI对话工具: <RobotOutlined />,
+  AI图像视频: <FileImageOutlined />,
+  AI办公软件: <BuildOutlined />,
+  AI编程工具: <CodeOutlined />,
+  其他: <EllipsisOutlined />
+}
+
+// 默认图标，用于没有映射的分类
+const defaultCategoryIcon = <AppstoreOutlined />
+
 const AppsPage: FC = () => {
   const { t } = useTranslation()
   const [search, setSearch] = useState('')
@@ -124,32 +144,6 @@ const AppsPage: FC = () => {
     // 分类应用
     filteredApps.forEach((app) => {
       let assigned = false
-
-      // 尝试将应用分配到相应类别
-      // for (const [category, appIds] of Object.entries(APP_CATEGORIES)) {
-      //   // 精准匹配应用ID
-      //   if (app.id && appIds.includes(app.id as string)) {
-      //     categorized[category].push(app)
-      //     assigned = true
-      //     break
-      //   }
-      // }
-
-      // 1. 首先尝试通过ID精确匹配
-      // if (app.id && appIdToCategoryMap[app.id as string]) {
-      //   const category = appIdToCategoryMap[app.id as string]
-      //   categorized[category].push(app)
-      //   assigned = true
-      // }
-      // // 2. 然后尝试通过名称匹配用户自定义分类
-      // else if (app.name && userCategoryMap[app.name.toLowerCase()]) {
-      //   const category = userCategoryMap[app.name.toLowerCase()]
-      //   if (!categorized[category]) {
-      //     categorized[category] = []
-      //   }
-      //   categorized[category].push(app)
-      //   assigned = true
-      // }
 
       // 遍历所有分类
       for (const [category, appIds] of Object.entries(appCategories)) {
@@ -236,10 +230,16 @@ const AppsPage: FC = () => {
           <CategoriesContainer>
             {categorizedApps.map(([category, apps]) => (
               <CategorySection key={category}>
-                <CategoryTitle>{category}</CategoryTitle>
+                <CategoryTitle>
+                  {categoryIconMap[category] || defaultCategoryIcon}
+                  <span>{category}</span>
+                </CategoryTitle>
                 <AppsContainer>
                   {apps.map((app) => (
-                    <Card key={app.id} style={{ minWidth: '200px', minHeight: '120px' }} hoverable>
+                    <Card
+                      key={app.id}
+                      style={{ minWidth: '200px', minHeight: '120px', backgroundColor: 'var(--color-background-soft)' }}
+                      hoverable>
                       <App key={app.id} app={app} size={40} />
                     </Card>
                   ))}
@@ -303,6 +303,14 @@ const CategoryTitle = styled.h2`
   font-weight: 500;
   margin-bottom: 15px;
   color: var(--color-text);
+  display: flex;
+  align-items: center;
+
+  .anticon {
+    margin-right: 8px;
+    font-size: 18px;
+    color: var(--color-icon);
+  }
 `
 
 export default AppsPage
