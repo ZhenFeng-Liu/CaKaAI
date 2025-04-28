@@ -312,8 +312,19 @@ function App(): JSX.Element {
 
   return (
     <>
-      <ReduxProvider store={store}>
+      {/* <ReduxProvider store={store}>
         {isAuthenticated ? <MainContent /> : <LoginPage setIsAuthenticated={setIsAuthenticated} />}
+      </ReduxProvider> */}
+      <ReduxProvider store={store}>
+        <StyleSheetManager>
+          <ThemeProvider>
+            <AntdProvider>
+              <SyntaxHighlighterProvider>
+                {isAuthenticated ? <MainContent /> : <LoginPage setIsAuthenticated={setIsAuthenticated} />}
+              </SyntaxHighlighterProvider>
+            </AntdProvider>
+          </ThemeProvider>
+        </StyleSheetManager>
       </ReduxProvider>
     </>
   )
