@@ -104,6 +104,24 @@ const DisplaySettings: FC = () => {
   return (
     <SettingContainer theme={themeMode}>
       <SettingGroup theme={theme}>
+        <SettingTitle>
+          {t('settings.display.custom.css')}
+          <TitleExtra onClick={() => window.api.openWebsite('https://cherrycss.com/')}>
+            {t('settings.display.custom.css.cherrycss')}
+          </TitleExtra>
+        </SettingTitle>
+        <SettingDivider />
+        <Input.TextArea
+          value={customCss}
+          onChange={(e) => dispatch(setCustomCss(e.target.value))}
+          placeholder={t('settings.display.custom.css.placeholder')}
+          style={{
+            minHeight: 1000,
+            fontFamily: 'monospace'
+          }}
+        />
+      </SettingGroup>
+      <SettingGroup theme={theme}>
         <SettingTitle>{t('settings.display.title')}</SettingTitle>
         <SettingDivider />
         <SettingRow>
@@ -191,24 +209,6 @@ const DisplaySettings: FC = () => {
           disabledMiniApps={disabledMiniApps}
           setVisibleMiniApps={setVisibleMiniApps}
           setDisabledMiniApps={setDisabledMiniApps}
-        />
-      </SettingGroup>
-      <SettingGroup theme={theme}>
-        <SettingTitle>
-          {t('settings.display.custom.css')}
-          <TitleExtra onClick={() => window.api.openWebsite('https://cherrycss.com/')}>
-            {t('settings.display.custom.css.cherrycss')}
-          </TitleExtra>
-        </SettingTitle>
-        <SettingDivider />
-        <Input.TextArea
-          value={customCss}
-          onChange={(e) => dispatch(setCustomCss(e.target.value))}
-          placeholder={t('settings.display.custom.css.placeholder')}
-          style={{
-            minHeight: 200,
-            fontFamily: 'monospace'
-          }}
         />
       </SettingGroup>
     </SettingContainer>

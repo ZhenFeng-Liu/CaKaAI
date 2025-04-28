@@ -1,6 +1,6 @@
 import { EyeInvisibleOutlined, EyeOutlined, LockOutlined, UserOutlined } from '@ant-design/icons'
 import { userApi } from '@renderer/api/user'
-import logoImage from '@renderer/assets/images/0416-logo.png'
+// import logoImage from '@renderer/assets/images/0416-logo.png'
 import loginBgImage from '@renderer/assets/images/login-bg.png'
 // import { useAdminCheck } from '@renderer/hooks/useAdminCheck'
 import useUserInfo from '@renderer/hooks/useUserInfo'
@@ -169,9 +169,9 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
 
       <LoginCard>
         <LogoContainer>
-          <LogoIcon>
+          {/* <LogoIcon>
             <img src={logoImage} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-          </LogoIcon>
+          </LogoIcon> */}
           {/* <LogoText>卡卡</LogoText> */}
         </LogoContainer>
         <WelcomeText>和Caka一起开始你的工作</WelcomeText>
@@ -294,17 +294,17 @@ const LogoContainer = styled.div`
   margin-bottom: 24px;
 `
 
-const LogoIcon = styled.div`
-  width: 100px;
-  height: 45px;
-  border-radius: 50%;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 8px;
-  overflow: hidden;
-`
+// const LogoIcon = styled.div`
+//   width: 100px;
+//   height: 45px;
+//   border-radius: 50%;
+//   background: white;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   margin-right: 8px;
+//   overflow: hidden;
+// `
 
 // const LogoText = styled.div`
 //   font-size: 20px;
