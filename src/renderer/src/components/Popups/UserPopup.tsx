@@ -36,6 +36,7 @@ const PopupContainer: React.FC<Props> = ({ resolve }) => {
   const { userName } = useSettings()
   const dispatch = useAppDispatch()
   const avatar = useAvatar()
+  const { theme } = useSettings()
 
   // 从缓存获取用户信息
   const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
@@ -292,8 +293,9 @@ const PopupContainer: React.FC<Props> = ({ resolve }) => {
             variant="filled"
             style={{
               width: '100%',
-              background: '#e8f3ff',
-              color: '#3b82f6'
+              background: theme === 'dark' ? '#ffffff' : '#e8f3ff',
+              color: theme === 'dark' ? '#000000' : '#3b82f6',
+              transition: 'all 0.3s ease'
             }}
             onClick={() => setPasswordModalVisible(true)}
             icon={<LockOutlined />}>
@@ -306,9 +308,9 @@ const PopupContainer: React.FC<Props> = ({ resolve }) => {
             variant="filled"
             style={{
               width: '100%',
-              background: '#ffffff',
-              color: '#3b82f6',
-              border: '1px solid #e8f3ff'
+              background: theme === 'dark' ? '#ffffff' : '#fff1f0',
+              color: '#ff4d4f',
+              transition: 'all 0.3s ease'
             }}
             onClick={handleLogout}
             icon={<LogoutOutlined />}>
