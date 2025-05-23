@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unknown-property */
 import { CloseOutlined, CodeOutlined, ExportOutlined, PushpinOutlined, ReloadOutlined } from '@ant-design/icons'
-import { isMac, isWindows } from '@renderer/config/constant'
+import { isLinux, isMac, isWindows } from '@renderer/config/constant'
 import { AppLogo } from '@renderer/config/env'
 import { DEFAULT_MIN_APPS } from '@renderer/config/minapps'
 import { useBridge } from '@renderer/hooks/useBridge'
@@ -140,7 +140,7 @@ const PopupContainer: React.FC<Props> = ({ app, resolve }) => {
       height={'100%'}
       maskClosable={false}
       closeIcon={null}
-      style={{ marginLeft: 'var(--sidebar-width)' }}>
+      style={{ marginLeft: 'var(--sidebar-width)', backgroundColor: window.root.style.background }}>
       {!isReady && (
         <EmptyView>
           {/* <Avatar src={app.logo} size={80} style={{ border: '1px solid var(--color-border)', marginTop: -150 }} /> */}
@@ -167,7 +167,7 @@ const PopupContainer: React.FC<Props> = ({ app, resolve }) => {
 const WebviewStyle: React.CSSProperties = {
   width: 'calc(100vw - var(--sidebar-width))',
   height: 'calc(100vh - var(--navbar-height))',
-  backgroundColor: 'white',
+  backgroundColor: 'var(--color-background)',
   display: 'inline-flex'
 }
 
@@ -182,14 +182,16 @@ const TitleContainer = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
+  background-color: transparent;
 `
 
 const TitleText = styled.div`
   font-weight: bold;
   font-size: 14px;
   color: var(--color-text-1);
+  -webkit-app-region: no-drag;
   margin-right: 10px;
-  user-select: none;
+  // user-select: none;
 `
 
 const ButtonsGroup = styled.div`
@@ -199,7 +201,7 @@ const ButtonsGroup = styled.div`
   gap: 5px;
   -webkit-app-region: no-drag;
   &.windows {
-    margin-right: ${isWindows ? '130px' : 0};
+    margin-right: ${isWindows ? '130px' : isLinux ? '100px' : 0};
     background-color: var(--color-background-mute);
     border-radius: 50px;
     padding: 0 3px;
@@ -219,11 +221,16 @@ const Button = styled.div`
   color: var(--color-text-2);
   transition: all 0.2s ease;
   font-size: 14px;
+  -webkit-app-region: no-drag;
   &:hover {
     color: var(--color-text-1);
     background-color: var(--color-background-mute);
   }
   &.pinned {
+    color: var(--color-primary);
+    background-color: var(--color-primary-bg);
+  }
+  &.open-external {
     color: var(--color-primary);
     background-color: var(--color-primary-bg);
   }
