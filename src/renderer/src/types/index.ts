@@ -306,6 +306,7 @@ export type SidebarIcon =
   | 'files'
   | 'aiimages'
   | 'talent'
+  | 'inquiry'
 
 export type WebSearchProvider = {
   id: string

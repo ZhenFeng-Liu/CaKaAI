@@ -4,6 +4,7 @@ import {
   PictureOutlined,
   QuestionCircleOutlined,
   SolutionOutlined,
+  TransactionOutlined,
   TranslationOutlined
 } from '@ant-design/icons'
 import { isMac } from '@renderer/config/constant'
@@ -144,7 +145,8 @@ const MainMenus: FC = () => {
     knowledge: '知识库',
     files: '文件',
     aiimages: 'AI图像',
-    talent: '人才库'
+    talent: '人才库',
+    inquiry: 'AI询价'
   }
 
   // 添加调试代码
@@ -157,9 +159,9 @@ const MainMenus: FC = () => {
   // 新代码: 对'talent'和'aiimages'特殊处理，其他菜单正常权限检查
   const authorizedIcons = sidebarIcons.visible.filter((icon) => {
     // 对于新添加的菜单，临时绕过权限检查
-    // if (icon === 'talent' || icon === 'aiimages') {
-    //   return true
-    // }
+    if (icon === 'inquiry') {
+      return true
+    }
     return checkMenuPermission(menuPermissionMap[icon])
   })
   const iconMap = {
@@ -171,7 +173,8 @@ const MainMenus: FC = () => {
     knowledge: <FileSearchOutlined />,
     files: <FolderOutlined />,
     aiimages: <i className="iconfont icon-image" />,
-    talent: <SolutionOutlined />
+    talent: <SolutionOutlined />,
+    inquiry: <TransactionOutlined />
   }
 
   const pathMap = {
@@ -183,7 +186,8 @@ const MainMenus: FC = () => {
     knowledge: '/knowledge',
     files: '/files',
     aiimages: '/aiimages',
-    talent: '/talent'
+    talent: '/talent',
+    inquiry: '/inquiry'
   }
 
   return authorizedIcons.map((icon) => {

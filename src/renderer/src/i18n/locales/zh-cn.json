@@ -932,6 +932,9 @@
     },
     "aiimages": {
       "title": "AI图像"
+    },
+    "inquiry": {
+      "title": "AI 询价"
     }
   }
 }

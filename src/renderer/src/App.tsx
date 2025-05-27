@@ -27,6 +27,7 @@ import AIimagesPage from './pages/aiimages/AIimagesPage'
 import AppsPage from './pages/apps/AppsPage'
 import FilesPage from './pages/files/FilesPage'
 import HomePage from './pages/home/HomePage'
+import InquiryPage from './pages/inquiry/SettingsPage'
 import KnowledgePage from './pages/knowledge/KnowledgePage'
 import LoginPage from './pages/login/LoginPage'
 // import TranslatePage from './pages/translate/TranslatePage'
@@ -189,6 +190,14 @@ const MainContent: FC = () => {
                           <AuthRoute menuName="人才库">
                             <AITalent />
                           </AuthRoute>
+                        }
+                      />
+                      <Route
+                        path="/inquiry/*"
+                        element={
+                          // <AuthRoute menuName="AI询价">
+                          <InquiryPage />
+                          // </AuthRoute>
                         }
                       />
                       <Route path="/settings/*" element={<SettingsPage />} />

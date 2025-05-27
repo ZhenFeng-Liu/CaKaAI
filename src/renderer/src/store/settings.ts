@@ -14,6 +14,7 @@ export type SidebarIcon =
   | 'files'
   | 'aiimages'
   | 'talent'
+  | 'inquiry'
 
 export const DEFAULT_SIDEBAR_ICONS: SidebarIcon[] = [
   'assistants',
@@ -23,8 +24,9 @@ export const DEFAULT_SIDEBAR_ICONS: SidebarIcon[] = [
   'minapp',
   'knowledge',
   'files',
-  // 'aiimages',
-  'talent'
+  'aiimages',
+  'talent',
+  'inquiry'
 ]
 
 export interface SettingsState {
@@ -138,7 +140,7 @@ const initialState: SettingsState = {
   topicNamingPrompt: '',
   sidebarIcons: {
     visible: DEFAULT_SIDEBAR_ICONS.filter((icon) => icon !== 'aiimages'),
-    disabled: ['aiimages'] // 将 'aiimages' 添加到禁用列表
+    disabled: [] // 将 'aiimages' 添加到禁用列表
   },
   narrowMode: false,
   enableQuickAssistant: false,
