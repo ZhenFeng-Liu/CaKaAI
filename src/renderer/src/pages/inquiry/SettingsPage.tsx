@@ -1,4 +1,5 @@
 import {
+  DatabaseOutlined,
   HomeOutlined,
   ProfileOutlined
   // CloudOutlined,
@@ -20,6 +21,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 
+import DataPage from './DataSettings/DataPage'
 import InquiryPage from './InquirySettings/InquiryPage'
 import InquiryLogPage from './LogSettings/InquiryPage'
 // import DataSettings from './DataSettings/DataSettings'
@@ -118,6 +120,14 @@ const SettingsPage: FC = () => {
               </MenuItem>
             </Tooltip>
           </MenuItemLink>
+          <MenuItemLink to="/inquiry/data">
+            <Tooltip title={t('数据清洗平台')} placement="right">
+              <MenuItem className={isRoute('/inquiry/data')}>
+                <DatabaseOutlined />
+                {/* {t('数据平台')} */}
+              </MenuItem>
+            </Tooltip>
+          </MenuItemLink>
         </SettingMenus>
         <SettingContent>
           <Routes>
@@ -133,6 +143,7 @@ const SettingsPage: FC = () => {
             <Route index element={<Navigate to="inquiry" replace />} />
             <Route path="inquiry" element={<InquiryPage />} />
             <Route path="log" element={<InquiryLogPage />} />
+            <Route path="data" element={<DataPage />} />
           </Routes>
         </SettingContent>
       </ContentContainer>
