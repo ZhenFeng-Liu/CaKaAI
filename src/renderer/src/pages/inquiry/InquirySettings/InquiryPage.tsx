@@ -418,7 +418,7 @@ const InquiryPage: FC = () => {
                 <ProgressBar>
                   <ProgressFill style={{ width: `${progress}%` }} />
                 </ProgressBar>
-                <LoadingText>加载中 {Math.round(progress)}%</LoadingText>
+                <LoadingText>请稍后，正在询价中 {Math.round(progress)}%</LoadingText>
               </LoadingOverlay>
             )}
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayedMarkdown}</ReactMarkdown>
