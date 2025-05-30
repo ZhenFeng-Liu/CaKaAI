@@ -5,7 +5,7 @@ import type { ColumnsType } from 'antd/es/table'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
-const PRODUCT_TYPES = ['房卡', '楼板', '雨伞', '窗帘', '智能门锁']
+const PRODUCT_TYPES = ['房卡-自产', '房卡-外购', '拖鞋', '环保笔', '雨伞', '胸牌', '六小件']
 
 const columns: ColumnsType<any> = [
   { title: '序号', dataIndex: 'index', width: 60, align: 'center' as const, fixed: 'left' },
