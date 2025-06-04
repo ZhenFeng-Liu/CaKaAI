@@ -2,12 +2,28 @@ import { useTheme } from '@renderer/context/ThemeProvider'
 import { ThemeMode } from '@renderer/types'
 import { Button, message, Radio, Table } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-const PRODUCT_TYPES = ['房卡-自产', '房卡-外购', '拖鞋', '环保笔', '雨伞', '胸牌', '六小件']
+import { queryProdType } from '../api/query_prodtype'
+import { PRODUCT_TYPE_MAP, PRODUCT_TYPES, ProductType } from './constants'
+import {
+  BadgeData,
+  EcoPenData,
+  ProductData,
+  RawBadgeData,
+  RawEcoPenData,
+  RawProductData,
+  RawSixPieceData,
+  RawSlipperData,
+  RawUmbrellaData,
+  SixPieceData,
+  SlipperData,
+  UmbrellaData
+} from './types'
 
-const columns: ColumnsType<any> = [
+// 房卡表格列定义
+const roomCardColumns: ColumnsType<ProductData> = [
   { title: '序号', dataIndex: 'index', width: 60, align: 'center' as const, fixed: 'left' },
   { title: '产品编号', dataIndex: 'productNo', width: 90, align: 'center' as const, fixed: 'left' },
   { title: '品类', dataIndex: 'category', width: 70, align: 'center' as const, fixed: 'left' },
@@ -26,102 +42,98 @@ const columns: ColumnsType<any> = [
   { title: '税率', dataIndex: 'tax', width: 60, align: 'center' as const, fixed: 'left' }
 ]
 
-const dataSource = [
-  {
-    key: '1',
-    index: 1,
-    productNo: '202510',
-    category: '房卡',
-    material: '木质',
-    thickness: '1.2',
-    length: '85.5',
-    width: '54',
-    process: '印刷, 烫金',
-    chip: 'CP.1.01.0372',
-    encrypted: '是',
-    sampleLead: '15',
-    bulkLead: '15',
-    ladderPrice: '1-100张，每张1元; 101-500张，每张0.7元/张',
-    proofingFee: '1-10张，每张1元; 11-20张，每张2元/张',
-    invoice: '专票',
-    tax: '13%'
-  },
-  {
-    key: '2',
-    index: 2,
-    productNo: '202511',
-    category: '房卡',
-    material: 'PVC',
-    thickness: '1.2',
-    length: '85.5',
-    width: '54',
-    process: '印刷, 覆刻',
-    chip: 'CP.1.01.0372',
-    encrypted: '是',
-    sampleLead: '15',
-    bulkLead: '15',
-    ladderPrice: '1-100张，每张1元; 101-500张，每张0.7元/张',
-    proofingFee: '1-10张，每张1元; 11-20张，每张2元/张',
-    invoice: '专票',
-    tax: '13%'
-  },
-  {
-    key: '3',
-    index: 3,
-    productNo: '202511',
-    category: '房卡',
-    material: 'PVC',
-    thickness: '1.2',
-    length: '85.5',
-    width: '54',
-    process: '印刷, 覆刻',
-    chip: 'CP.1.01.0372',
-    encrypted: '是',
-    sampleLead: '15',
-    bulkLead: '15',
-    ladderPrice: '1-100张，每张1元; 101-500张，每张0.7元/张',
-    proofingFee: '1-10张，每张1元; 11-20张，每张2元/张',
-    invoice: '专票',
-    tax: '13%'
-  },
-  {
-    key: '4',
-    index: 4,
-    productNo: '202511',
-    category: '房卡',
-    material: 'PVC',
-    thickness: '1.2',
-    length: '85.5',
-    width: '54',
-    process: '印刷, 覆刻',
-    chip: 'CP.1.01.0372',
-    encrypted: '是',
-    sampleLead: '15',
-    bulkLead: '15',
-    ladderPrice: '1-100张，每张1元; 101-500张，每张0.7元/张',
-    proofingFee: '1-10张，每张1元; 11-20张，每张2元/张',
-    invoice: '专票',
-    tax: '13%'
-  },
-  {
-    key: '5',
-    index: 5,
-    productNo: '202511',
-    category: '房卡',
-    material: 'PVC',
-    thickness: '1.2',
-    length: '85.5',
-    width: '54',
-    process: '印刷, 覆刻',
-    chip: 'CP.1.01.0372',
-    encrypted: '是',
-    sampleLead: '15',
-    bulkLead: '15',
-    ladderPrice: '1-100张，每张1元; 101-500张，每张0.7元/张',
-    proofingFee: '1-10张，每张1元; 11-20张，每张2元/张',
-    invoice: '专票',
-    tax: '13%'
-  }
+// 拖鞋表格列定义
+const slipperColumns: ColumnsType<SlipperData> = [
+  { title: '序号', dataIndex: 'serial', width: 60, align: 'center' as const, fixed: 'left' },
+  { title: '产品编号', dataIndex: 'productNo', width: 90, align: 'center' as const, fixed: 'left' },
+  { title: '物料编码', dataIndex: 'materialCode', width: 120, align: 'center' as const },
+  { title: '材质', dataIndex: 'texture', width: 120, align: 'center' as const },
+  { title: '尺码', dataIndex: 'size', width: 80, align: 'center' as const },
+  { title: '工艺', dataIndex: 'craft', width: 100, align: 'center' as const },
+  { title: '包装', dataIndex: 'packaging', width: 100, align: 'center' as const },
+  { title: '价格', dataIndex: 'price', width: 100, align: 'center' as const },
+  { title: '打样数量', dataIndex: 'proofingNum', width: 90, align: 'center' as const },
+  { title: '样品交期（工作日）', dataIndex: 'sampleLead', width: 110, align: 'center' as const },
+  { title: '大货交期（工作日）', dataIndex: 'bulkLead', width: 110, align: 'center' as const },
+  { title: '打样费用', dataIndex: 'proofingFee', width: 180, align: 'center' as const },
+  { title: '发票', dataIndex: 'invoice', width: 80, align: 'center' as const },
+  { title: '税率', dataIndex: 'tax', width: 80, align: 'center' as const }
+]
+
+// 环保笔表格列定义
+const ecoPenColumns: ColumnsType<EcoPenData> = [
+  { title: '序号', dataIndex: 'serial', width: 60, align: 'center' as const, fixed: 'left' },
+  { title: '产品编号', dataIndex: 'productNo', width: 90, align: 'center' as const, fixed: 'left' },
+  { title: '物料编码', dataIndex: 'materialCode', width: 120, align: 'center' as const },
+  { title: '材质', dataIndex: 'texture', width: 120, align: 'center' as const },
+  { title: '尺码', dataIndex: 'size', width: 150, align: 'center' as const },
+  { title: '工艺', dataIndex: 'craft', width: 100, align: 'center' as const },
+  { title: '打样数量', dataIndex: 'proofingNum', width: 90, align: 'center' as const },
+  { title: '样品交期（工作日）', dataIndex: 'sampleLead', width: 110, align: 'center' as const },
+  { title: '大货交期（工作日）', dataIndex: 'bulkLead', width: 110, align: 'center' as const },
+  { title: '阶梯报价', dataIndex: 'ladderPrice', width: 300, align: 'center' as const },
+  { title: '打样费用', dataIndex: 'proofingFee', width: 100, align: 'center' as const },
+  { title: '发票', dataIndex: 'invoice', width: 80, align: 'center' as const },
+  { title: '税率', dataIndex: 'tax', width: 80, align: 'center' as const }
+]
+
+// 雨伞表格列定义
+const umbrellaColumns: ColumnsType<UmbrellaData> = [
+  { title: '序号', dataIndex: 'serial', width: 60, align: 'center' as const, fixed: 'left' },
+  { title: '产品编号', dataIndex: 'productNo', width: 90, align: 'center' as const, fixed: 'left' },
+  { title: '物料编码', dataIndex: 'materialCode', width: 120, align: 'center' as const },
+  { title: '产品名称', dataIndex: 'name', width: 200, align: 'center' as const },
+  { title: '材质', dataIndex: 'texture', width: 100, align: 'center' as const },
+  { title: '尺寸', dataIndex: 'size', width: 100, align: 'center' as const },
+  { title: '伞骨数量', dataIndex: 'boneNum', width: 100, align: 'center' as const },
+  { title: '手柄类型', dataIndex: 'handShank', width: 150, align: 'center' as const },
+  { title: '工艺', dataIndex: 'craft', width: 120, align: 'center' as const },
+  { title: '打样数量', dataIndex: 'proofingNum', width: 90, align: 'center' as const },
+  { title: '样品交期', dataIndex: 'sampleLead', width: 100, align: 'center' as const },
+  { title: '大货交期', dataIndex: 'bulkLead', width: 100, align: 'center' as const },
+  { title: '阶梯报价', dataIndex: 'ladderPrice', width: 300, align: 'center' as const },
+  { title: '打样费用', dataIndex: 'proofingFee', width: 100, align: 'center' as const },
+  { title: '发票', dataIndex: 'invoice', width: 80, align: 'center' as const },
+  { title: '税率', dataIndex: 'tax', width: 80, align: 'center' as const }
+]
+
+// 胸牌表格列定义
+const badgeColumns: ColumnsType<BadgeData> = [
+  { title: '序号', dataIndex: 'serial', width: 60, align: 'center' as const, fixed: 'left' },
+  { title: '产品编号', dataIndex: 'productNo', width: 90, align: 'center' as const, fixed: 'left' },
+  { title: '物料编码', dataIndex: 'materialCode', width: 120, align: 'center' as const },
+  { title: '产品名称', dataIndex: 'name', width: 250, align: 'center' as const },
+  { title: '尺寸', dataIndex: 'size', width: 100, align: 'center' as const },
+  { title: '工艺', dataIndex: 'craft', width: 120, align: 'center' as const },
+  { title: '打样数量', dataIndex: 'proofingNum', width: 90, align: 'center' as const },
+  { title: '样品交期', dataIndex: 'sampleLead', width: 100, align: 'center' as const },
+  { title: '大货交期', dataIndex: 'bulkLead', width: 100, align: 'center' as const },
+  { title: '阶梯报价', dataIndex: 'ladderPrice', width: 300, align: 'center' as const },
+  { title: '打样费用', dataIndex: 'proofingFee', width: 100, align: 'center' as const },
+  { title: '工具费用', dataIndex: 'toolCharge', width: 100, align: 'center' as const },
+  { title: '发票', dataIndex: 'invoice', width: 80, align: 'center' as const },
+  { title: '税率', dataIndex: 'tax', width: 80, align: 'center' as const }
+]
+
+// 六小件表格列定义
+const sixPieceColumns: ColumnsType<SixPieceData> = [
+  { title: '序号', dataIndex: 'serial', width: 60, align: 'center' as const, fixed: 'left' },
+  { title: '产品编号', dataIndex: 'productNo', width: 90, align: 'center' as const, fixed: 'left' },
+  { title: '物料编码', dataIndex: 'materialCode', width: 120, align: 'center' as const },
+  { title: '产品名称', dataIndex: 'name', width: 250, align: 'center' as const },
+  { title: '材质', dataIndex: 'texture', width: 100, align: 'center' as const },
+  { title: '厚度', dataIndex: 'thickness', width: 80, align: 'center' as const },
+  { title: '长度', dataIndex: 'length', width: 80, align: 'center' as const },
+  { title: '宽度', dataIndex: 'width', width: 80, align: 'center' as const },
+  { title: '重量', dataIndex: 'weight', width: 80, align: 'center' as const },
+  { title: '工艺', dataIndex: 'craft', width: 100, align: 'center' as const },
+  { title: '打样数量', dataIndex: 'proofingNum', width: 90, align: 'center' as const },
+  { title: '样品交期', dataIndex: 'sampleLead', width: 100, align: 'center' as const },
+  { title: '大货交期', dataIndex: 'bulkLead', width: 100, align: 'center' as const },
+  { title: '阶梯报价', dataIndex: 'ladderPrice', width: 300, align: 'center' as const },
+  { title: '打样费用', dataIndex: 'proofingFee', width: 100, align: 'center' as const },
+  { title: '发票', dataIndex: 'invoice', width: 80, align: 'center' as const },
+  { title: '税率', dataIndex: 'tax', width: 80, align: 'center' as const }
 ]
 
 const Container = styled.div<{ $theme?: ThemeMode }>`
@@ -129,6 +141,7 @@ const Container = styled.div<{ $theme?: ThemeMode }>`
   height: 100%;
   width: 100%;
 `
+
 const Card = styled.div<{ $theme?: ThemeMode }>`
   background: ${({ $theme }) => ($theme === ThemeMode.dark ? '#232428' : '#fff')};
   border-radius: 6px;
@@ -139,13 +152,163 @@ const Card = styled.div<{ $theme?: ThemeMode }>`
   overflow: auto;
 `
 
+const Header = styled.div`
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`
+
+const RadioGroup = styled.div`
+  display: flex;
+  align-items: center;
+`
+
+const RadioLabel = styled.span`
+  margin-right: 8px;
+`
+
+const RadioButton = styled(Radio.Button)`
+  margin-right: 4px;
+`
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 8px;
+`
+
+const TableContainer = styled.div`
+  overflow: auto;
+`
+
 const DataPage: React.FC = () => {
   const { theme } = useTheme()
-  const [selectedType, setSelectedType] = useState(PRODUCT_TYPES[0])
+  const [selectedType, setSelectedType] = useState<ProductType>(PRODUCT_TYPES[0])
+  const [roomCardData, setRoomCardData] = useState<ProductData[]>([])
+  const [slipperData, setSlipperData] = useState<SlipperData[]>([])
+  const [ecoPenData, setEcoPenData] = useState<EcoPenData[]>([])
+  const [umbrellaData, setUmbrellaData] = useState<UmbrellaData[]>([])
+  const [badgeData, setBadgeData] = useState<BadgeData[]>([])
+  const [sixPieceData, setSixPieceData] = useState<SixPieceData[]>([])
+  const [loading, setLoading] = useState(false)
+
+  const fetchData = useCallback(async () => {
+    setLoading(true)
+    try {
+      const response = await queryProdType(PRODUCT_TYPE_MAP[selectedType])
+      if (response.code === 200) {
+        if (selectedType === '房卡') {
+          const transformedData = response.data.map((item: RawProductData, index: number) => ({
+            ...item,
+            index: index + 1
+          }))
+          setRoomCardData(transformedData)
+        } else if (selectedType === '拖鞋') {
+          const transformedData = response.data.map((item: RawSlipperData, index: number) => ({
+            ...item,
+            serial: index + 1
+          }))
+          setSlipperData(transformedData)
+        } else if (selectedType === '环保笔') {
+          const transformedData = response.data.map((item: RawEcoPenData, index: number) => ({
+            key: `${item.id}-${selectedType}-${index}`,
+            serial: item.serial,
+            productNo: item.id,
+            materialCode: item.material_code,
+            texture: item.texture,
+            size: item.size,
+            craft: item.craft,
+            proofingNum: item.proofingNum,
+            sampleLead: item.sampleDelTime,
+            bulkLead: item.prodDelTime,
+            ladderPrice: item.stepNum,
+            proofingFee: item.sampleCharge,
+            invoice: item.invoices,
+            tax: item.tax
+          }))
+          setEcoPenData(transformedData)
+        } else if (selectedType === '雨伞') {
+          const transformedData = response.data.map((item: RawUmbrellaData, index: number) => ({
+            key: `${item.serial}-${selectedType}-${index}`,
+            serial: item.serial,
+            productNo: item.id,
+            materialCode: item.material_code,
+            name: item.name,
+            texture: item.texture,
+            size: item.size,
+            boneNum: item.boneNum,
+            handShank: item.handShank,
+            craft: item.craft,
+            proofingNum: item.proofingNum,
+            sampleLead: item.sampleDelTime,
+            bulkLead: item.prodDelTime,
+            ladderPrice: item.stepNum,
+            proofingFee: item.sampleCharge,
+            invoice: item.invoices,
+            tax: item.tax
+          }))
+          setUmbrellaData(transformedData)
+        } else if (selectedType === '胸牌') {
+          const transformedData = response.data.map((item: RawBadgeData, index: number) => ({
+            key: `${item.serial}-${selectedType}-${index}`,
+            serial: item.serial,
+            productNo: item.id,
+            materialCode: item.material_code,
+            name: item.name,
+            size: item.size,
+            craft: item.craft,
+            proofingNum: item.proofingNum,
+            sampleLead: item.sampleDelTime,
+            bulkLead: item.prodDelTime,
+            ladderPrice: item.stepNum,
+            proofingFee: item.sampleCharge,
+            toolCharge: item.toolCharge,
+            invoice: item.invoices,
+            tax: item.tax
+          }))
+          setBadgeData(transformedData)
+        } else if (selectedType === '六小件') {
+          const transformedData = response.data.map((item: RawSixPieceData, index: number) => ({
+            key: `${item.serial}-${selectedType}-${index}`,
+            serial: item.serial,
+            productNo: item.id || '-',
+            materialCode: item.material_code,
+            name: item.name,
+            texture: item.texture,
+            thickness: item.thickness === '/' ? '-' : item.thickness,
+            length: item.length === '/' ? '-' : item.length,
+            width: item.width === '/' ? '-' : item.width,
+            weight: item.weight === '/' ? '-' : item.weight,
+            craft: item.craft === '/' ? '-' : item.craft,
+            proofingNum: item.proofingNum,
+            sampleLead: item.sampleDelTime,
+            bulkLead: item.prodDelTime,
+            ladderPrice: item.stepNum,
+            proofingFee: item.sampleCharge === '/' ? '-' : item.sampleCharge,
+            invoice: item.invoices,
+            tax: item.tax
+          }))
+          setSixPieceData(transformedData)
+        }
+      } else {
+        message.error(response.message || '获取数据失败')
+      }
+    } catch (error) {
+      console.error('获取数据失败:', error)
+      message.error('获取数据失败')
+    } finally {
+      setLoading(false)
+    }
+  }, [selectedType])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
 
   const handleImport = () => {
     message.info('导入功能暂未实现')
   }
+
   const handleExport = () => {
     message.info('导出功能暂未实现')
   }
@@ -153,34 +316,87 @@ const DataPage: React.FC = () => {
   return (
     <Container $theme={theme}>
       <Card $theme={theme}>
-        <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div>
-            <span style={{ marginRight: 8 }}>请选择产品类目：</span>
+        <Header>
+          <RadioGroup>
+            <RadioLabel>请选择产品类目：</RadioLabel>
             <Radio.Group value={selectedType} onChange={(e) => setSelectedType(e.target.value)}>
               {PRODUCT_TYPES.map((type) => (
-                <Radio.Button key={type} value={type} style={{ marginRight: 4 }}>
+                <RadioButton key={type} value={type}>
                   {type}
-                </Radio.Button>
+                </RadioButton>
               ))}
             </Radio.Group>
-          </div>
-          <div>
-            <Button type="primary" style={{ marginRight: 8 }} onClick={handleImport}>
+          </RadioGroup>
+          <ButtonGroup>
+            <Button type="primary" onClick={handleImport}>
               导入
             </Button>
             <Button onClick={handleExport}>导出</Button>
-          </div>
-        </div>
-        <div style={{ overflow: 'auto' }}>
-          <Table
-            columns={columns}
-            dataSource={dataSource}
-            scroll={{ x: 'max-content', y: 'calc(100vh - 200px)' }}
-            bordered
-            pagination={false}
-            style={{ minWidth: 800 }}
-          />
-        </div>
+          </ButtonGroup>
+        </Header>
+        <TableContainer>
+          {selectedType === '拖鞋' ? (
+            <Table<SlipperData>
+              columns={slipperColumns}
+              dataSource={slipperData}
+              scroll={{ x: 'max-content', y: 'calc(100vh - 200px)' }}
+              bordered
+              pagination={false}
+              loading={loading}
+              style={{ minWidth: 800 }}
+            />
+          ) : selectedType === '环保笔' ? (
+            <Table<EcoPenData>
+              columns={ecoPenColumns}
+              dataSource={ecoPenData}
+              scroll={{ x: 'max-content', y: 'calc(100vh - 200px)' }}
+              bordered
+              pagination={false}
+              loading={loading}
+              style={{ minWidth: 800 }}
+            />
+          ) : selectedType === '雨伞' ? (
+            <Table<UmbrellaData>
+              columns={umbrellaColumns}
+              dataSource={umbrellaData}
+              scroll={{ x: 'max-content', y: 'calc(100vh - 200px)' }}
+              bordered
+              pagination={false}
+              loading={loading}
+              style={{ minWidth: 800 }}
+            />
+          ) : selectedType === '胸牌' ? (
+            <Table<BadgeData>
+              columns={badgeColumns}
+              dataSource={badgeData}
+              scroll={{ x: 'max-content', y: 'calc(100vh - 200px)' }}
+              bordered
+              pagination={false}
+              loading={loading}
+              style={{ minWidth: 800 }}
+            />
+          ) : selectedType === '六小件' ? (
+            <Table<SixPieceData>
+              columns={sixPieceColumns}
+              dataSource={sixPieceData}
+              scroll={{ x: 'max-content', y: 'calc(100vh - 200px)' }}
+              bordered
+              pagination={false}
+              loading={loading}
+              style={{ minWidth: 800 }}
+            />
+          ) : (
+            <Table<ProductData>
+              columns={roomCardColumns}
+              dataSource={roomCardData}
+              scroll={{ x: 'max-content', y: 'calc(100vh - 200px)' }}
+              bordered
+              pagination={false}
+              loading={loading}
+              style={{ minWidth: 800 }}
+            />
+          )}
+        </TableContainer>
       </Card>
     </Container>
   )
