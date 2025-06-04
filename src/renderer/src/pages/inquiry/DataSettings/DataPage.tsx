@@ -5,7 +5,7 @@ import type { ColumnsType } from 'antd/es/table'
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { queryProdType } from '../api/query_prodtype'
+import { download, queryProdType, upload, UploadProdType } from '../api/query_prodtype'
 import { PRODUCT_TYPE_MAP, PRODUCT_TYPES, ProductType } from './constants'
 import {
   BadgeData,
@@ -305,12 +305,116 @@ const DataPage: React.FC = () => {
     fetchData()
   }, [fetchData])
 
-  const handleImport = () => {
-    message.info('导入功能暂未实现')
+  const handleImport = async () => {
+    try {
+      // 获取用户信息
+      const userInfoStr = localStorage.getItem('userInfo')
+      if (!userInfoStr) {
+        message.error('请先登录')
+        return
+      }
+
+      const userInfo = JSON.parse(userInfoStr)
+      if (!userInfo.uid || !userInfo.name) {
+        message.error('用户信息不完整，请重新登录')
+        return
+      }
+
+      // 创建文件输入元素
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = '.csv'
+
+      input.onchange = async (event) => {
+        const file = (event.target as HTMLInputElement).files?.[0]
+        if (!file) return
+
+        // 验证文件类型
+        if (!file.name.endsWith('.csv')) {
+          message.error('请选择CSV文件')
+          return
+        }
+
+        try {
+          setLoading(true)
+
+          // 映射产品类型到上传类型
+          const prodTypeMap: Record<ProductType, UploadProdType> = {
+            房卡: 'room_card',
+            拖鞋: 'slipper',
+            雨伞: 'umbrella',
+            环保笔: 'pen',
+            胸牌: 'badge_lanyard',
+            六小件: 'six_small_items'
+          }
+
+          const response = await upload({
+            userId: userInfo.uid,
+            userName: userInfo.name,
+            prodType: prodTypeMap[selectedType],
+            file
+          })
+
+          if (response.code === 200) {
+            message.success('导入成功')
+            // 刷新数据
+            fetchData()
+          } else {
+            message.error(response.message || '导入失败')
+          }
+        } catch (error) {
+          console.error('导入失败:', error)
+          message.error('导入失败')
+        } finally {
+          setLoading(false)
+        }
+      }
+
+      // 触发文件选择
+      input.click()
+    } catch (error) {
+      console.error('导入失败:', error)
+      message.error('导入失败')
+    }
   }
 
-  const handleExport = () => {
-    message.info('导出功能暂未实现')
+  const handleExport = async () => {
+    try {
+      setLoading(true)
+      // 映射产品类型到对应的CSV文件名
+      const filenameMap: Record<
+        ProductType,
+        '房卡.csv' | '拖鞋.csv' | '伞.csv' | '环保笔.csv' | '胸牌.csv' | '六小件.csv'
+      > = {
+        房卡: '房卡.csv',
+        拖鞋: '拖鞋.csv',
+        雨伞: '伞.csv',
+        环保笔: '环保笔.csv',
+        胸牌: '胸牌.csv',
+        六小件: '六小件.csv'
+      }
+      const filename = filenameMap[selectedType]
+      const blob = await download(filename)
+
+      // 创建下载链接
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+
+      // 清理
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+
+      message.success('导出成功')
+    } catch (error) {
+      console.error('导出失败:', error)
+      message.error('导出失败')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
