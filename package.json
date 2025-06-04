@@ -66,6 +66,7 @@
     "@llm-tools/embedjs-qdrant": "^0.1.28",
     "@notionhq/client": "^2.2.15",
     "@types/react-infinite-scroll-component": "^5.0.0",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "adm-zip": "^0.5.16",
     "antd-style": "^3.7.1",
     "apache-arrow": "^18.1.0",
@@ -78,6 +79,7 @@
     "fs-extra": "^11.2.0",
     "markdown-it": "^14.1.0",
     "officeparser": "^4.1.1",
+    "react-syntax-highlighter": "^15.6.1",
     "tokenx": "^0.4.1",
     "webdav": "4.11.4"
   },

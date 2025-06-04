@@ -1,197 +1,111 @@
-import {
-  DeleteOutlined,
-  EditOutlined,
-  EllipsisOutlined,
-  FileImageOutlined,
-  FilePdfOutlined,
-  FileTextOutlined
-} from '@ant-design/icons'
 // import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
-import TextEditPopup from '@renderer/components/Popups/TextEditPopup'
 import Scrollbar from '@renderer/components/Scrollbar'
-import db from '@renderer/databases'
-import { useProviders } from '@renderer/hooks/useProvider'
-import FileManager from '@renderer/services/FileManager'
-import store from '@renderer/store'
-import { FileType, FileTypes } from '@renderer/types'
-import { formatFileSize } from '@renderer/utils'
-import type { MenuProps } from 'antd'
-import { Button, Dropdown, Menu } from 'antd'
-import dayjs from 'dayjs'
-import { useLiveQuery } from 'dexie-react-hooks'
-import { FC, useMemo, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { Menu, message } from 'antd'
+import { FC, useEffect, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism'
+import remarkGfm from 'remark-gfm'
 import styled from 'styled-components'
 
-import ContentView from './ContentView'
+import { queryEnquiry } from '../api/query_enquiry'
+
+interface EnquiryRecord {
+  id: number
+  userId: number
+  create_time: string
+  content: string
+}
 
 const InquiryPage: FC = () => {
-  const { t } = useTranslation()
-  const [fileType, setFileType] = useState<FileTypes | 'all' | 'gemini'>('all')
-  const { providers } = useProviders()
+  const [records, setRecords] = useState<EnquiryRecord[]>([])
+  const [selectedRecord, setSelectedRecord] = useState<EnquiryRecord | null>(null)
 
-  const geminiProviders = providers.filter((provider) => provider.type === 'gemini')
-
-  const files = useLiveQuery<FileType[]>(() => {
-    if (fileType === 'all') {
-      return db.files.orderBy('count').toArray()
-    }
-    return db.files.where('type').equals(fileType).sortBy('count')
-  }, [fileType])
-
-  const handleDelete = async (fileId: string) => {
-    const file = await FileManager.getFile(fileId)
-
-    const paintings = await store.getState().paintings.paintings
-    const paintingsFiles = paintings.flatMap((p) => p.files)
-
-    if (paintingsFiles.some((p) => p.id === fileId)) {
-      window.modal.warning({ content: t('files.delete.paintings.warning'), centered: true })
-      return
-    }
-
-    if (file) {
-      await FileManager.deleteFile(fileId, true)
-    }
-
-    const topics = await db.topics
-      .filter((topic) => topic.messages.some((message) => message.files?.some((f) => f.id === fileId)))
-      .toArray()
-
-    if (topics.length > 0) {
-      for (const topic of topics) {
-        const updatedMessages = topic.messages.map((message) => ({
-          ...message,
-          files: message.files?.filter((f) => f.id !== fileId)
-        }))
-        await db.topics.update(topic.id, { messages: updatedMessages })
+  // 获取询价记录数据
+  const fetchEnquiryData = async () => {
+    try {
+      const response = await queryEnquiry()
+      if (response.code === 200 && response.data) {
+        setRecords(response.data)
+        // 默认选中第一条记录
+        if (response.data.length > 0) {
+          setSelectedRecord(response.data[0])
+        }
       }
+    } catch (error) {
+      message.error('获取询价记录失败')
+      console.error('获取询价记录失败:', error)
     }
   }
 
-  const handleRename = async (fileId: string) => {
-    const file = await FileManager.getFile(fileId)
-    if (file) {
-      const newName = await TextEditPopup.show({ text: file.origin_name })
-      if (newName) {
-        FileManager.updateFile({ ...file, origin_name: newName })
-      }
-    }
+  useEffect(() => {
+    fetchEnquiryData()
+  }, [])
+
+  // 处理记录选择
+  const handleRecordSelect = (record: EnquiryRecord) => {
+    setSelectedRecord(record)
   }
-
-  const getActionMenu = (fileId: string): MenuProps['items'] => [
-    {
-      key: 'rename',
-      icon: <EditOutlined />,
-      label: t('files.edit'),
-      onClick: () => handleRename(fileId)
-    },
-    {
-      key: 'delete',
-      icon: <DeleteOutlined />,
-      label: t('files.delete'),
-      danger: true,
-      onClick: () => {
-        window.modal.confirm({
-          title: t('files.delete.title'),
-          content: t('files.delete.content'),
-          centered: true,
-          okButtonProps: { danger: true },
-          onOk: () => handleDelete(fileId)
-        })
-      }
-    }
-  ]
-
-  const dataSource = files?.map((file) => {
-    return {
-      key: file.id,
-      file: (
-        <FileNameText className="text-nowrap" onClick={() => window.api.file.openPath(file.path)}>
-          {file.origin_name}
-        </FileNameText>
-      ),
-      size: formatFileSize(file.size),
-      size_bytes: file.size,
-      count: file.count,
-      created_at: dayjs(file.created_at).format('MM-DD HH:mm'),
-      created_at_unix: dayjs(file.created_at).unix(),
-      actions: (
-        <Dropdown menu={{ items: getActionMenu(file.id) }} trigger={['click']} placement="bottom" arrow>
-          <Button type="text" size="small" icon={<EllipsisOutlined />} />
-        </Dropdown>
-      )
-    }
-  })
-
-  const columns = useMemo(
-    () => [
-      {
-        title: t('files.name'),
-        dataIndex: 'file',
-        key: 'file',
-        width: '300px'
-      },
-      {
-        title: t('files.size'),
-        dataIndex: 'size',
-        key: 'size',
-        width: '80px',
-        sorter: (a: { size_bytes: number }, b: { size_bytes: number }) => b.size_bytes - a.size_bytes,
-        align: 'center'
-      },
-      {
-        title: t('files.count'),
-        dataIndex: 'count',
-        key: 'count',
-        width: '60px',
-        sorter: (a: { count: number }, b: { count: number }) => b.count - a.count,
-        align: 'center'
-      },
-      {
-        title: t('files.created_at'),
-        dataIndex: 'created_at',
-        key: 'created_at',
-        width: '120px',
-        align: 'center',
-        sorter: (a: { created_at_unix: number }, b: { created_at_unix: number }) =>
-          b.created_at_unix - a.created_at_unix
-      },
-      {
-        title: t('files.actions'),
-        dataIndex: 'actions',
-        key: 'actions',
-        width: '80px',
-        align: 'center'
-      }
-    ],
-    [t]
-  )
-
-  const menuItems = [
-    { key: 'all', label: t('files.all'), icon: <FileTextOutlined /> },
-    { key: FileTypes.IMAGE, label: t('files.image'), icon: <FileImageOutlined /> },
-    { key: FileTypes.TEXT, label: t('files.text'), icon: <FileTextOutlined /> },
-    { key: FileTypes.DOCUMENT, label: t('files.document'), icon: <FilePdfOutlined /> },
-    ...geminiProviders.map((provider) => ({
-      key: 'gemini_' + provider.id,
-      label: provider.name,
-      icon: <FilePdfOutlined />
-    }))
-  ].filter(Boolean) as MenuProps['items']
 
   return (
     <Container>
-      {/* <Navbar>
-        <NavbarCenter style={{ borderRight: 'none' }}>{t('询价记录')}</NavbarCenter>
-      </Navbar> */}
       <ContentContainer>
         <SideNav>
-          <Menu selectedKeys={[fileType]} items={menuItems} onSelect={({ key }) => setFileType(key as FileTypes)} />
+          <Scrollbar>
+            {/* 记录选项，点击可切换查看记录 */}
+            <Menu
+              mode="inline"
+              selectedKeys={selectedRecord ? [selectedRecord.id.toString()] : []}
+              items={records.map((record) => ({
+                key: record.id.toString(),
+                label: new Date(record.create_time).toLocaleString(),
+                onClick: () => handleRecordSelect(record)
+              }))}
+            />
+          </Scrollbar>
         </SideNav>
-        <TableContainer right>
-          <ContentView id={fileType} files={files} dataSource={dataSource} columns={columns} />
-        </TableContainer>
+        <MarkdownContainer right>
+          {/* 记录详情，content字段 */}
+          {selectedRecord ? (
+            <div className="markdown-body">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  code({ inline, className, children, ...props }: any) {
+                    const match = /language-(\w+)/.exec(className || '')
+                    const code = String(children).replace(/\n$/, '')
+
+                    if (!inline && match) {
+                      return (
+                        <CodeBlockWrapper>
+                          <CopyButton
+                            onClick={() => {
+                              navigator.clipboard.writeText(code)
+                              message.success('代码已复制到剪贴板')
+                            }}>
+                            复制代码
+                          </CopyButton>
+                          {/* @ts-ignore - react-syntax-highlighter 的类型定义与 React 组件类型不兼容 */}
+                          <SyntaxHighlighter style={vscDarkPlus} language={match[1]} PreTag="div" {...props}>
+                            {code}
+                          </SyntaxHighlighter>
+                        </CodeBlockWrapper>
+                      )
+                    }
+                    return (
+                      <code className={className} {...props}>
+                        {children}
+                      </code>
+                    )
+                  }
+                }}>
+                {selectedRecord.content}
+              </ReactMarkdown>
+            </div>
+          ) : (
+            <EmptyText>请选择一条记录查看详情</EmptyText>
+          )}
+        </MarkdownContainer>
       </ContentContainer>
     </Container>
   )
@@ -209,19 +123,222 @@ const ContentContainer = styled.div`
   flex: 1;
   flex-direction: row;
   min-height: 100%;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `
 
-const TableContainer = styled(Scrollbar)`
+const MarkdownContainer = styled(Scrollbar)`
   padding: 15px;
   display: flex;
   width: 100%;
   flex-direction: column;
+
+  /* Markdown 基础样式 */
+  .markdown-body {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text);
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+
+    @media (max-width: 768px) {
+      padding: 15px;
+      font-size: 13px;
+    }
+  }
+
+  /* 标题样式 */
+  .markdown-body h1,
+  .markdown-body h2,
+  .markdown-body h3,
+  .markdown-body h4,
+  .markdown-body h5,
+  .markdown-body h6 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--color-text);
+
+    @media (max-width: 768px) {
+      margin-top: 20px;
+      margin-bottom: 12px;
+    }
+  }
+
+  .markdown-body h1 {
+    font-size: 2em;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.3em;
+
+    @media (max-width: 768px) {
+      font-size: 1.75em;
+    }
+  }
+
+  .markdown-body h2 {
+    font-size: 1.5em;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.3em;
+
+    @media (max-width: 768px) {
+      font-size: 1.35em;
+    }
+  }
+
+  .markdown-body h3 {
+    font-size: 1.25em;
+
+    @media (max-width: 768px) {
+      font-size: 1.15em;
+    }
+  }
+
+  .markdown-body h4 {
+    font-size: 1em;
+  }
+
+  .markdown-body h5 {
+    font-size: 0.875em;
+  }
+
+  .markdown-body h6 {
+    font-size: 0.85em;
+    color: var(--color-text-secondary);
+  }
+
+  /* 段落样式 */
+  .markdown-body p {
+    margin-top: 0;
+    margin-bottom: 16px;
+
+    @media (max-width: 768px) {
+      margin-bottom: 12px;
+    }
+  }
+
+  /* 列表样式 */
+  .markdown-body ul,
+  .markdown-body ol {
+    padding-left: 2em;
+    margin-top: 0;
+    margin-bottom: 16px;
+
+    @media (max-width: 768px) {
+      padding-left: 1.5em;
+      margin-bottom: 12px;
+    }
+  }
+
+  .markdown-body li {
+    margin-top: 0.25em;
+  }
+
+  /* 引用块样式 */
+  .markdown-body blockquote {
+    padding: 0 1em;
+    color: var(--color-text-secondary);
+    border-left: 0.25em solid var(--color-border);
+    margin: 0 0 16px 0;
+
+    @media (max-width: 768px) {
+      margin-bottom: 12px;
+    }
+  }
+
+  /* 代码块样式 */
+  .markdown-body pre {
+    margin-top: 0;
+    margin-bottom: 16px;
+    padding: 16px;
+    overflow: auto;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: var(--color-background-soft);
+    border-radius: 3px;
+
+    @media (max-width: 768px) {
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 80%;
+    }
+  }
+
+  .markdown-body pre code {
+    padding: 0;
+    margin: 0;
+    font-size: 100%;
+    word-break: normal;
+    white-space: pre;
+    background: transparent;
+    border: 0;
+  }
+
+  .markdown-body pre > code {
+    display: block;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    line-height: inherit;
+    word-wrap: normal;
+    background-color: transparent;
+    border: 0;
+  }
+
+  /* 链接样式 */
+  .markdown-body a {
+    color: var(--color-primary);
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  /* 表格样式 */
+  .markdown-body table {
+    display: block;
+    width: 100%;
+    overflow: auto;
+    margin-top: 0;
+    margin-bottom: 16px;
+    border-spacing: 0;
+    border-collapse: collapse;
+
+    @media (max-width: 768px) {
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+  }
+
+  .markdown-body table th {
+    font-weight: 600;
+    padding: 6px 13px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-background-soft);
+  }
+
+  .markdown-body table td {
+    padding: 6px 13px;
+    border: 1px solid var(--color-border);
+  }
+
+  .markdown-body table tr {
+    background-color: var(--color-background);
+    border-top: 1px solid var(--color-border);
+    &:nth-child(2n) {
+      background-color: var(--color-background-soft);
+    }
+  }
 `
 
-const FileNameText = styled.div`
-  font-size: 14px;
-  color: var(--color-text);
-  cursor: pointer;
+const EmptyText = styled.div`
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin-top: 20px;
 `
 
 const SideNav = styled.div`
@@ -229,6 +346,15 @@ const SideNav = styled.div`
   border-right: 0.5px solid var(--color-border);
   padding: 7px 12px;
   user-select: none;
+  height: 100%;
+  overflow-y: auto;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    border-right: none;
+    border-bottom: 0.5px solid var(--color-border);
+    max-height: 200px;
+  }
 
   .ant-menu {
     border-inline-end: none !important;
@@ -253,6 +379,51 @@ const SideNav = styled.div`
       border: 0.5px solid var(--color-border);
       color: var(--color-text);
     }
+  }
+
+  /* 自定义滚动条样式 */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--color-background);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-secondary);
+  }
+`
+
+const CopyButton = styled.button`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--color-text);
+  background-color: var(--color-background-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+
+  &:hover {
+    background-color: var(--color-background);
+  }
+`
+
+const CodeBlockWrapper = styled.div`
+  position: relative;
+
+  &:hover ${CopyButton} {
+    opacity: 1;
   }
 `
 
