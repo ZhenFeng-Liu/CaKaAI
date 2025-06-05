@@ -13,17 +13,17 @@ export const queryProdType = (prodType: ProdType): Promise<ProdTypeResponse> => 
 /**
  * CSV文件下载类型
  */
-export type CsvFileName = '房卡.csv' | '拖鞋.csv' | '伞.csv' | '环保笔.csv' | '胸牌.csv' | '六小件.csv'
+export type CsvFileProdType = 'room_card' | 'slipper' | 'umbrella' | 'badge_lanyard' | 'six_small_items' | 'pen'
 
 /**
- * 下载CSV文件
- * @param filename CSV文件名
+ * 品类csv下载接口
+ * @param prodType 品类
  * @returns Promise<Blob> 文件数据
  */
-export const download = (filename: CsvFileName): Promise<Blob> => {
+export const prodtypeDownload = (prodType: CsvFileProdType): Promise<Blob> => {
   return http.get<Blob>(
-    '/download',
-    { filename },
+    '/prodtype-download',
+    { prodType },
     {
       responseType: 'blob',
       headers: {

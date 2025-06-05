@@ -22,6 +22,11 @@ class HttpRequest {
     // 响应拦截器
     this.instance.interceptors.response.use(
       (response: AxiosResponse) => {
+        // 如果是blob响应，直接返回
+        if (response.config.responseType === 'blob') {
+          return response.data
+        }
+
         const { code, message } = response.data
         if (code === 200) {
           return response.data

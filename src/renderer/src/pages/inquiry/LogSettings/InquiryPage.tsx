@@ -1,6 +1,6 @@
 // import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
 import Scrollbar from '@renderer/components/Scrollbar'
-import { Menu, message } from 'antd'
+import { Empty, Menu, message } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
@@ -53,15 +53,19 @@ const InquiryPage: FC = () => {
         <SideNav>
           <Scrollbar>
             {/* 记录选项，点击可切换查看记录 */}
-            <Menu
-              mode="inline"
-              selectedKeys={selectedRecord ? [selectedRecord.id.toString()] : []}
-              items={records.map((record) => ({
-                key: record.id.toString(),
-                label: new Date(record.create_time).toLocaleString(),
-                onClick: () => handleRecordSelect(record)
-              }))}
-            />
+            {records.length > 0 ? (
+              <Menu
+                mode="inline"
+                selectedKeys={selectedRecord ? [selectedRecord.id.toString()] : []}
+                items={records.map((record) => ({
+                  key: record.id.toString(),
+                  label: new Date(record.create_time).toLocaleString(),
+                  onClick: () => handleRecordSelect(record)
+                }))}
+              />
+            ) : (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            )}
           </Scrollbar>
         </SideNav>
         <MarkdownContainer right>
@@ -103,7 +107,8 @@ const InquiryPage: FC = () => {
               </ReactMarkdown>
             </div>
           ) : (
-            <EmptyText>请选择一条记录查看详情</EmptyText>
+            // <EmptyText>请选择一条记录查看详情</EmptyText>
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
           )}
         </MarkdownContainer>
       </ContentContainer>
@@ -335,11 +340,11 @@ const MarkdownContainer = styled(Scrollbar)`
   }
 `
 
-const EmptyText = styled.div`
-  color: var(--color-text-secondary);
-  text-align: center;
-  margin-top: 20px;
-`
+// const EmptyText = styled.div`
+//   color: var(--color-text-secondary);
+//   text-align: center;
+//   margin-top: 20px;
+// `
 
 const SideNav = styled.div`
   width: var(--assistants-width);

@@ -5,7 +5,7 @@ import type { ColumnsType } from 'antd/es/table'
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { download, queryProdType, upload, UploadProdType } from '../api/query_prodtype'
+import { CsvFileProdType, prodtypeDownload, queryProdType, upload, UploadProdType } from '../api/query_prodtype'
 import { PRODUCT_TYPE_MAP, PRODUCT_TYPES, ProductType } from './constants'
 import {
   BadgeData,
@@ -382,33 +382,40 @@ const DataPage: React.FC = () => {
     try {
       setLoading(true)
       // 映射产品类型到对应的CSV文件名
-      const filenameMap: Record<
-        ProductType,
-        '房卡.csv' | '拖鞋.csv' | '伞.csv' | '环保笔.csv' | '胸牌.csv' | '六小件.csv'
-      > = {
-        房卡: '房卡.csv',
-        拖鞋: '拖鞋.csv',
-        雨伞: '伞.csv',
-        环保笔: '环保笔.csv',
-        胸牌: '胸牌.csv',
-        六小件: '六小件.csv'
+      const filenameMap: Record<ProductType, CsvFileProdType> = {
+        房卡: 'room_card',
+        拖鞋: 'slipper',
+        雨伞: 'umbrella',
+        环保笔: 'pen',
+        胸牌: 'badge_lanyard',
+        六小件: 'six_small_items'
       }
-      const filename = filenameMap[selectedType]
-      const blob = await download(filename)
+      const prodType = filenameMap[selectedType]
 
-      // 创建下载链接
-      const url = window.URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = filename
-      document.body.appendChild(link)
-      link.click()
+      try {
+        const blob = await prodtypeDownload(prodType)
+        if (!blob || blob.size === 0) {
+          message.error('下载的文件为空')
+          return
+        }
 
-      // 清理
-      document.body.removeChild(link)
-      window.URL.revokeObjectURL(url)
+        // 创建下载链接
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `${selectedType}.csv`
+        document.body.appendChild(link)
+        link.click()
 
-      message.success('导出成功')
+        // 清理
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
+
+        message.success('导出成功')
+      } catch (downloadError) {
+        console.error('下载失败:', downloadError)
+        message.error(`下载失败: ${downloadError instanceof Error ? downloadError.message : '未知错误'}`)
+      }
     } catch (error) {
       console.error('导出失败:', error)
       message.error('导出失败')

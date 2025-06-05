@@ -16,10 +16,9 @@ export const queryEnquiry = async (): Promise<any> => {
     throw new Error('未找到用户信息')
   }
 
-  // const userInfo = JSON.parse(userInfoStr)
+  const userInfo = JSON.parse(userInfoStr)
   const params: QueryEnquiryParams = {
-    // userId: userInfo.uid
-    userId: 11
+    userId: userInfo.uid
   }
 
   return http.get('/query-enquiry', params)
