@@ -8,6 +8,7 @@ import {
   Divider,
   Empty,
   Form,
+  Input,
   InputNumber,
   message,
   Modal,
@@ -21,6 +22,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import styled from 'styled-components'
 
+import { queryProdTypeParams } from '../api/query_prodtype_params'
 const useStyle = createStyles(({ prefixCls, css }) => ({
   linearGradientButton: css`
     &.${prefixCls}-btn-primary:not([disabled]):not(.${prefixCls}-btn-dangerous) {
@@ -2434,6 +2436,7 @@ const InquiryPage: FC = () => {
   const [activeKey, setActiveKey] = useState<string | string[]>([])
   // 添加拖鞋材质状态
   const [selectedTexture, setSelectedTexture] = useState<string>('')
+  const [selectedUmbrellaName, setSelectedUmbrellaName] = useState<string>('')
 
   // 完整的 markdown 内容
   const fullMarkdown = `
@@ -2605,6 +2608,7 @@ const InquiryPage: FC = () => {
       'craft',
       'packaging'
     ])
+    handlePrintProdTypeParams(value)
   }
 
   // 处理拖鞋材质变化
@@ -2717,130 +2721,205 @@ const InquiryPage: FC = () => {
             </Radio.Group>
           </Form.Item>,
           <Form.Item key="size" label="尺码" name="size" rules={[{ required: true, message: '请选择尺码' }]}>
-            <Radio.Group>
-              {getCurrentSizeOptions().map((option) => (
-                <Radio key={option.value} value={option.value}>
-                  {option.label}
-                </Radio>
-              ))}
-            </Radio.Group>
-          </Form.Item>,
-          <Form.Item key="craft" label="工艺" name="craft" rules={[{ required: true, message: '请选择工艺' }]}>
-            <Checkbox.Group>
-              {getCurrentCraftOptions().map((option) => (
-                <Checkbox key={option.value} value={option.value}>
-                  {option.label}
-                </Checkbox>
-              ))}
-            </Checkbox.Group>
-          </Form.Item>,
-          <Form.Item key="packaging" label="包装" name="packaging" rules={[{ required: true, message: '请选择包装' }]}>
             <Select>
-              {SLIPPER_DATA.packaging.map((option) => (
+              {getCurrentSizeOptions().map((option) => (
                 <Select.Option key={option.value} value={option.value}>
                   {option.label}
                 </Select.Option>
               ))}
             </Select>
+          </Form.Item>,
+          <Form.Item key="craft" label="工艺" name="craft" rules={[{ required: true, message: '请选择工艺' }]}>
+            <Select>
+              {getCurrentCraftOptions().map((option) => (
+                <Select.Option key={option.value} value={option.value}>
+                  {option.label}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>,
+          <Form.Item key="packaging" label="包装" name="packaging" rules={[{ required: true, message: '请选择包装' }]}>
+            <Radio.Group>
+              {SLIPPER_DATA.packaging.map((option) => (
+                <Radio key={option.value} value={option.value}>
+                  {option.label}
+                </Radio>
+              ))}
+            </Radio.Group>
           </Form.Item>
         ]
       case 'pen':
         return [
           categoryItem,
-          <Form.Item key="material" label="材质" name="material" rules={[{ required: true, message: '请选择材质' }]}>
-            <Radio.Group buttonStyle="outline">
-              <Radio value="纸质">纸质</Radio>
-              <Radio value="塑料">塑料</Radio>
-              <Radio value="金属">金属</Radio>
+          <Form.Item key="texture" label="材质" name="texture" rules={[{ required: true, message: '请选择材质' }]}>
+            <Radio.Group buttonStyle="outline" onChange={(e) => handlePenTextureChange(e.target.value)}>
+              {PEN_DATA.textures.map((texture) => (
+                <Radio key={texture.key} value={texture.value}>
+                  {texture.label}
+                </Radio>
+              ))}
             </Radio.Group>
           </Form.Item>,
-          <Form.Item key="color" label="颜色" name="color" rules={[{ required: true, message: '请选择颜色' }]}>
+          <Form.Item key="size" label="长*宽mm" name="size" rules={[{ required: true, message: '请选择长宽' }]}>
             <Select>
-              <Select.Option value="黑色">黑色</Select.Option>
-              <Select.Option value="蓝色">蓝色</Select.Option>
-              <Select.Option value="红色">红色</Select.Option>
+              {getCurrentPenSizeOptions().map((size) => (
+                <Select.Option key={size.value} value={size.value}>
+                  {size.label}
+                </Select.Option>
+              ))}
             </Select>
           </Form.Item>,
-          <Form.Item key="type" label="类型" name="type" rules={[{ required: true, message: '请选择类型' }]}>
-            <Radio.Group>
-              <Radio value="圆珠笔">圆珠笔</Radio>
-              <Radio value="中性笔">中性笔</Radio>
-            </Radio.Group>
+          <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: true, message: '请选择产品工艺' }]}>
+            <Select>
+              {getCurrentPenCraftOptions().map((craft) => (
+                <Select.Option key={craft.value} value={craft.value}>
+                  {craft.label}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
         ]
       case 'badge_lanyard':
         return [
           categoryItem,
-          <Form.Item key="material" label="材质" name="material" rules={[{ required: true, message: '请选择材质' }]}>
-            <Radio.Group buttonStyle="outline">
-              <Radio value="纸质">纸质</Radio>
-              <Radio value="塑料">塑料</Radio>
-              <Radio value="金属">金属</Radio>
-            </Radio.Group>
+          <Form.Item key="name" label="名称" name="name" rules={[{ required: true, message: '请选择名称' }]}>
+            <Select
+              placeholder="请选择名称"
+              showSearch
+              optionFilterProp="label"
+              onChange={(value: string) => {
+                form.setFieldsValue({
+                  sizes: BADEG_LANYARD_DATA.sizes[value]?.[0]?.value || '',
+                  crafts: BADEG_LANYARD_DATA.crafts[value]?.[0]?.value || ''
+                })
+              }}>
+              {BADEG_LANYARD_DATA.names.map((option) => (
+                <Select.Option key={option.key} value={option.key} label={option.label}>
+                  {option.label}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>,
-          <Form.Item key="size" label="尺寸" name="size" rules={[{ required: true, message: '请选择尺寸' }]}>
-            <Radio.Group>
-              <Radio value="小号">小号</Radio>
-              <Radio value="中号">中号</Radio>
-              <Radio value="大号">大号</Radio>
-            </Radio.Group>
+          <Form.Item key="sizes" label="尺寸" shouldUpdate={(prev, curr) => prev.name !== curr.name}>
+            {() => {
+              const nameKey = form.getFieldValue('name')
+              const sizeArr = nameKey ? BADEG_LANYARD_DATA.sizes[nameKey] : []
+              return (
+                <Input
+                  value={sizeArr && sizeArr.length > 0 ? sizeArr[0].label : ''}
+                  readOnly
+                  placeholder="请选择名称后自动显示"
+                />
+              )
+            }}
           </Form.Item>,
-          <Form.Item key="process" label="工艺" name="process" rules={[{ required: true, message: '请选择工艺' }]}>
-            <Checkbox.Group
-              options={[
-                { label: '印刷', value: '印刷' },
-                { label: '烫金', value: '烫金' },
-                { label: 'UV', value: 'UV' }
-              ]}
-            />
+          <Form.Item key="crafts" label="工艺" shouldUpdate={(prev, curr) => prev.name !== curr.name}>
+            {() => {
+              const nameKey = form.getFieldValue('name')
+              const craftArr = nameKey ? BADEG_LANYARD_DATA.crafts[nameKey] : []
+              return (
+                <Input
+                  value={craftArr && craftArr.length > 0 ? craftArr[0].label : ''}
+                  readOnly
+                  placeholder="请选择名称后自动显示"
+                />
+              )
+            }}
           </Form.Item>
         ]
       case 'umbrella':
         return [
           categoryItem,
-          <Form.Item key="material" label="材质" name="material" rules={[{ required: true, message: '请选择材质' }]}>
-            <Radio.Group buttonStyle="outline">
-              <Radio value="纸质">纸质</Radio>
-              <Radio value="塑料">塑料</Radio>
-              <Radio value="金属">金属</Radio>
-            </Radio.Group>
+          <Form.Item key="name" label="产品名称" name="name" rules={[{ required: true, message: '请选择产品名称' }]}>
+            <Select onChange={handleUmbrellaNameChange}>
+              {UMBRELLA_DATA.names.map((item) => (
+                <Select.Option key={item.key} value={item.key}>
+                  {item.label}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>,
-          <Form.Item key="size" label="尺寸" name="size" rules={[{ required: true, message: '请选择尺寸' }]}>
-            <Radio.Group>
-              <Radio value="小号">小号</Radio>
-              <Radio value="中号">中号</Radio>
-              <Radio value="大号">大号</Radio>
-            </Radio.Group>
+          <Form.Item key="texture" label="材质" name="texture" rules={[{ required: true, message: '请选择材质' }]}>
+            <Input disabled placeholder="请选择产品名称后自动显示" />
           </Form.Item>,
-          <Form.Item key="color" label="颜色" name="color" rules={[{ required: true, message: '请选择颜色' }]}>
-            <Select>
-              <Select.Option value="黑色">黑色</Select.Option>
-              <Select.Option value="蓝色">蓝色</Select.Option>
-              <Select.Option value="红色">红色</Select.Option>
+          <Form.Item
+            key="boneNum"
+            label="雨伞骨数"
+            name="boneNum"
+            rules={[{ required: true, message: '请选择雨伞骨数' }]}>
+            <Select disabled>
+              {getCurrentBoneNumOptions().map((item) => (
+                <Select.Option key={item.value} value={item.value}>
+                  {item.label}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>,
+          <Form.Item
+            key="handShank"
+            label="雨伞手柄"
+            name="handShank"
+            rules={[{ required: true, message: '请选择雨伞手柄' }]}>
+            <Select disabled>
+              {getCurrentHandShankOptions().map((item) => (
+                <Select.Option key={item.value} value={item.value}>
+                  {item.label}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>,
+          <Form.Item key="size" label="雨伞尺寸" name="size" rules={[{ required: true, message: '请选择雨伞尺寸' }]}>
+            <Select disabled>
+              {getCurrentUmbrellaSizeOptions().map((item) => (
+                <Select.Option key={item.value} value={item.value}>
+                  {item.label}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>,
+          <Form.Item key="craft" label="工艺" name="craft" rules={[{ required: true, message: '请选择工艺' }]}>
+            <Select disabled>
+              {getCurrentUmbrellaCraftOptions().map((item) => (
+                <Select.Option key={item.value} value={item.value}>
+                  {item.label}
+                </Select.Option>
+              ))}
             </Select>
           </Form.Item>
         ]
       case 'six_small_items':
         return [
           categoryItem,
-          <Form.Item key="material" label="材质" name="material" rules={[{ required: true, message: '请选择材质' }]}>
-            <Radio.Group buttonStyle="outline">
-              <Radio value="纸质">纸质</Radio>
-              <Radio value="塑料">塑料</Radio>
-              <Radio value="金属">金属</Radio>
-            </Radio.Group>
+          <Form.Item key="name" label="产品名称" name="name" rules={[{ required: true, message: '请选择产品名称' }]}>
+            <Select onChange={handleSixSmallItemsNameChange}>
+              {SIX_SMALL_ITEMS_DATA.names.map((item) => (
+                <Select.Option key={item.key} value={item.key}>
+                  {item.label}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>,
-          <Form.Item key="items" label="包含物品" name="items" rules={[{ required: true, message: '请选择包含物品' }]}>
-            <Checkbox.Group
-              options={[
-                { label: '牙刷', value: '牙刷' },
-                { label: '牙膏', value: '牙膏' },
-                { label: '梳子', value: '梳子' },
-                { label: '香皂', value: '香皂' },
-                { label: '洗发水', value: '洗发水' },
-                { label: '沐浴露', value: '沐浴露' }
-              ]}
-            />
+          <Form.Item key="texture" label="材质" name="texture" rules={[{ required: true, message: '请选择材质' }]}>
+            <Input disabled placeholder="请选择产品名称后自动显示" />
+          </Form.Item>,
+          <Form.Item
+            key="thickness"
+            label="厚度mm"
+            name="thickness"
+            rules={[{ required: true, message: '请选择厚度' }]}>
+            <Input disabled placeholder="请选择产品名称后自动显示" />
+          </Form.Item>,
+          <Form.Item key="length" label="长度mm" name="length" rules={[{ required: true, message: '请输入长度' }]}>
+            <Input disabled placeholder="请选择产品名称后自动显示" />
+          </Form.Item>,
+          <Form.Item key="width" label="宽度mm" name="width" rules={[{ required: true, message: '请输入宽度' }]}>
+            <Input disabled placeholder="请选择产品名称后自动显示" />
+          </Form.Item>,
+          <Form.Item key="weight" label="克重g" name="weight" rules={[{ required: true, message: '请输入克重' }]}>
+            <Input disabled placeholder="请选择产品名称后自动显示" />
+          </Form.Item>,
+          <Form.Item key="craft" label="工艺" name="craft" rules={[{ required: true, message: '请选择工艺' }]}>
+            <Input disabled placeholder="请选择产品名称后自动显示" />
           </Form.Item>
         ]
       default:
@@ -2950,6 +3029,146 @@ const InquiryPage: FC = () => {
 
     return () => clearInterval(timer)
   }, [])
+
+  // 新增打印品类参数按钮的处理逻辑
+  const handlePrintProdTypeParams = async (category: CategoryType) => {
+    try {
+      const res = await queryProdTypeParams(category)
+      console.log(`【queryProdTypeParams返回内容 - ${category}】`, res)
+
+      // 检查返回结果
+      if (!res || res.code !== 200) {
+        message.error(`获取${category}品类参数失败: ${res?.message || '未知错误'}`)
+        return
+      }
+
+      // 检查数据是否存在
+      if (!res.data) {
+        message.warning(`未找到${category}品类参数数据`)
+        return
+      }
+
+      // 拿到对应品类的参数赋予到相关常量数据
+      switch (category) {
+        case 'room_card':
+          Object.assign(ROOM_CARD_DATA, res.data)
+          console.log('ROOM_CARD_DATA', ROOM_CARD_DATA)
+          break
+        case 'slipper':
+          Object.assign(SLIPPER_DATA, res.data)
+          console.log('SLIPPER_DATA', SLIPPER_DATA)
+          break
+        case 'pen':
+          Object.assign(PEN_DATA, res.data)
+          console.log('PEN_DATA', PEN_DATA)
+          break
+        case 'badge_lanyard':
+          Object.assign(BADEG_LANYARD_DATA, res.data)
+          console.log('BADEG_LANYARD_DATA', BADEG_LANYARD_DATA)
+          break
+        case 'umbrella':
+          Object.assign(UMBRELLA_DATA, res.data)
+          console.log('UMBRELLA_DATA', UMBRELLA_DATA)
+          break
+        case 'six_small_items':
+          Object.assign(SIX_SMALL_ITEMS_DATA, res.data)
+          console.log('SIX_SMALL_ITEMS_DATA', SIX_SMALL_ITEMS_DATA)
+          break
+      }
+    } catch (e) {
+      console.error(`【queryProdTypeParams接口调用失败 - ${category}】`, e)
+    }
+  }
+
+  // 处理环保笔材质变化
+  const handlePenTextureChange = (value: string) => {
+    setSelectedTexture(value)
+    // 重置尺码和工艺选择
+    form.setFieldsValue({
+      size: undefined,
+      craft: undefined
+    })
+  }
+
+  // 获取当前材质对应的尺码选项
+  const getCurrentPenSizeOptions = () => {
+    if (!selectedTexture) return []
+    const textureKey = PEN_DATA.textures.find((t) => t.value === selectedTexture)?.key
+    return textureKey ? PEN_DATA.sizes[textureKey as keyof typeof PEN_DATA.sizes] : []
+  }
+
+  // 获取当前材质对应的工艺选项
+  const getCurrentPenCraftOptions = () => {
+    if (!selectedTexture) return []
+    const textureKey = PEN_DATA.textures.find((t) => t.value === selectedTexture)?.key
+    return textureKey ? PEN_DATA.crafts[textureKey as keyof typeof PEN_DATA.crafts] : []
+  }
+
+  // 处理雨伞名称变化
+  const handleUmbrellaNameChange = (value: string) => {
+    setSelectedUmbrellaName(value)
+
+    // 获取选中雨伞的所有参数
+    const boneNumOptions = UMBRELLA_DATA.boneNums[value as keyof typeof UMBRELLA_DATA.boneNums] || []
+    const handShankOptions = UMBRELLA_DATA.handShanks[value as keyof typeof UMBRELLA_DATA.handShanks] || []
+    const sizeOptions = UMBRELLA_DATA.sizes[value as keyof typeof UMBRELLA_DATA.sizes] || []
+    const craftOptions = UMBRELLA_DATA.crafts[value as keyof typeof UMBRELLA_DATA.crafts] || []
+    const textureOptions = UMBRELLA_DATA.textures[value as keyof typeof UMBRELLA_DATA.textures] || []
+
+    // 自动填充联动字段
+    form.setFieldsValue({
+      boneNum: boneNumOptions[0]?.value,
+      handShank: handShankOptions[0]?.value,
+      size: sizeOptions[0]?.value,
+      craft: craftOptions[0]?.value,
+      texture: textureOptions[0]?.value
+    })
+  }
+
+  // 获取当前雨伞名称对应的骨数选项
+  const getCurrentBoneNumOptions = () => {
+    if (!selectedUmbrellaName) return []
+    return UMBRELLA_DATA.boneNums[selectedUmbrellaName as keyof typeof UMBRELLA_DATA.boneNums] || []
+  }
+
+  // 获取当前雨伞名称对应的手柄选项
+  const getCurrentHandShankOptions = () => {
+    if (!selectedUmbrellaName) return []
+    return UMBRELLA_DATA.handShanks[selectedUmbrellaName as keyof typeof UMBRELLA_DATA.handShanks] || []
+  }
+
+  // 获取当前雨伞名称对应的尺寸选项
+  const getCurrentUmbrellaSizeOptions = () => {
+    if (!selectedUmbrellaName) return []
+    return UMBRELLA_DATA.sizes[selectedUmbrellaName as keyof typeof UMBRELLA_DATA.sizes] || []
+  }
+
+  // 获取当前雨伞名称对应的工艺选项
+  const getCurrentUmbrellaCraftOptions = () => {
+    if (!selectedUmbrellaName) return []
+    return UMBRELLA_DATA.crafts[selectedUmbrellaName as keyof typeof UMBRELLA_DATA.crafts] || []
+  }
+
+  // 处理六小件名称变化
+  const handleSixSmallItemsNameChange = (value: string) => {
+    // 获取选中六小件的所有参数
+    const textureOptions = SIX_SMALL_ITEMS_DATA.textures[value as keyof typeof SIX_SMALL_ITEMS_DATA.textures] || []
+    const thicknessOptions = SIX_SMALL_ITEMS_DATA.thickness[value as keyof typeof SIX_SMALL_ITEMS_DATA.thickness] || []
+    const lengthOptions = SIX_SMALL_ITEMS_DATA.length[value as keyof typeof SIX_SMALL_ITEMS_DATA.length] || []
+    const widthOptions = SIX_SMALL_ITEMS_DATA.widths[value as keyof typeof SIX_SMALL_ITEMS_DATA.widths] || []
+    const weightOptions = SIX_SMALL_ITEMS_DATA.weights[value as keyof typeof SIX_SMALL_ITEMS_DATA.weights] || []
+    const craftOptions = SIX_SMALL_ITEMS_DATA.crafts[value as keyof typeof SIX_SMALL_ITEMS_DATA.crafts] || []
+
+    // 自动填充联动字段
+    form.setFieldsValue({
+      texture: textureOptions[0]?.value,
+      thickness: thicknessOptions[0]?.value,
+      length: lengthOptions[0]?.value,
+      width: widthOptions[0]?.value,
+      weight: weightOptions[0]?.value,
+      craft: craftOptions[0]?.value
+    })
+  }
 
   return (
     <Container>
