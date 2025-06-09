@@ -107,7 +107,7 @@ const initialState: SettingsState = {
   showMessageDivider: true,
   messageFont: 'system',
   showInputEstimatedTokens: false,
-  tray: true,
+  tray: false,
   theme: ThemeMode.auto,
   windowStyle: 'transparent',
   fontSize: 14,

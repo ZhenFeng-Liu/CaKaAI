@@ -31,7 +31,7 @@ export class ConfigManager {
   }
 
   getTray(): boolean {
-    return !!this.store.get('tray', true)
+    return !!this.store.get('tray', false)
   }
 
   setTray(value: boolean) {

@@ -2442,7 +2442,7 @@ const InquiryPage: FC = () => {
   const { styles } = useStyle()
   const [displayedMarkdown, setDisplayedMarkdown] = useState('')
   const [isTyping, setIsTyping] = useState(true)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const [progress, setProgress] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [form] = Form.useForm()
@@ -3385,7 +3385,7 @@ const InquiryPage: FC = () => {
   }
   const handleInquiry = async () => {
     try {
-      setIsLoading(true)
+      setIsLoading(true) // 开始询价时设置状态
       setProgress(0)
       setDisplayedMarkdown('')
       setIsTyping(false) // 重置打字效果状态
@@ -3536,7 +3536,7 @@ const InquiryPage: FC = () => {
       console.error('询价失败:', error)
       message.error(error instanceof Error ? error.message : '询价失败，请重试')
     } finally {
-      setIsLoading(false)
+      setIsLoading(false) // 询价结束时重置状态
     }
   }
   // 监听 fullMarkdown 的变化
@@ -3577,7 +3577,7 @@ const InquiryPage: FC = () => {
         </SideNav>
         <TableContainer right>
           <MarkdownContainer className={isTyping ? 'typing' : ''} ref={markdownContainerRef}>
-            {isLoading && (
+            {isLoading && displayedMarkdown === '' && (
               <LoadingOverlay>
                 <ProgressBar>
                   <ProgressFill style={{ width: `${progress}%` }} />
@@ -3585,7 +3585,11 @@ const InquiryPage: FC = () => {
                 <LoadingText>请稍后，正在询价中 {Math.round(progress)}%</LoadingText>
               </LoadingOverlay>
             )}
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayedMarkdown}</ReactMarkdown>
+            {!isLoading && !displayedMarkdown ? (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            ) : (
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayedMarkdown}</ReactMarkdown>
+            )}
           </MarkdownContainer>
         </TableContainer>
       </ContentContainer>

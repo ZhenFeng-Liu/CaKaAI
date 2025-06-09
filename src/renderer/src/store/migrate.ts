@@ -682,7 +682,7 @@ const migrateConfig = {
     return state
   },
   '40': (state: RootState) => {
-    state.settings.tray = true
+    state.settings.tray = false
     return state
   },
   '41': (state: RootState) => {
