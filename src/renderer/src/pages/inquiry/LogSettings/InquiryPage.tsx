@@ -14,6 +14,7 @@ interface EnquiryRecord {
   id: number
   userId: number
   create_time: string
+  info: string
   content: string
 }
 
@@ -59,7 +60,8 @@ const InquiryPage: FC = () => {
                 selectedKeys={selectedRecord ? [selectedRecord.id.toString()] : []}
                 items={records.map((record) => ({
                   key: record.id.toString(),
-                  label: new Date(record.create_time).toLocaleString(),
+                  // label: new Date(record.create_time).toLocaleString(),
+                  label: record.info,
                   onClick: () => handleRecordSelect(record)
                 }))}
               />

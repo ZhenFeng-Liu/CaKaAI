@@ -3,7 +3,7 @@ import { message } from 'antd'
 // API 配置
 export const API_CONFIG = {
   BASE_URL: 'http://192.168.0.111:9919/api/v1', // 统一使用API文档中的基础URL
-  TIMEOUT: 10000
+  TIMEOUT: 300000 // 增加到5分钟
 }
 
 // API 错误码
