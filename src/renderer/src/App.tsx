@@ -80,7 +80,7 @@ const AITalent: FC = () => {
       MinApp.start({
         id: 'huoshan-talent',
         name: '人才库',
-        url: `http://192.168.0.245:5173/?inputer=${inputer}`,
+        url: `http://192.168.0.123:5173/?inputer=${inputer}`,
         logo: AppLogo // 需要导入 AppLogo 或使用其他合适的图标
       })
     }

@@ -1,5 +1,6 @@
 import { AntDesignOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
 import Scrollbar from '@renderer/components/Scrollbar'
+import Markdown from '@renderer/pages/home/Markdown/Markdown'
 import {
   Button,
   Checkbox,
@@ -19,8 +20,6 @@ import {
 import { createStyles } from 'antd-style'
 import { debounce } from 'lodash'
 import { FC, useCallback, useEffect, useRef, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 import styled from 'styled-components'
 
 import {
@@ -196,12 +195,14 @@ const MarkdownContainer = styled.div`
     background-color: ${(props) => props.theme.colorBgLayout};
   }
 
-  &.typing::after {
-    content: '|';
-    display: inline-block;
-    animation: blink 1s step-end infinite;
-    color: ${(props) => props.theme.colorPrimary};
-    font-weight: bold;
+  &.typing {
+    &::after {
+      content: '|';
+      display: inline-block;
+      animation: blink 1s step-end infinite;
+      color: ${(props) => props.theme.colorPrimary};
+      font-weight: bold;
+    }
   }
 
   @keyframes blink {
@@ -227,11 +228,9 @@ const MarkdownContainer = styled.div`
   h1 {
     font-size: 24px;
   }
-
   h2 {
     font-size: 20px;
   }
-
   h3 {
     font-size: 16px;
   }
@@ -258,6 +257,19 @@ const MarkdownContainer = styled.div`
   strong {
     color: ${(props) => props.theme.colorTextHeading};
     font-weight: 600;
+  }
+
+  pre {
+    background: ${(props) => props.theme.colorBgLayout};
+    padding: 16px;
+    border-radius: 4px;
+    overflow-x: auto;
+  }
+
+  code {
+    background: ${(props) => props.theme.colorBgLayout};
+    padding: 2px 4px;
+    border-radius: 4px;
   }
 
   table {
@@ -2440,7 +2452,7 @@ const CATEGORY_LABEL_MAP: Record<CategoryType, string> = {
 
 const InquiryPage: FC = () => {
   const { styles } = useStyle()
-  const [displayedMarkdown, setDisplayedMarkdown] = useState('')
+  const [displayedMarkdown, setDisplayedMarkdown] = useState<string>('')
   const [isTyping, setIsTyping] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -2452,16 +2464,8 @@ const InquiryPage: FC = () => {
   // 添加拖鞋材质状态
   const [selectedTexture, setSelectedTexture] = useState<string>('')
   const [selectedUmbrellaName, setSelectedUmbrellaName] = useState<string>('')
-  const [userInfo, setUserInfo] = useState<any>(null)
-  const [fullMarkdown, setFullMarkdown] = useState<string>('')
+  const [fullMarkdown, setFullMarkdown] = useState<string[]>([])
   const markdownContainerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const storedUserInfo = localStorage.getItem('userInfo')
-    if (storedUserInfo) {
-      setUserInfo(JSON.parse(storedUserInfo))
-    }
-  }, [])
 
   const onChange = (key: string | string[]) => {
     setActiveKey(key)
@@ -3228,16 +3232,25 @@ const InquiryPage: FC = () => {
   )
 
   useEffect(() => {
+    let currentText = ''
     let currentIndex = 0
-    const interval = 50
-    setIsTyping(true) // 开始打字效果
+    let currentArrayIndex = 0
+    const interval = 30 // 更快的打字速度
+    setIsTyping(true)
 
     const timer = setInterval(() => {
-      if (currentIndex <= fullMarkdown.length) {
-        setDisplayedMarkdown(fullMarkdown.slice(0, currentIndex))
-        // 使用优化后的滚动函数
+      if (currentArrayIndex < fullMarkdown.length) {
+        const currentMarkdown = fullMarkdown[currentArrayIndex]
+        if (currentIndex < currentMarkdown.length) {
+          currentText += currentMarkdown[currentIndex]
+          currentIndex++
+        } else {
+          currentText += '\n\n'
+          currentArrayIndex++
+          currentIndex = 0
+        }
+        setDisplayedMarkdown(currentText)
         scrollToBottom()
-        currentIndex++
       } else {
         clearInterval(timer)
         setIsTyping(false)
@@ -3246,12 +3259,12 @@ const InquiryPage: FC = () => {
 
     return () => {
       clearInterval(timer)
-      scrollToBottom.cancel() // 清理 debounce
+      scrollToBottom.cancel()
     }
-  }, [fullMarkdown, scrollToBottom]) // 添加 scrollToBottom 作为依赖
+  }, [fullMarkdown, scrollToBottom])
 
   useEffect(() => {
-    setDisplayedMarkdown(fullMarkdown)
+    setDisplayedMarkdown(fullMarkdown.join('\n\n'))
   }, [fullMarkdown])
 
   const handlePrintProdTypeParams = async (category: CategoryType) => {
@@ -3389,72 +3402,72 @@ const InquiryPage: FC = () => {
       setProgress(0)
       setDisplayedMarkdown('')
       setIsTyping(false) // 重置打字效果状态
-      const finishedCount = 0
-      const total = items.length
+      // const finishedCount = 0
+      // const total = items.length
 
       // 用于并发流式 fetch
       await Promise.all(
         items.map(async (item) => {
           // 构造请求体
-          const baseData = {
-            user_id: userInfo?.uid || 0,
-            user_name: userInfo?.name || '',
-            prod_type: item.category,
-            filter: (() => {
-              switch (item.category) {
-                case 'room_card':
-                  return {
-                    material: item.material,
-                    thickness: item.thickness,
-                    length: item.length?.toString(),
-                    width: item.width?.toString(),
-                    craft: Array.isArray(item.process) ? item.process.join(',') : item.process || '',
-                    chip: item.chip,
-                    encrypt: item.encrypted
-                  }
-                case 'slipper':
-                  return {
-                    texture: item.texture,
-                    size: item.size,
-                    craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || '',
-                    packaging: item.packaging || ''
-                  }
-                case 'pen':
-                  return {
-                    texture: item.texture,
-                    size: item.size,
-                    craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || ''
-                  }
-                case 'umbrella':
-                  return {
-                    name: item.name,
-                    texture: item.texture,
-                    size: item.size,
-                    boneNum: item.boneNum,
-                    handShank: item.handShank,
-                    craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || ''
-                  }
-                case 'badge_lanyard':
-                  return {
-                    name: item.name,
-                    size: item.size,
-                    craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || ''
-                  }
-                case 'six_small_items':
-                  return {
-                    name: item.name,
-                    texture: item.texture,
-                    thickness: item.thickness || '',
-                    length: item.length?.toString() || '',
-                    width: item.width?.toString() || '',
-                    weight: item.weight || '',
-                    craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || ''
-                  }
-                default:
-                  return {}
-              }
-            })()
-          }
+          // const baseData = {
+          //   user_id: userInfo?.uid || 0,
+          //   user_name: userInfo?.name || '',
+          //   prod_type: item.category,
+          //   filter: (() => {
+          //     switch (item.category) {
+          //       case 'room_card':
+          //         return {
+          //           material: item.material,
+          //           thickness: item.thickness,
+          //           length: item.length?.toString(),
+          //           width: item.width?.toString(),
+          //           craft: Array.isArray(item.process) ? item.process.join(',') : item.process || '',
+          //           chip: item.chip,
+          //           encrypt: item.encrypted
+          //         }
+          //       case 'slipper':
+          //         return {
+          //           texture: item.texture,
+          //           size: item.size,
+          //           craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || '',
+          //           packaging: item.packaging || ''
+          //         }
+          //       case 'pen':
+          //         return {
+          //           texture: item.texture,
+          //           size: item.size,
+          //           craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || ''
+          //         }
+          //       case 'umbrella':
+          //         return {
+          //           name: item.name,
+          //           texture: item.texture,
+          //           size: item.size,
+          //           boneNum: item.boneNum,
+          //           handShank: item.handShank,
+          //           craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || ''
+          //         }
+          //       case 'badge_lanyard':
+          //         return {
+          //           name: item.name,
+          //           size: item.size,
+          //           craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || ''
+          //         }
+          //       case 'six_small_items':
+          //         return {
+          //           name: item.name,
+          //           texture: item.texture,
+          //           thickness: item.thickness || '',
+          //           length: item.length?.toString() || '',
+          //           width: item.width?.toString() || '',
+          //           weight: item.weight || '',
+          //           craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || ''
+          //         }
+          //       default:
+          //         return {}
+          //     }
+          //   })()
+          // }
 
           // 流式 fetch
           try {
@@ -3523,7 +3536,7 @@ const InquiryPage: FC = () => {
             if (response && response.data) {
               const markdownContent = response.data
               if (markdownContent) {
-                setFullMarkdown((prev) => prev + markdownContent + '\n\n')
+                setFullMarkdown((prev) => [...prev, markdownContent])
               }
             }
           } catch (error) {
@@ -3588,7 +3601,18 @@ const InquiryPage: FC = () => {
             {!isLoading && !displayedMarkdown ? (
               <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
             ) : (
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{displayedMarkdown}</ReactMarkdown>
+              <Markdown
+                message={{
+                  id: 'markdown-content',
+                  assistantId: 'default',
+                  role: 'assistant',
+                  content: displayedMarkdown,
+                  topicId: 'default',
+                  createdAt: new Date().toISOString(),
+                  type: 'text',
+                  status: 'success'
+                }}
+              />
             )}
           </MarkdownContainer>
         </TableContainer>
