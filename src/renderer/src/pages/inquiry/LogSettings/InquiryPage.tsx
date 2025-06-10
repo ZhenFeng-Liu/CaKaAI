@@ -71,18 +71,20 @@ const InquiryPage: FC = () => {
           {/* 记录详情，content字段 */}
           {selectedRecord ? (
             <div className="markdown-body">
-              <Markdown
-                message={{
-                  id: selectedRecord.id.toString(),
-                  assistantId: selectedRecord.userId.toString(),
-                  topicId: selectedRecord.id.toString(),
-                  role: 'assistant',
-                  content: selectedRecord.content,
-                  status: 'success',
-                  type: 'text',
-                  createdAt: selectedRecord.create_time
-                }}
-              />
+              <div className="markdown-content">
+                <Markdown
+                  message={{
+                    id: selectedRecord.id.toString(),
+                    assistantId: selectedRecord.userId.toString(),
+                    topicId: selectedRecord.id.toString(),
+                    role: 'assistant',
+                    content: selectedRecord.content,
+                    status: 'success',
+                    type: 'text',
+                    createdAt: selectedRecord.create_time
+                  }}
+                />
+              </div>
             </div>
           ) : (
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
@@ -105,10 +107,6 @@ const ContentContainer = styled.div`
   flex: 1;
   flex-direction: row;
   min-height: 100%;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
 `
 
 const MarkdownContainer = styled(Scrollbar)`
@@ -116,6 +114,7 @@ const MarkdownContainer = styled(Scrollbar)`
   display: flex;
   width: 100%;
   flex-direction: column;
+  overflow-x: auto;
 
   /* Markdown 基础样式 */
   .markdown-body {
@@ -123,13 +122,11 @@ const MarkdownContainer = styled(Scrollbar)`
     line-height: 1.6;
     color: var(--color-text);
     padding: 20px;
-    // min-width: 800px;
     margin: 0 auto;
     width: 100%;
-
-    @media (max-width: 768px) {
-      padding: 15px;
-      font-size: 13px;
+    overflow-x: auto;
+    .markdown-content {
+      white-space: normal;
     }
   }
 
@@ -146,13 +143,6 @@ const SideNav = styled.div`
   user-select: none;
   height: 100%;
   overflow-y: auto;
-
-  @media (max-width: 768px) {
-    width: 100%;
-    border-right: none;
-    border-bottom: 0.5px solid var(--color-border);
-    max-height: 200px;
-  }
 
   .ant-menu {
     border-inline-end: none !important;

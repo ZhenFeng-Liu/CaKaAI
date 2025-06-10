@@ -45,94 +45,95 @@ const roomCardColumns: ColumnsType<ProductData> = [
 // 拖鞋表格列定义
 const slipperColumns: ColumnsType<SlipperData> = [
   { title: '序号', dataIndex: 'serial', width: 60, align: 'center' as const, fixed: 'left' },
-  { title: '产品编号', dataIndex: 'productNo', width: 90, align: 'center' as const, fixed: 'left' },
-  { title: '物料编码', dataIndex: 'materialCode', width: 120, align: 'center' as const },
+  { title: '产品编号', dataIndex: 'id', width: 90, align: 'center' as const, fixed: 'left' },
+  { title: '物料编码', dataIndex: 'material_code', width: 120, align: 'center' as const },
   { title: '材质', dataIndex: 'texture', width: 120, align: 'center' as const },
-  { title: '尺码', dataIndex: 'size', width: 80, align: 'center' as const },
-  { title: '工艺', dataIndex: 'craft', width: 100, align: 'center' as const },
+  { title: '长*宽mm', dataIndex: 'size', width: 80, align: 'center' as const },
+  { title: '产品工艺', dataIndex: 'craft', width: 100, align: 'center' as const },
   { title: '包装', dataIndex: 'packaging', width: 100, align: 'center' as const },
-  { title: '价格', dataIndex: 'price', width: 100, align: 'center' as const },
+  { title: '阶梯数量/报价', dataIndex: 'price', width: 100, align: 'center' as const },
   { title: '打样数量', dataIndex: 'proofingNum', width: 90, align: 'center' as const },
-  { title: '样品交期（工作日）', dataIndex: 'sampleLead', width: 110, align: 'center' as const },
-  { title: '大货交期（工作日）', dataIndex: 'bulkLead', width: 110, align: 'center' as const },
-  { title: '打样费用', dataIndex: 'proofingFee', width: 180, align: 'center' as const },
-  { title: '发票', dataIndex: 'invoice', width: 80, align: 'center' as const },
+  { title: '样品交期（工作日）', dataIndex: 'sampleDelTime', width: 110, align: 'center' as const },
+  { title: '大货交期（工作日）', dataIndex: 'prodDelTime', width: 110, align: 'center' as const },
+  { title: '打样费用', dataIndex: 'sampleCharge', width: 180, align: 'center' as const },
+  { title: '专票/普票', dataIndex: 'invoices', width: 80, align: 'center' as const },
   { title: '税率', dataIndex: 'tax', width: 80, align: 'center' as const }
 ]
 
 // 环保笔表格列定义
 const ecoPenColumns: ColumnsType<EcoPenData> = [
   { title: '序号', dataIndex: 'serial', width: 60, align: 'center' as const, fixed: 'left' },
-  { title: '产品编号', dataIndex: 'productNo', width: 90, align: 'center' as const, fixed: 'left' },
-  { title: '物料编码', dataIndex: 'materialCode', width: 120, align: 'center' as const },
+  { title: '产品编号', dataIndex: 'id', width: 90, align: 'center' as const, fixed: 'left' },
+  { title: '物料编码（C.L）', dataIndex: 'material_code', width: 120, align: 'center' as const },
+  { title: '物料编码（C.P）', dataIndex: 'material_code2', width: 120, align: 'center' as const },
   { title: '材质', dataIndex: 'texture', width: 120, align: 'center' as const },
-  { title: '尺码', dataIndex: 'size', width: 150, align: 'center' as const },
-  { title: '工艺', dataIndex: 'craft', width: 100, align: 'center' as const },
+  { title: '长*宽mm', dataIndex: 'size', width: 150, align: 'center' as const },
+  { title: '产品工艺', dataIndex: 'craft', width: 100, align: 'center' as const },
   { title: '打样数量', dataIndex: 'proofingNum', width: 90, align: 'center' as const },
-  { title: '样品交期（工作日）', dataIndex: 'sampleLead', width: 110, align: 'center' as const },
-  { title: '大货交期（工作日）', dataIndex: 'bulkLead', width: 110, align: 'center' as const },
-  { title: '阶梯报价', dataIndex: 'ladderPrice', width: 300, align: 'center' as const },
-  { title: '打样费用', dataIndex: 'proofingFee', width: 100, align: 'center' as const },
-  { title: '发票', dataIndex: 'invoice', width: 80, align: 'center' as const },
+  { title: '样品交期（工作日）', dataIndex: 'sampleDelTime', width: 110, align: 'center' as const },
+  { title: '大货交期（工作日）', dataIndex: 'prodDelTime', width: 110, align: 'center' as const },
+  { title: '阶梯数量/报价', dataIndex: 'stepNum', width: 300, align: 'center' as const },
+  { title: '打样费用', dataIndex: 'sampleCharge', width: 100, align: 'center' as const },
+  { title: '专票/普票', dataIndex: 'invoices', width: 80, align: 'center' as const },
   { title: '税率', dataIndex: 'tax', width: 80, align: 'center' as const }
 ]
 
 // 雨伞表格列定义
 const umbrellaColumns: ColumnsType<UmbrellaData> = [
   { title: '序号', dataIndex: 'serial', width: 60, align: 'center' as const, fixed: 'left' },
-  { title: '产品编号', dataIndex: 'productNo', width: 90, align: 'center' as const, fixed: 'left' },
-  { title: '物料编码', dataIndex: 'materialCode', width: 120, align: 'center' as const },
+  { title: '产品编号', dataIndex: 'id', width: 90, align: 'center' as const, fixed: 'left' },
+  { title: '物料编码', dataIndex: 'material_code', width: 120, align: 'center' as const },
   { title: '产品名称', dataIndex: 'name', width: 200, align: 'center' as const },
-  { title: '材质', dataIndex: 'texture', width: 100, align: 'center' as const },
-  { title: '尺寸', dataIndex: 'size', width: 100, align: 'center' as const },
-  { title: '伞骨数量', dataIndex: 'boneNum', width: 100, align: 'center' as const },
-  { title: '手柄类型', dataIndex: 'handShank', width: 150, align: 'center' as const },
-  { title: '工艺', dataIndex: 'craft', width: 120, align: 'center' as const },
+  { title: '伞珠材质', dataIndex: 'texture', width: 100, align: 'center' as const },
+  { title: '雨伞尺寸', dataIndex: 'size', width: 100, align: 'center' as const },
+  { title: '雨伞骨数', dataIndex: 'boneNum', width: 100, align: 'center' as const },
+  { title: '雨伞手柄', dataIndex: 'handShank', width: 150, align: 'center' as const },
+  { title: '产品工艺', dataIndex: 'craft', width: 120, align: 'center' as const },
   { title: '打样数量', dataIndex: 'proofingNum', width: 90, align: 'center' as const },
-  { title: '样品交期', dataIndex: 'sampleLead', width: 100, align: 'center' as const },
-  { title: '大货交期', dataIndex: 'bulkLead', width: 100, align: 'center' as const },
-  { title: '阶梯报价', dataIndex: 'ladderPrice', width: 300, align: 'center' as const },
-  { title: '打样费用', dataIndex: 'proofingFee', width: 100, align: 'center' as const },
-  { title: '发票', dataIndex: 'invoice', width: 80, align: 'center' as const },
+  { title: '样品交期（工作日）', dataIndex: 'sampleDelTime', width: 110, align: 'center' as const },
+  { title: '大货交期（工作日）', dataIndex: 'prodDelTime', width: 110, align: 'center' as const },
+  { title: '阶梯数量/报价', dataIndex: 'stepNum', width: 300, align: 'center' as const },
+  { title: '打样费用', dataIndex: 'sampleCharge', width: 100, align: 'center' as const },
+  { title: '专票/普票', dataIndex: 'invoices', width: 80, align: 'center' as const },
   { title: '税率', dataIndex: 'tax', width: 80, align: 'center' as const }
 ]
 
 // 胸牌表格列定义
 const badgeColumns: ColumnsType<BadgeData> = [
   { title: '序号', dataIndex: 'serial', width: 60, align: 'center' as const, fixed: 'left' },
-  { title: '产品编号', dataIndex: 'productNo', width: 90, align: 'center' as const, fixed: 'left' },
-  { title: '物料编码', dataIndex: 'materialCode', width: 120, align: 'center' as const },
+  { title: '产品编号', dataIndex: 'id', width: 90, align: 'center' as const, fixed: 'left' },
+  { title: '物料编码', dataIndex: 'material_code', width: 120, align: 'center' as const },
   { title: '产品名称', dataIndex: 'name', width: 250, align: 'center' as const },
   { title: '尺寸', dataIndex: 'size', width: 100, align: 'center' as const },
-  { title: '工艺', dataIndex: 'craft', width: 120, align: 'center' as const },
+  { title: '产品工艺', dataIndex: 'craft', width: 120, align: 'center' as const },
   { title: '打样数量', dataIndex: 'proofingNum', width: 90, align: 'center' as const },
-  { title: '样品交期', dataIndex: 'sampleLead', width: 100, align: 'center' as const },
-  { title: '大货交期', dataIndex: 'bulkLead', width: 100, align: 'center' as const },
-  { title: '阶梯报价', dataIndex: 'ladderPrice', width: 300, align: 'center' as const },
-  { title: '打样费用', dataIndex: 'proofingFee', width: 100, align: 'center' as const },
-  { title: '工具费用', dataIndex: 'toolCharge', width: 100, align: 'center' as const },
-  { title: '发票', dataIndex: 'invoice', width: 80, align: 'center' as const },
-  { title: '税率', dataIndex: 'tax', width: 80, align: 'center' as const }
+  { title: '样品交期（工作日）', dataIndex: 'sampleDelTime', width: 110, align: 'center' as const },
+  { title: '大货交期（工作日）', dataIndex: 'prodDelTime', width: 110, align: 'center' as const },
+  { title: '阶梯数量/报价', dataIndex: 'stepNum', width: 300, align: 'center' as const },
+  { title: '打样费用', dataIndex: 'sampleCharge', width: 100, align: 'center' as const },
+  { title: '专票/普票', dataIndex: 'invoices', width: 80, align: 'center' as const },
+  { title: '税率', dataIndex: 'tax', width: 80, align: 'center' as const },
+  { title: '模具费', dataIndex: 'toolCharge', width: 100, align: 'center' as const }
 ]
 
 // 六小件表格列定义
 const sixPieceColumns: ColumnsType<SixPieceData> = [
   { title: '序号', dataIndex: 'serial', width: 60, align: 'center' as const, fixed: 'left' },
-  { title: '产品编号', dataIndex: 'productNo', width: 90, align: 'center' as const, fixed: 'left' },
-  { title: '物料编码', dataIndex: 'materialCode', width: 120, align: 'center' as const },
+  { title: '产品编号', dataIndex: 'id', width: 90, align: 'center' as const, fixed: 'left' },
+  { title: '物料编码', dataIndex: 'material_code', width: 120, align: 'center' as const },
   { title: '产品名称', dataIndex: 'name', width: 250, align: 'center' as const },
   { title: '材质', dataIndex: 'texture', width: 100, align: 'center' as const },
-  { title: '厚度', dataIndex: 'thickness', width: 80, align: 'center' as const },
-  { title: '长度', dataIndex: 'length', width: 80, align: 'center' as const },
-  { title: '宽度', dataIndex: 'width', width: 80, align: 'center' as const },
-  { title: '重量', dataIndex: 'weight', width: 80, align: 'center' as const },
-  { title: '工艺', dataIndex: 'craft', width: 100, align: 'center' as const },
+  { title: '厚度mm', dataIndex: 'thickness', width: 80, align: 'center' as const },
+  { title: '长度mm', dataIndex: 'length', width: 80, align: 'center' as const },
+  { title: '宽度mm', dataIndex: 'width', width: 80, align: 'center' as const },
+  { title: '克重g', dataIndex: 'weight', width: 80, align: 'center' as const },
+  { title: '产品工艺', dataIndex: 'craft', width: 100, align: 'center' as const },
   { title: '打样数量', dataIndex: 'proofingNum', width: 90, align: 'center' as const },
-  { title: '样品交期', dataIndex: 'sampleLead', width: 100, align: 'center' as const },
-  { title: '大货交期', dataIndex: 'bulkLead', width: 100, align: 'center' as const },
-  { title: '阶梯报价', dataIndex: 'ladderPrice', width: 300, align: 'center' as const },
-  { title: '打样费用', dataIndex: 'proofingFee', width: 100, align: 'center' as const },
-  { title: '发票', dataIndex: 'invoice', width: 80, align: 'center' as const },
+  { title: '样品交期（工作日）', dataIndex: 'sampleDelTime', width: 110, align: 'center' as const },
+  { title: '大货交期（工作日）', dataIndex: 'prodDelTime', width: 110, align: 'center' as const },
+  { title: '阶梯数量/报价', dataIndex: 'stepNum', width: 300, align: 'center' as const },
+  { title: '打样费用', dataIndex: 'sampleCharge', width: 100, align: 'center' as const },
+  { title: '专票/普票', dataIndex: 'invoices', width: 80, align: 'center' as const },
   { title: '税率', dataIndex: 'tax', width: 80, align: 'center' as const }
 ]
 
@@ -204,89 +205,29 @@ const DataPage: React.FC = () => {
           }))
           setRoomCardData(transformedData)
         } else if (selectedType === '拖鞋') {
-          const transformedData = response.data.map((item: RawSlipperData, index: number) => ({
-            ...item,
-            serial: index + 1
+          const transformedData = response.data.map((item: RawSlipperData) => ({
+            ...item
+            // serial: index + 1
           }))
           setSlipperData(transformedData)
         } else if (selectedType === '环保笔') {
-          const transformedData = response.data.map((item: RawEcoPenData, index: number) => ({
-            key: `${item.id}-${selectedType}-${index}`,
-            serial: item.serial,
-            productNo: item.id,
-            materialCode: item.material_code,
-            texture: item.texture,
-            size: item.size,
-            craft: item.craft,
-            proofingNum: item.proofingNum,
-            sampleLead: item.sampleDelTime,
-            bulkLead: item.prodDelTime,
-            ladderPrice: item.stepNum,
-            proofingFee: item.sampleCharge,
-            invoice: item.invoices,
-            tax: item.tax
+          const transformedData = response.data.map((item: RawEcoPenData) => ({
+            ...item
           }))
           setEcoPenData(transformedData)
         } else if (selectedType === '雨伞') {
-          const transformedData = response.data.map((item: RawUmbrellaData, index: number) => ({
-            key: `${item.serial}-${selectedType}-${index}`,
-            serial: item.serial,
-            productNo: item.id,
-            materialCode: item.material_code,
-            name: item.name,
-            texture: item.texture,
-            size: item.size,
-            boneNum: item.boneNum,
-            handShank: item.handShank,
-            craft: item.craft,
-            proofingNum: item.proofingNum,
-            sampleLead: item.sampleDelTime,
-            bulkLead: item.prodDelTime,
-            ladderPrice: item.stepNum,
-            proofingFee: item.sampleCharge,
-            invoice: item.invoices,
-            tax: item.tax
+          const transformedData = response.data.map((item: RawUmbrellaData) => ({
+            ...item
           }))
           setUmbrellaData(transformedData)
         } else if (selectedType === '胸牌') {
-          const transformedData = response.data.map((item: RawBadgeData, index: number) => ({
-            key: `${item.serial}-${selectedType}-${index}`,
-            serial: item.serial,
-            productNo: item.id,
-            materialCode: item.material_code,
-            name: item.name,
-            size: item.size,
-            craft: item.craft,
-            proofingNum: item.proofingNum,
-            sampleLead: item.sampleDelTime,
-            bulkLead: item.prodDelTime,
-            ladderPrice: item.stepNum,
-            proofingFee: item.sampleCharge,
-            toolCharge: item.toolCharge,
-            invoice: item.invoices,
-            tax: item.tax
+          const transformedData = response.data.map((item: RawBadgeData) => ({
+            ...item
           }))
           setBadgeData(transformedData)
         } else if (selectedType === '六小件') {
-          const transformedData = response.data.map((item: RawSixPieceData, index: number) => ({
-            key: `${item.serial}-${selectedType}-${index}`,
-            serial: item.serial,
-            productNo: item.id || '-',
-            materialCode: item.material_code,
-            name: item.name,
-            texture: item.texture,
-            thickness: item.thickness === '/' ? '-' : item.thickness,
-            length: item.length === '/' ? '-' : item.length,
-            width: item.width === '/' ? '-' : item.width,
-            weight: item.weight === '/' ? '-' : item.weight,
-            craft: item.craft === '/' ? '-' : item.craft,
-            proofingNum: item.proofingNum,
-            sampleLead: item.sampleDelTime,
-            bulkLead: item.prodDelTime,
-            ladderPrice: item.stepNum,
-            proofingFee: item.sampleCharge === '/' ? '-' : item.sampleCharge,
-            invoice: item.invoices,
-            tax: item.tax
+          const transformedData = response.data.map((item: RawSixPieceData) => ({
+            ...item
           }))
           setSixPieceData(transformedData)
         }
