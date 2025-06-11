@@ -3292,6 +3292,7 @@ const InquiryPage: FC = () => {
           break
         case 'slipper':
           console.log(res.data)
+          SLIPPER_DATA.packaging = res.data?.packagings
           Object.assign(SLIPPER_DATA, res.data)
           console.log('SLIPPER_DATA', SLIPPER_DATA)
           break
