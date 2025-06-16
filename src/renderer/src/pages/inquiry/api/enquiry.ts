@@ -76,9 +76,31 @@ export interface SixSmallItemsFilter {
   craft: string
 }
 
+// 木卡房卡询价参数
+export interface WoodenRoomCardFilter {
+  prod_length: string
+  prod_width: string
+  material: string
+  thickness: string
+  craft: string //若干个用+拼接
+  chip_material_code: string
+  encrypt: string
+}
+
+// DND房卡询价参数
+export interface DNDRoomCardFilter {
+  prod_length: string
+  prod_width: string
+  material: string
+  thickness: string
+  craft: string //若干个用+拼接
+}
+
 // 产品类型枚举
 export enum ProductType {
   ROOM_CARD = 'room_card',
+  ROOM_CARD_WC = 'room_card_wc',
+  ROOM_CARD_DND = 'room_card_dnd',
   SLIPPER = 'slipper',
   PEN = 'pen',
   UMBRELLA = 'umbrella',
@@ -117,6 +139,24 @@ export const enquiry = async (prodType: ProductType, filter: Record<string, any>
  */
 export const roomCardEnquiry = async (filter: RoomCardFilter): Promise<any> => {
   return enquiry(ProductType.ROOM_CARD, filter)
+}
+
+/**
+ * 木卡房卡询价
+ * @param filter 房卡询价参数
+ * @returns Promise<any>
+ */
+export const WoodenRoomCardEnquiry = async (filter: WoodenRoomCardFilter): Promise<any> => {
+  return enquiry(ProductType.ROOM_CARD_WC, filter)
+}
+
+/**
+ * DND房卡询价
+ * @param filter 房卡询价参数
+ * @returns Promise<any>
+ */
+export const DNDRoomCardEnquiry = async (filter: DNDRoomCardFilter): Promise<any> => {
+  return enquiry(ProductType.ROOM_CARD_DND, filter)
 }
 
 /**

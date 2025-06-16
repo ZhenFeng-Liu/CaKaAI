@@ -25,11 +25,13 @@ import styled from 'styled-components'
 
 import {
   badgeLanyardEnquiry,
+  DNDRoomCardEnquiry,
   penEnquiry,
   roomCardEnquiry,
   sixSmallItemsEnquiry,
   slipperEnquiry,
-  umbrellaEnquiry
+  umbrellaEnquiry,
+  WoodenRoomCardEnquiry
 } from '../api/enquiry'
 import { queryProdTypeParams } from '../api/query_prodtype_params'
 
@@ -360,8 +362,16 @@ const CategoryRadioGroup = styled(Radio.Group)`
   }
 `
 
-// 定义品类类型：品类：slipper--拖鞋、room_card--房卡、pen--环保笔、umbrella--伞、badge_lanyard--胸牌、six_small_items--六小件
-type CategoryType = 'room_card' | 'slipper' | 'pen' | 'badge_lanyard' | 'umbrella' | 'six_small_items'
+// 定义品类类型：品类：room_card_wc--木卡房卡、room_card_dnd--DND房卡、slipper--拖鞋、room_card--房卡、pen--环保笔、umbrella--伞、badge_lanyard--胸牌、six_small_items--六小件
+type CategoryType =
+  | 'room_card_wc'
+  | 'room_card_dnd'
+  | 'room_card'
+  | 'slipper'
+  | 'pen'
+  | 'badge_lanyard'
+  | 'umbrella'
+  | 'six_small_items'
 
 // 定义品类数据接口
 interface CategoryItem {
@@ -390,11 +400,18 @@ interface CategoryItem {
   weight?: string
   children: React.ReactNode
   extra: React.ReactNode | null
+  // 房卡特有字段
+  prod_length?: string
+  prod_width?: string
+  chip_material_code?: string
+  encrypt?: string
 }
 
 // 定义品类选项
 const CATEGORY_OPTIONS = [
-  { label: '房卡', value: 'room_card' },
+  { label: '木卡房卡', value: 'room_card_wc' },
+  { label: 'DND房卡', value: 'room_card_dnd' },
+  // { label: '房卡', value: 'room_card' },
   { label: '拖鞋', value: 'slipper' },
   { label: '环保笔', value: 'pen' },
   { label: '胸牌', value: 'badge_lanyard' },
@@ -404,6 +421,436 @@ const CATEGORY_OPTIONS = [
 
 // 房卡相关常量数据
 const ROOM_CARD_DATA = {}
+
+// 木卡房卡相关常量数据
+const ROOM_CARD_WC_DATA = {
+  thickness: [
+    {
+      value: '1.1~1.3mm',
+      label: '1.1~1.3mm'
+    },
+    {
+      value: '1.31~1.55mm',
+      label: '1.31~1.55mm'
+    },
+    {
+      value: '1.56~2mm',
+      label: '1.56~2mm'
+    }
+  ],
+  material: [
+    {
+      value: '樱桃',
+      label: '樱桃'
+    },
+    {
+      value: '竹子',
+      label: '竹子'
+    },
+    {
+      value: '椴木',
+      label: '椴木'
+    },
+    {
+      value: '沙比利',
+      label: '沙比利'
+    },
+    {
+      value: '黑胡桃',
+      label: '黑胡桃'
+    },
+    {
+      value: '榉木',
+      label: '榉木'
+    },
+    {
+      value: '黑木',
+      label: '黑木'
+    }
+  ],
+  craft: [
+    {
+      value: '印刷',
+      label: '印刷'
+    },
+    {
+      value: '雕刻',
+      label: '雕刻'
+    }
+  ],
+  chip_material_code: [
+    {
+      value: '芯片-NXP S50 1k(4byte)-CL.001.00.001',
+      label: '芯片-NXP S50 1k(4byte)-CL.001.00.001'
+    },
+    {
+      value: '芯片-FM1108S(4byte)-CL.001.00.002',
+      label: '芯片-FM1108S(4byte)-CL.001.00.002'
+    },
+    {
+      value: '芯片-K50-CL.001.00.003',
+      label: '芯片-K50-CL.001.00.003'
+    },
+    {
+      value: '芯片-FM11RF32N-CL.001.00.004',
+      label: '芯片-FM11RF32N-CL.001.00.004'
+    },
+    {
+      value: '芯片-NXP S70 EV1-CL.001.00.005',
+      label: '芯片-NXP S70 EV1-CL.001.00.005'
+    },
+    {
+      value: '芯片-NXP S20-CL.001.00.006',
+      label: '芯片-NXP S20-CL.001.00.006'
+    },
+    {
+      value: '芯片-TK4100-CL.001.00.007',
+      label: '芯片-TK4100-CL.001.00.007'
+    },
+    {
+      value: '芯片-5200-CL.001.00.008',
+      label: '芯片-5200-CL.001.00.008'
+    },
+    {
+      value: '芯片-G36A-CL.001.00.009',
+      label: '芯片-G36A-CL.001.00.009'
+    },
+    {
+      value: '芯片-T5577-CL.001.00.010',
+      label: '芯片-T5577-CL.001.00.010'
+    },
+    {
+      value: '芯片-2K-90-CL.001.00.011',
+      label: '芯片-2K-90-CL.001.00.011'
+    },
+    {
+      value: '芯片-旧版2K-CL.001.00.012',
+      label: '芯片-旧版2K-CL.001.00.012'
+    },
+    {
+      value: '芯片-EM4305-CL.001.00.013',
+      label: '芯片-EM4305-CL.001.00.013'
+    },
+    {
+      value: '芯片-NXP Ultralight EV1(48byte)-CL.001.00.014',
+      label: '芯片-NXP Ultralight EV1(48byte)-CL.001.00.014'
+    },
+    {
+      value: '芯片-G36B-CL.001.00.015',
+      label: '芯片-G36B-CL.001.00.015'
+    },
+    {
+      value: '芯片-NXP Ultralight C(17PF)-CL.001.00.016',
+      label: '芯片-NXP Ultralight C(17PF)-CL.001.00.016'
+    },
+    {
+      value: '芯片-SRI512-CL.001.00.017',
+      label: '芯片-SRI512-CL.001.00.017'
+    },
+    {
+      value: '芯片-SRE55VO2P-CL.001.00.018',
+      label: '芯片-SRE55VO2P-CL.001.00.018'
+    },
+    {
+      value: '芯片-I CODE SLI-CL.001.00.019',
+      label: '芯片-I CODE SLI-CL.001.00.019'
+    },
+    {
+      value: '芯片-NXP S50(gc)-CL.001.00.020',
+      label: '芯片-NXP S50(gc)-CL.001.00.020'
+    },
+    {
+      value: '芯片-CUID-CL.001.00.021',
+      label: '芯片-CUID-CL.001.00.021'
+    },
+    {
+      value: '芯片-UID-CL.001.00.022',
+      label: '芯片-UID-CL.001.00.022'
+    },
+    {
+      value: '芯片-ISSI4439-CL.001.00.023',
+      label: '芯片-ISSI4439-CL.001.00.023'
+    },
+    {
+      value: '芯片-FM S50-CL.001.00.024',
+      label: '芯片-FM S50-CL.001.00.024'
+    },
+    {
+      value: '芯片-TI 2K-CL.001.00.025',
+      label: '芯片-TI 2K-CL.001.00.025'
+    },
+    {
+      value: '芯片-UL-EV1 COB(48byte)-CL.001.00.026',
+      label: '芯片-UL-EV1 COB(48byte)-CL.001.00.026'
+    },
+    {
+      value: '芯片-G36A 晶圆-CL.001.00.027',
+      label: '芯片-G36A 晶圆-CL.001.00.027'
+    },
+    {
+      value: '芯片-新版2K-CL.001.00.028',
+      label: '芯片-新版2K-CL.001.00.028'
+    },
+    {
+      value: '芯片-FM1280-194-A1-CL.001.00.030',
+      label: '芯片-FM1280-194-A1-CL.001.00.030'
+    },
+    {
+      value: '芯片-FM1280-198-C1-CL.001.00.031',
+      label: '芯片-FM1280-198-C1-CL.001.00.031'
+    },
+    {
+      value: '芯片-NXP NTAG213-CL.001.00.029',
+      label: '芯片-NXP NTAG213-CL.001.00.029'
+    },
+    {
+      value: '芯片-gc ULT -C-CL.001.00.032',
+      label: '芯片-gc ULT -C-CL.001.00.032'
+    },
+    {
+      value: '芯片-NXP DESFire EV1 2K(7byte)-CL.001.005',
+      label: '芯片-NXP DESFire EV1 2K(7byte)-CL.001.005'
+    },
+    {
+      value: '芯片-NXP DESFire EV1 4K(7byte)-CL.001.006',
+      label: '芯片-NXP DESFire EV1 4K(7byte)-CL.001.006'
+    },
+    {
+      value: '芯片-PLUS X 4K 7B-CL.001.007',
+      label: '芯片-PLUS X 4K 7B-CL.001.007'
+    },
+    {
+      value: '芯片-NXP Plus EV1 4K-CL.001.008',
+      label: '芯片-NXP Plus EV1 4K-CL.001.008'
+    },
+    {
+      value: '芯片-NXP Plus EV1 2K-CL.001.009',
+      label: '芯片-NXP Plus EV1 2K-CL.001.009'
+    },
+    {
+      value: '芯片-HT4168-CL.001.010',
+      label: '芯片-HT4168-CL.001.010'
+    },
+    {
+      value: '芯片-FM11RM08S-CL.001.011',
+      label: '芯片-FM11RM08S-CL.001.011'
+    },
+    {
+      value: '芯片-NXP D81(7byte)-CL.001.012',
+      label: '芯片-NXP D81(7byte)-CL.001.012'
+    },
+    {
+      value: '芯片-Hitag 2-CL.001.013',
+      label: '芯片-Hitag 2-CL.001.013'
+    },
+    {
+      value: '芯片-NXP Ultralight EV1(128bytes）-CL.001.014',
+      label: '芯片-NXP Ultralight EV1(128bytes）-CL.001.014'
+    },
+    {
+      value: '芯片-NXP S50 EV1(7byte）-CL.001.00.033',
+      label: '芯片-NXP S50 EV1(7byte）-CL.001.00.033'
+    },
+    {
+      value: '芯片-NXP PLUS X 2K(7byte)-CL.001.015',
+      label: '芯片-NXP PLUS X 2K(7byte)-CL.001.015'
+    },
+    {
+      value: '芯片-NXP NTAG215-CL.001.016',
+      label: '芯片-NXP NTAG215-CL.001.016'
+    },
+    {
+      value: '芯片-I CODE SLIX2-CL.001.00.034',
+      label: '芯片-I CODE SLIX2-CL.001.00.034'
+    },
+    {
+      value: '芯片-MCU-CL.001.00.035',
+      label: '芯片-MCU-CL.001.00.035'
+    },
+    {
+      value: '芯片-NXP D42-CL.001.00.036',
+      label: '芯片-NXP D42-CL.001.00.036'
+    },
+    {
+      value: '芯片-NXP D22-CL.001.00.037',
+      label: '芯片-NXP D22-CL.001.00.037'
+    },
+    {
+      value: '芯片-NXP D82 70pf-CL.001.00.038',
+      label: '芯片-NXP D82 70pf-CL.001.00.038'
+    },
+    {
+      value: '芯片-JT1024 -CL.001.00.039',
+      label: '芯片-JT1024 -CL.001.00.039'
+    },
+    {
+      value: '芯片-NXP PLUS S 2K(7byte)-CL.001.00.040',
+      label: '芯片-NXP PLUS S 2K(7byte)-CL.001.00.040'
+    },
+    {
+      value: '芯片-NTAG216-CL.001.0017',
+      label: '芯片-NTAG216-CL.001.0017'
+    },
+    {
+      value: '芯片-NXP DESFire EV3 4K(7byte)-CL.001.0018',
+      label: '芯片-NXP DESFire EV3 4K(7byte)-CL.001.0018'
+    },
+    {
+      value: '芯片-FM1280-7102-C1-CL.001.0019',
+      label: '芯片-FM1280-7102-C1-CL.001.0019'
+    },
+    {
+      value: '芯片-I CDOE SLI X -CL.001.0020',
+      label: '芯片-I CDOE SLI X -CL.001.0020'
+    },
+    {
+      value: '芯片-NXP Desfire EV1 8K(7byte)-CL.001.0021',
+      label: '芯片-NXP Desfire EV1 8K(7byte)-CL.001.0021'
+    },
+    {
+      value: '芯片-NXP Desfire EV2 2K(7byte)-CL.001.0022',
+      label: '芯片-NXP Desfire EV2 2K(7byte)-CL.001.0022'
+    },
+    {
+      value: '芯片-NXP Desfire EV3 2K(7byte)-CL.001.0023',
+      label: '芯片-NXP Desfire EV3 2K(7byte)-CL.001.0023'
+    },
+    {
+      value: '芯片-NXP DESFire EV2 4K(7byte)-CL.001.0024',
+      label: '芯片-NXP DESFire EV2 4K(7byte)-CL.001.0024'
+    },
+    {
+      value: '芯片-NXP Desfire EV2 8K(7byte)-CL.001.0025',
+      label: '芯片-NXP Desfire EV2 8K(7byte)-CL.001.0025'
+    },
+    {
+      value: '芯片-MIFARE Ultralight AES-CL.001.0026',
+      label: '芯片-MIFARE Ultralight AES-CL.001.0026'
+    },
+    {
+      value: '芯片-NXP ULT AES-CL.001.0027',
+      label: '芯片-NXP ULT AES-CL.001.0027'
+    },
+    {
+      value: '芯片-EM4200-CL.001.0028',
+      label: '芯片-EM4200-CL.001.0028'
+    },
+    {
+      value: '芯片-UHF 9662-CL.001.0029',
+      label: '芯片-UHF 9662-CL.001.0029'
+    },
+    {
+      value: '芯片-NXP S70 7B-CL.001.0030',
+      label: '芯片-NXP S70 7B-CL.001.0030'
+    },
+    {
+      value: '芯片-MIFARE Plus EV2 2K -CL.001.0031',
+      label: '芯片-MIFARE Plus EV2 2K -CL.001.0031'
+    },
+    {
+      value: '芯片-NXP Ultralight C wafer(17PF)-CL.001.0032',
+      label: '芯片-NXP Ultralight C wafer(17PF)-CL.001.0032'
+    },
+    {
+      value: '芯片-Hitag 2-CL.001.0033',
+      label: '芯片-Hitag 2-CL.001.0033'
+    },
+    {
+      value: '芯片-FM24C02-CL.001.0034',
+      label: '芯片-FM24C02-CL.001.0034'
+    },
+    {
+      value: '芯片-NXP UL-C 50PF-CL.001.0035',
+      label: '芯片-NXP UL-C 50PF-CL.001.0035'
+    },
+    {
+      value: '芯片-NXP DESFire Light -CL.001.0036',
+      label: '芯片-NXP DESFire Light -CL.001.0036'
+    },
+    {
+      value: '芯片-NXP Hitag 1-CL.001.0037',
+      label: '芯片-NXP Hitag 1-CL.001.0037'
+    },
+    {
+      value: '辅料配件-LED发光灯珠COB-CL.001.0038',
+      label: '辅料配件-LED发光灯珠COB-CL.001.0038'
+    },
+    {
+      value: '芯片-MIFARE Plus EV2 4K -CL.001.0039',
+      label: '芯片-MIFARE Plus EV2 4K -CL.001.0039'
+    },
+    {
+      value: '芯片-MIFARE Plus EV2 4k(7byte)-CL.001.0040',
+      label: '芯片-MIFARE Plus EV2 4k(7byte)-CL.001.0040'
+    },
+    {
+      value: '芯片-Monza R6-CL.001.0041',
+      label: '芯片-Monza R6-CL.001.0041'
+    },
+    {
+      value: '芯片-CPU(FM1208-09)-CL.001.00.0042',
+      label: '芯片-CPU(FM1208-09)-CL.001.00.0042'
+    },
+    {
+      value: '芯片-MIFARE Classic EV1 1K(7byte)-CL.001.00.0043',
+      label: '芯片-MIFARE Classic EV1 1K(7byte)-CL.001.00.0043'
+    },
+    {
+      value: '芯片-NXP S50 EV1(4byte）-CL.001.00.0044',
+      label: '芯片-NXP S50 EV1(4byte）-CL.001.00.0044'
+    }
+  ]
+}
+
+// DND房卡相关常量数据
+const ROOM_CARD_DND_DATA = {
+  thickness: [
+    {
+      value: '3mm',
+      label: '3mm'
+    },
+    {
+      value: '5mm',
+      label: '5mm'
+    }
+  ],
+  material: [
+    {
+      value: '樱桃',
+      label: '樱桃'
+    },
+    {
+      value: '竹子',
+      label: '竹子'
+    },
+    {
+      value: '椴木',
+      label: '椴木'
+    },
+    {
+      value: '沙比利',
+      label: '沙比利'
+    },
+    {
+      value: '黑胡桃',
+      label: '黑胡桃'
+    },
+    {
+      value: '榉木',
+      label: '榉木'
+    }
+  ],
+  craft: [
+    {
+      value: '印刷',
+      label: '印刷'
+    },
+    {
+      value: '雕刻',
+      label: '雕刻'
+    }
+  ]
+}
 
 // 拖鞋相关常量数据
 const SLIPPER_DATA = {
@@ -2444,6 +2891,8 @@ const SIX_SMALL_ITEMS_DATA = {
 
 // 定义品类标签映射
 const CATEGORY_LABEL_MAP: Record<CategoryType, string> = {
+  room_card_wc: '木卡房卡',
+  room_card_dnd: 'DND房卡',
   room_card: '房卡',
   slipper: '拖鞋',
   pen: '环保笔',
@@ -2545,6 +2994,10 @@ const InquiryPage: FC = () => {
         handShank: values.handShank,
         selectedUmbrellaName: values.name, // 保存雨伞名称
         weight: values.weight, // 添加克重字段
+        prod_length: values.prod_length,
+        prod_width: values.prod_width,
+        chip_material_code: values.chip_material_code,
+        encrypt: values.encrypt,
         children: renderDetailForm({
           key: newKey,
           label: values.category,
@@ -2565,6 +3018,10 @@ const InquiryPage: FC = () => {
           handShank: values.handShank,
           selectedUmbrellaName: values.name, // 保存雨伞名称
           weight: values.weight, // 添加克重字段
+          prod_length: values.prod_length,
+          prod_width: values.prod_width,
+          chip_material_code: values.chip_material_code,
+          encrypt: values.encrypt,
           children: null,
           extra: null
         }),
@@ -2639,6 +3096,115 @@ const InquiryPage: FC = () => {
     if (!selectedCategory) return [categoryItem]
 
     switch (selectedCategory) {
+      case 'room_card_wc':
+        return [
+          categoryItem,
+          <Form.Item key="material" label="材质" name="material" rules={[{ required: true, message: '请选择材质' }]}>
+            <Radio.Group buttonStyle="outline">
+              {ROOM_CARD_WC_DATA.material.map((option) => (
+                <Radio key={option.value} value={option.value}>
+                  {option.label}
+                </Radio>
+              ))}
+            </Radio.Group>
+          </Form.Item>,
+          <Form.Item
+            key="thickness"
+            label="厚度mm"
+            name="thickness"
+            rules={[{ required: true, message: '请选择厚度' }]}>
+            <Radio.Group>
+              {ROOM_CARD_WC_DATA.thickness.map((option) => (
+                <Radio key={option.value} value={option.value}>
+                  {option.label}
+                </Radio>
+              ))}
+            </Radio.Group>
+          </Form.Item>,
+          <Form.Item
+            key="prod_length"
+            label="长mm"
+            name="prod_length"
+            rules={[{ required: true, message: '请输入长度' }]}>
+            <InputNumber min={1} />
+          </Form.Item>,
+          <Form.Item
+            key="prod_width"
+            label="宽mm"
+            name="prod_width"
+            rules={[{ required: true, message: '请输入宽度' }]}>
+            <InputNumber min={1} />
+          </Form.Item>,
+          <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: true, message: '请选择产品工艺' }]}>
+            <Checkbox.Group options={ROOM_CARD_WC_DATA.craft} />
+          </Form.Item>,
+          <Form.Item
+            key="chip_material_code"
+            label="芯片"
+            name="chip_material_code"
+            rules={[{ required: true, message: '请选择芯片' }]}>
+            <Select>
+              {ROOM_CARD_WC_DATA.chip_material_code.map((option) => (
+                <Select.Option key={option.value} value={option.value}>
+                  {option.label}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>,
+          <Form.Item
+            key="encrypt"
+            label="是否加密"
+            name="encrypt"
+            rules={[{ required: true, message: '请选择是否加密' }]}>
+            <Select>
+              <Select.Option value="是">是</Select.Option>
+              <Select.Option value="否">否</Select.Option>
+            </Select>
+          </Form.Item>
+        ]
+      case 'room_card_dnd':
+        return [
+          categoryItem,
+          <Form.Item key="material" label="材质" name="material" rules={[{ required: true, message: '请选择材质' }]}>
+            <Radio.Group buttonStyle="outline">
+              {ROOM_CARD_DND_DATA.material.map((option) => (
+                <Radio key={option.value} value={option.value}>
+                  {option.label}
+                </Radio>
+              ))}
+            </Radio.Group>
+          </Form.Item>,
+          <Form.Item
+            key="thickness"
+            label="厚度mm"
+            name="thickness"
+            rules={[{ required: true, message: '请选择厚度' }]}>
+            <Radio.Group>
+              {ROOM_CARD_DND_DATA.thickness.map((option) => (
+                <Radio key={option.value} value={option.value}>
+                  {option.label}
+                </Radio>
+              ))}
+            </Radio.Group>
+          </Form.Item>,
+          <Form.Item
+            key="prod_length"
+            label="长mm"
+            name="prod_length"
+            rules={[{ required: true, message: '请输入长度' }]}>
+            <InputNumber min={1} />
+          </Form.Item>,
+          <Form.Item
+            key="prod_width"
+            label="宽mm"
+            name="prod_width"
+            rules={[{ required: true, message: '请输入宽度' }]}>
+            <InputNumber min={1} />
+          </Form.Item>,
+          <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: true, message: '请选择产品工艺' }]}>
+            <Checkbox.Group options={ROOM_CARD_DND_DATA.craft} />
+          </Form.Item>
+        ]
       case 'room_card':
         return [
           categoryItem,
@@ -2901,6 +3467,133 @@ const InquiryPage: FC = () => {
           className={styles.detailForm}
           initialValues={item}
           onValuesChange={handleFormValuesChange}>
+          {item.category === 'room_card_wc' && (
+            <>
+              <Form.Item
+                key="material"
+                label="材质"
+                name="material"
+                rules={[{ required: true, message: '请选择材质' }]}>
+                <Radio.Group buttonStyle="outline">
+                  {ROOM_CARD_WC_DATA.material.map((option) => (
+                    <Radio key={option.value} value={option.value}>
+                      {option.label}
+                    </Radio>
+                  ))}
+                </Radio.Group>
+              </Form.Item>
+              <Form.Item
+                key="thickness"
+                label="厚度mm"
+                name="thickness"
+                rules={[{ required: true, message: '请选择厚度' }]}>
+                <Radio.Group>
+                  {ROOM_CARD_WC_DATA.thickness.map((option) => (
+                    <Radio key={option.value} value={option.value}>
+                      {option.label}
+                    </Radio>
+                  ))}
+                </Radio.Group>
+              </Form.Item>
+              <Form.Item
+                key="prod_length"
+                label="长mm"
+                name="prod_length"
+                rules={[{ required: true, message: '请输入长度' }]}>
+                <InputNumber min={1} />
+              </Form.Item>
+              <Form.Item
+                key="prod_width"
+                label="宽mm"
+                name="prod_width"
+                rules={[{ required: true, message: '请输入宽度' }]}>
+                <InputNumber min={1} />
+              </Form.Item>
+              <Form.Item
+                key="craft"
+                label="产品工艺"
+                name="craft"
+                rules={[{ required: true, message: '请选择产品工艺' }]}>
+                <Checkbox.Group options={ROOM_CARD_WC_DATA.craft} />
+              </Form.Item>
+              <Form.Item
+                key="chip_material_code"
+                label="芯片"
+                name="chip_material_code"
+                rules={[{ required: true, message: '请选择芯片' }]}>
+                <Select>
+                  {ROOM_CARD_WC_DATA.chip_material_code.map((option) => (
+                    <Select.Option key={option.value} value={option.value}>
+                      {option.label}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                key="encrypt"
+                label="是否加密"
+                name="encrypt"
+                rules={[{ required: true, message: '请选择是否加密' }]}>
+                <Select>
+                  <Select.Option value="是">是</Select.Option>
+                  <Select.Option value="否">否</Select.Option>
+                </Select>
+              </Form.Item>
+            </>
+          )}
+
+          {item.category === 'room_card_dnd' && (
+            <>
+              <Form.Item
+                key="material"
+                label="材质"
+                name="material"
+                rules={[{ required: true, message: '请选择材质' }]}>
+                <Radio.Group buttonStyle="outline">
+                  {ROOM_CARD_DND_DATA.material.map((option) => (
+                    <Radio key={option.value} value={option.value}>
+                      {option.label}
+                    </Radio>
+                  ))}
+                </Radio.Group>
+              </Form.Item>
+              <Form.Item
+                key="thickness"
+                label="厚度mm"
+                name="thickness"
+                rules={[{ required: true, message: '请选择厚度' }]}>
+                <Radio.Group>
+                  {ROOM_CARD_DND_DATA.thickness.map((option) => (
+                    <Radio key={option.value} value={option.value}>
+                      {option.label}
+                    </Radio>
+                  ))}
+                </Radio.Group>
+              </Form.Item>
+              <Form.Item
+                key="prod_length"
+                label="长mm"
+                name="prod_length"
+                rules={[{ required: true, message: '请输入长度' }]}>
+                <InputNumber min={1} />
+              </Form.Item>
+              <Form.Item
+                key="prod_width"
+                label="宽mm"
+                name="prod_width"
+                rules={[{ required: true, message: '请输入宽度' }]}>
+                <InputNumber min={1} />
+              </Form.Item>
+              <Form.Item
+                key="craft"
+                label="产品工艺"
+                name="craft"
+                rules={[{ required: true, message: '请选择产品工艺' }]}>
+                <Checkbox.Group options={ROOM_CARD_DND_DATA.craft} />
+              </Form.Item>
+            </>
+          )}
+
           {item.category === 'room_card' && (
             <>
               <Form.Item
@@ -3267,7 +3960,7 @@ const InquiryPage: FC = () => {
     setDisplayedMarkdown(fullMarkdown.join('\n\n'))
   }, [fullMarkdown])
 
-  const handlePrintProdTypeParams = async (category: CategoryType) => {
+  const handlePrintProdTypeParams = async (category) => {
     try {
       const res = await queryProdTypeParams(category)
       console.log(`【queryProdTypeParams返回内容 - ${category}】`, res)
@@ -3286,6 +3979,14 @@ const InquiryPage: FC = () => {
 
       // 拿到对应品类的参数赋予到相关常量数据
       switch (category) {
+        case 'room_card_wc':
+          Object.assign(ROOM_CARD_WC_DATA, res.data)
+          console.log('ROOM_CARD_WC_DATA', ROOM_CARD_WC_DATA)
+          break
+        case 'room_card_dnd':
+          Object.assign(ROOM_CARD_DND_DATA, res.data)
+          console.log('ROOM_CARD_DND_DATA', ROOM_CARD_DND_DATA)
+          break
         case 'room_card':
           Object.assign(ROOM_CARD_DATA, res.data)
           console.log('ROOM_CARD_DATA', ROOM_CARD_DATA)
@@ -3445,6 +4146,26 @@ const InquiryPage: FC = () => {
             // 根据产品类型调用对应的非流式询价接口
             let response
             switch (item.category) {
+              case 'room_card_wc':
+                response = await WoodenRoomCardEnquiry({
+                  material: item.material,
+                  thickness: item.thickness || '',
+                  prod_length: item.prod_length?.toString() || '',
+                  prod_width: item.prod_width?.toString() || '',
+                  craft: item.craft?.join('+') || '',
+                  chip_material_code: item.chip_material_code || '',
+                  encrypt: item.encrypt || ''
+                })
+                break
+              case 'room_card_dnd':
+                response = await DNDRoomCardEnquiry({
+                  material: item.material,
+                  thickness: item.thickness || '',
+                  prod_length: item.prod_length?.toString() || '',
+                  prod_width: item.prod_width?.toString() || '',
+                  craft: item.craft?.join('+') || ''
+                })
+                break
               case 'room_card':
                 response = await roomCardEnquiry({
                   material: item.material,
