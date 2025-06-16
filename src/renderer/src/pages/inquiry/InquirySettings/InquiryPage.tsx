@@ -1,7 +1,9 @@
 import { AntDesignOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
 import Scrollbar from '@renderer/components/Scrollbar'
 import Markdown from '@renderer/pages/home/Markdown/Markdown'
+import type { AvatarProps } from 'antd'
 import {
+  Avatar,
   Button,
   Checkbox,
   Collapse,
@@ -4248,7 +4250,10 @@ const InquiryPage: FC = () => {
     console.log('fullMarkdown 已更新:', fullMarkdown)
   }, [fullMarkdown])
 
-  const handleFormValuesChange = (changedValues: any, allValues: any) => {
+  const handleFormValuesChange = (
+    // changedValues: any,
+    allValues: any
+  ) => {
     if (typeof activeKey === 'string') {
       setItems((prevItems) =>
         prevItems.map((item) =>
@@ -4320,20 +4325,28 @@ const InquiryPage: FC = () => {
               <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
             ) : (
               <div className="markdown-body">
-                <div className="markdown-content">
-                  <Markdown
-                    message={{
-                      id: 'markdown-content',
-                      assistantId: 'default',
-                      role: 'assistant',
-                      content: displayedMarkdown,
-                      topicId: 'default',
-                      createdAt: new Date().toISOString(),
-                      type: 'text',
-                      status: 'success'
-                    }}
-                  />
-                </div>
+                <MessageContainer>
+                  <AvatarWrapper>
+                    <StyledAvatar size={32}>{'U'}</StyledAvatar>
+                  </AvatarWrapper>
+                  <ContentWrapper>
+                    <TimeWrapper>{new Date().toLocaleString()}</TimeWrapper>
+                    <MarkdownContent>
+                      <Markdown
+                        message={{
+                          id: 'markdown-content',
+                          assistantId: 'default',
+                          role: 'assistant',
+                          content: displayedMarkdown,
+                          topicId: 'default',
+                          createdAt: new Date().toISOString(),
+                          type: 'text',
+                          status: 'success'
+                        }}
+                      />
+                    </MarkdownContent>
+                  </ContentWrapper>
+                </MessageContainer>
               </div>
             )}
           </MarkdownContainer>
@@ -4353,5 +4366,47 @@ const InquiryPage: FC = () => {
     </Container>
   )
 }
+
+const MessageContainer = styled.div`
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 0;
+`
+
+const AvatarWrapper = styled.div`
+  flex-shrink: 0;
+  margin-top: 2px;
+`
+
+const ContentWrapper = styled.div`
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+const StyledAvatar = styled(Avatar)<AvatarProps>`
+  background-color: var(--color-background-soft);
+  color: var(--color-text);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.5px solid var(--color-border);
+`
+
+const TimeWrapper = styled.div`
+  font-size: 12px;
+  color: var(--color-text-3);
+  line-height: 1.2;
+`
+
+const MarkdownContent = styled.div`
+  .markdown-content {
+    margin-top: 0;
+  }
+`
 
 export default InquiryPage

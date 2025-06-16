@@ -13,7 +13,7 @@ import {
   ProductData,
   RawBadgeData,
   RawEcoPenData,
-  RawProductData,
+  // RawProductData,
   RawSixPieceData,
   RawSlipperData,
   RawUmbrellaData,
@@ -185,7 +185,10 @@ const TableContainer = styled.div`
 const DataPage: React.FC = () => {
   const { theme } = useTheme()
   const [selectedType, setSelectedType] = useState<ProductType>(PRODUCT_TYPES[0])
-  const [roomCardData, setRoomCardData] = useState<ProductData[]>([])
+  const [
+    roomCardData
+    // setRoomCardData
+  ] = useState<ProductData[]>([])
   const [slipperData, setSlipperData] = useState<SlipperData[]>([])
   const [ecoPenData, setEcoPenData] = useState<EcoPenData[]>([])
   const [umbrellaData, setUmbrellaData] = useState<UmbrellaData[]>([])
@@ -198,13 +201,14 @@ const DataPage: React.FC = () => {
     try {
       const response = await queryProdType(PRODUCT_TYPE_MAP[selectedType])
       if (response.code === 200) {
-        if (selectedType === '房卡') {
-          const transformedData = response.data.map((item: RawProductData, index: number) => ({
-            ...item,
-            index: index + 1
-          }))
-          setRoomCardData(transformedData)
-        } else if (selectedType === '拖鞋') {
+        // if (selectedType === '房卡') {
+        //   const transformedData = response.data.map((item: RawProductData, index: number) => ({
+        //     ...item,
+        //     index: index + 1
+        //   }))
+        //   setRoomCardData(transformedData)
+        // } else
+        if (selectedType === '拖鞋') {
           const transformedData = response.data.map((item: RawSlipperData) => ({
             ...item
             // serial: index + 1
@@ -281,7 +285,7 @@ const DataPage: React.FC = () => {
 
           // 映射产品类型到上传类型
           const prodTypeMap: Record<ProductType, UploadProdType> = {
-            房卡: 'room_card',
+            // 房卡: 'room_card',
             拖鞋: 'slipper',
             雨伞: 'umbrella',
             环保笔: 'pen',
@@ -324,7 +328,7 @@ const DataPage: React.FC = () => {
       setLoading(true)
       // 映射产品类型到对应的CSV文件名
       const filenameMap: Record<ProductType, CsvFileProdType> = {
-        房卡: 'room_card',
+        // 房卡: 'room_card',
         拖鞋: 'slipper',
         雨伞: 'umbrella',
         环保笔: 'pen',

@@ -1,18 +1,20 @@
 // import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
 import Scrollbar from '@renderer/components/Scrollbar'
 import Markdown from '@renderer/pages/home/Markdown/Markdown'
-import { Empty, Menu, message } from 'antd'
+import type { AvatarProps } from 'antd'
+import { Avatar, Empty, Menu, message } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { queryEnquiry } from '../api/query_enquiry'
 
-interface EnquiryRecord {
+export interface EnquiryRecord {
   id: number
   userId: number
   create_time: string
   info: string
   content: string
+  role: 'user' | 'assistant'
 }
 
 const InquiryPage: FC = () => {
@@ -58,7 +60,7 @@ const InquiryPage: FC = () => {
                 items={records.map((record) => ({
                   key: record.id.toString(),
                   // label: new Date(record.create_time).toLocaleString(),
-                  label: record.info,
+                  label: `${new Date(record.create_time).toLocaleString()}${record.info}`,
                   onClick: () => handleRecordSelect(record)
                 }))}
               />
@@ -71,20 +73,28 @@ const InquiryPage: FC = () => {
           {/* 记录详情，content字段 */}
           {selectedRecord ? (
             <div className="markdown-body">
-              <div className="markdown-content">
-                <Markdown
-                  message={{
-                    id: selectedRecord.id.toString(),
-                    assistantId: selectedRecord.userId.toString(),
-                    topicId: selectedRecord.id.toString(),
-                    role: 'assistant',
-                    content: selectedRecord.content,
-                    status: 'success',
-                    type: 'text',
-                    createdAt: selectedRecord.create_time
-                  }}
-                />
-              </div>
+              <MessageContainer>
+                <AvatarWrapper>
+                  <StyledAvatar size={32}>{selectedRecord.role === 'assistant' ? 'AI' : 'U'}</StyledAvatar>
+                </AvatarWrapper>
+                <ContentWrapper>
+                  <TimeWrapper>{new Date(selectedRecord.create_time).toLocaleString()}</TimeWrapper>
+                  <MarkdownContent>
+                    <Markdown
+                      message={{
+                        id: selectedRecord.id.toString(),
+                        assistantId: selectedRecord.userId.toString(),
+                        topicId: selectedRecord.id.toString(),
+                        role: 'assistant',
+                        content: selectedRecord.content,
+                        status: 'success',
+                        type: 'text',
+                        createdAt: selectedRecord.create_time
+                      }}
+                    />
+                  </MarkdownContent>
+                </ContentWrapper>
+              </MessageContainer>
             </div>
           ) : (
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
@@ -137,9 +147,9 @@ const MarkdownContainer = styled(Scrollbar)`
 `
 
 const SideNav = styled.div`
-  width: var(--assistants-width);
+  width: calc(var(--assistants-width) + 120px);
   border-right: 0.5px solid var(--color-border);
-  padding: 7px 12px;
+  padding: 12px;
   user-select: none;
   height: 100%;
   overflow-y: auto;
@@ -185,6 +195,48 @@ const SideNav = styled.div`
 
   &::-webkit-scrollbar-thumb:hover {
     background: var(--color-text-secondary);
+  }
+`
+
+const MessageContainer = styled.div`
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 0;
+`
+
+const AvatarWrapper = styled.div`
+  flex-shrink: 0;
+  margin-top: 2px;
+`
+
+const ContentWrapper = styled.div`
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+const StyledAvatar = styled(Avatar)<AvatarProps>`
+  background-color: var(--color-background-soft);
+  color: var(--color-text);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.5px solid var(--color-border);
+`
+
+const TimeWrapper = styled.div`
+  font-size: 12px;
+  color: var(--color-text-3);
+  line-height: 1.2;
+`
+
+const MarkdownContent = styled.div`
+  .markdown-content {
+    margin-top: 0;
   }
 `
 
