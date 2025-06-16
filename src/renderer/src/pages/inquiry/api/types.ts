@@ -6,7 +6,15 @@ export interface ApiResponse<T = any> {
 }
 
 // 品类类型
-export type ProdType = 'slipper' | 'room_card' | 'pen' | 'umbrella' | 'badge_lanyard' | 'six_small_items'
+export type ProdType =
+  | 'slipper'
+  // | 'room_card'
+  // | 'room_card_wc'
+  // | 'room_card_dnd'
+  | 'pen'
+  | 'umbrella'
+  | 'badge_lanyard'
+  | 'six_small_items'
 
 // 品类数据接口响应
 export interface ProdTypeResponse {

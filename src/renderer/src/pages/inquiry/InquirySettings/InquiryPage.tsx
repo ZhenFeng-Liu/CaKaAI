@@ -163,7 +163,7 @@ const LoadingText = styled.div`
   font-size: 14px;
 `
 
-const MarkdownContainer = styled.div`
+const MarkdownContainer = styled(Scrollbar)`
   position: relative;
   font-size: 15px;
   line-height: 1.8;
@@ -178,6 +178,24 @@ const MarkdownContainer = styled.div`
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
+
+  /* Markdown 基础样式 */
+  .markdown-body {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text);
+    margin: 0 auto;
+    width: 100%;
+    overflow-x: auto;
+    .markdown-content {
+      white-space: normal;
+    }
+  }
+
+  /* 确保 Markdown 组件样式正确显示 */
+  .markdown {
+    width: 100%;
+  }
 
   > div {
     flex: 1;
@@ -273,27 +291,6 @@ const MarkdownContainer = styled.div`
     background: ${(props) => props.theme.colorBgLayout};
     padding: 2px 4px;
     border-radius: 4px;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 16px 0;
-    font-size: 14px;
-    border: 1px solid ${(props) => props.theme.colorBorder};
-    table-layout: fixed;
-  }
-
-  th,
-  td {
-    border: 1px solid ${(props) => props.theme.colorBorder};
-    padding: 8px;
-    text-align: left;
-  }
-
-  th {
-    background-color: ${(props) => props.theme.colorBgLayout};
-    font-weight: 600;
   }
 `
 
@@ -4322,18 +4319,22 @@ const InquiryPage: FC = () => {
             {!isLoading && !displayedMarkdown ? (
               <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
             ) : (
-              <Markdown
-                message={{
-                  id: 'markdown-content',
-                  assistantId: 'default',
-                  role: 'assistant',
-                  content: displayedMarkdown,
-                  topicId: 'default',
-                  createdAt: new Date().toISOString(),
-                  type: 'text',
-                  status: 'success'
-                }}
-              />
+              <div className="markdown-body">
+                <div className="markdown-content">
+                  <Markdown
+                    message={{
+                      id: 'markdown-content',
+                      assistantId: 'default',
+                      role: 'assistant',
+                      content: displayedMarkdown,
+                      topicId: 'default',
+                      createdAt: new Date().toISOString(),
+                      type: 'text',
+                      status: 'success'
+                    }}
+                  />
+                </div>
+              </div>
             )}
           </MarkdownContainer>
         </TableContainer>
