@@ -1,11 +1,14 @@
 // import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
+import { DownloadOutlined } from '@ant-design/icons'
+import bigLogoBg from '@renderer/assets/images/avatar_caka.png'
 import Scrollbar from '@renderer/components/Scrollbar'
 import Markdown from '@renderer/pages/home/Markdown/Markdown'
 import type { AvatarProps } from 'antd'
-import { Avatar, Empty, Menu, message } from 'antd'
+import { Avatar, Button, Divider, Empty, Menu, message, Tooltip } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import { exportEnquiry } from '../api/enquiry'
 import { queryEnquiry } from '../api/query_enquiry'
 
 export interface EnquiryRecord {
@@ -15,11 +18,14 @@ export interface EnquiryRecord {
   info: string
   content: string
   role: 'user' | 'assistant'
+  unique_id?: string
 }
 
 const InquiryPage: FC = () => {
   const [records, setRecords] = useState<EnquiryRecord[]>([])
   const [selectedRecord, setSelectedRecord] = useState<EnquiryRecord | null>(null)
+  const [downloadStatus, setDownloadStatus] = useState<'idle' | 'downloading' | 'success' | 'error'>('idle')
+  const [downloadError, setDownloadError] = useState<string>('')
 
   // 获取询价记录数据
   const fetchEnquiryData = async () => {
@@ -45,6 +51,37 @@ const InquiryPage: FC = () => {
   // 处理记录选择
   const handleRecordSelect = (record: EnquiryRecord) => {
     setSelectedRecord(record)
+  }
+
+  // 处理下载功能
+  const handleDownload = async () => {
+    if (!selectedRecord?.unique_id) {
+      message.error('该记录不支持下载')
+      return
+    }
+
+    setDownloadStatus('downloading')
+    setDownloadError('')
+
+    try {
+      await exportEnquiry(
+        selectedRecord.unique_id,
+        `询价记录_${new Date(selectedRecord.create_time).toISOString().split('T')[0]}_${selectedRecord.info}.xlsx`
+      )
+      setDownloadStatus('success')
+      message.success('询价记录下载成功')
+    } catch (error) {
+      setDownloadStatus('error')
+      const errorMessage = error instanceof Error ? error.message : '下载失败'
+      setDownloadError(errorMessage)
+      message.error(`下载失败: ${errorMessage}`)
+    } finally {
+      // 3秒后重置状态
+      setTimeout(() => {
+        setDownloadStatus('idle')
+        setDownloadError('')
+      }, 3000)
+    }
   }
 
   return (
@@ -75,7 +112,7 @@ const InquiryPage: FC = () => {
             <div className="markdown-body">
               <MessageContainer>
                 <AvatarWrapper>
-                  <StyledAvatar size={32}>{selectedRecord.role === 'assistant' ? 'AI' : 'U'}</StyledAvatar>
+                  <StyledAvatar size={36} src={bigLogoBg}></StyledAvatar>
                 </AvatarWrapper>
                 <ContentWrapper>
                   <TimeWrapper>{new Date(selectedRecord.create_time).toLocaleString()}</TimeWrapper>
@@ -93,6 +130,23 @@ const InquiryPage: FC = () => {
                       }}
                     />
                   </MarkdownContent>
+                  {/* 如果unique_id存在，显示下载按钮 */}
+                  {selectedRecord.unique_id && (
+                    <DownloadButtonWrapper>
+                      <Divider variant="dotted" style={{ margin: 'none' }} />
+                      <Tooltip title={downloadStatus === 'downloading' ? '下载中...' : '下载询价结果'}>
+                        <Button
+                          icon={<DownloadOutlined />}
+                          size="small"
+                          loading={downloadStatus === 'downloading'}
+                          onClick={handleDownload}
+                          disabled={downloadStatus === 'downloading'}
+                          style={{ marginTop: '12px' }}
+                        />
+                      </Tooltip>
+                      {downloadStatus === 'error' && <ErrorMessage>{downloadError}</ErrorMessage>}
+                    </DownloadButtonWrapper>
+                  )}
                 </ContentWrapper>
               </MessageContainer>
             </div>
@@ -238,6 +292,16 @@ const MarkdownContent = styled.div`
   .markdown-content {
     margin-top: 0;
   }
+`
+
+const DownloadButtonWrapper = styled.div`
+  gap: 8px;
+`
+
+const ErrorMessage = styled.div`
+  color: var(--color-error);
+  font-size: 12px;
+  line-height: 1.2;
 `
 
 export default InquiryPage

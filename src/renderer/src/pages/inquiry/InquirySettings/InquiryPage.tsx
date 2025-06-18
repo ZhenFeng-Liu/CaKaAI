@@ -1,4 +1,5 @@
-import { AntDesignOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
+import { AntDesignOutlined, DeleteOutlined, DownloadOutlined, PlusOutlined } from '@ant-design/icons'
+import bigLogoBg from '@renderer/assets/images/avatar_caka.png'
 import Scrollbar from '@renderer/components/Scrollbar'
 import Markdown from '@renderer/pages/home/Markdown/Markdown'
 import type { AvatarProps } from 'antd'
@@ -18,7 +19,8 @@ import {
   Modal,
   Radio,
   Select,
-  Space
+  Space,
+  Tooltip
 } from 'antd'
 import { createStyles } from 'antd-style'
 import { debounce } from 'lodash'
@@ -28,6 +30,7 @@ import styled from 'styled-components'
 import {
   badgeLanyardEnquiry,
   DNDRoomCardEnquiry,
+  exportEnquiry,
   penEnquiry,
   roomCardEnquiry,
   sixSmallItemsEnquiry,
@@ -408,8 +411,8 @@ interface CategoryItem {
 
 // 定义品类选项
 const CATEGORY_OPTIONS = [
-  { label: '木卡房卡', value: 'room_card_wc' },
-  { label: 'DND房卡', value: 'room_card_dnd' },
+  { label: '木质房卡', value: 'room_card_wc' },
+  { label: '木质DND', value: 'room_card_dnd' },
   // { label: '房卡', value: 'room_card' },
   { label: '拖鞋', value: 'slipper' },
   { label: '环保笔', value: 'pen' },
@@ -2890,8 +2893,8 @@ const SIX_SMALL_ITEMS_DATA = {
 
 // 定义品类标签映射
 const CATEGORY_LABEL_MAP: Record<CategoryType, string> = {
-  room_card_wc: '木卡房卡',
-  room_card_dnd: 'DND房卡',
+  room_card_wc: '木质房卡',
+  room_card_dnd: '木质DND',
   room_card: '房卡',
   slipper: '拖鞋',
   pen: '环保笔',
@@ -2919,6 +2922,11 @@ const InquiryPage: FC = () => {
   // ] = useState<string>()
   const [fullMarkdown, setFullMarkdown] = useState<string[]>([])
   const markdownContainerRef = useRef<HTMLDivElement>(null)
+  const [downloadStatus, setDownloadStatus] = useState<'idle' | 'downloading' | 'success' | 'error'>('idle')
+  const [uniqueId, setUniqueId] = useState<string>('')
+  const [downloadError, setDownloadError] = useState<string>('')
+  // 添加询价完成状态
+  const [isInquiryCompleted, setIsInquiryCompleted] = useState<boolean>(false)
 
   const onChange = (key: string | string[]) => {
     setActiveKey(key)
@@ -2949,6 +2957,9 @@ const InquiryPage: FC = () => {
 
         // 清理对应的 md 数据
         setFullMarkdown(fullMarkdown.filter((_, index) => index !== items.findIndex((item) => item.key === key)))
+
+        // 重置询价完成状态
+        setIsInquiryCompleted(false)
 
         message.success('删除成功')
       }
@@ -3032,6 +3043,8 @@ const InquiryPage: FC = () => {
       setIsModalOpen(false)
       setSelectedCategory(undefined)
       form.resetFields()
+      // 重置询价完成状态
+      setIsInquiryCompleted(false)
       message.success('添加成功')
     } catch (error) {
       console.error('表单验证失败:', error)
@@ -3134,7 +3147,7 @@ const InquiryPage: FC = () => {
             rules={[{ required: true, message: '请输入宽度' }]}>
             <InputNumber min={1} />
           </Form.Item>,
-          <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: true, message: '请选择产品工艺' }]}>
+          <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: false, message: '请选择产品工艺' }]}>
             <Checkbox.Group options={ROOM_CARD_WC_DATA.craft} />
           </Form.Item>,
           <Form.Item
@@ -3142,7 +3155,13 @@ const InquiryPage: FC = () => {
             label="芯片"
             name="chip_material_code"
             rules={[{ required: true, message: '请选择芯片' }]}>
-            <Select>
+            <Select
+              showSearch
+              filterOption={(input, option) =>
+                String(option?.value ?? '')
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }>
               {ROOM_CARD_WC_DATA.chip_material_code.map((option) => (
                 <Select.Option key={option.value} value={option.value}>
                   {option.label}
@@ -3200,7 +3219,7 @@ const InquiryPage: FC = () => {
             rules={[{ required: true, message: '请输入宽度' }]}>
             <InputNumber min={1} />
           </Form.Item>,
-          <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: true, message: '请选择产品工艺' }]}>
+          <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: false, message: '请选择产品工艺' }]}>
             <Checkbox.Group options={ROOM_CARD_DND_DATA.craft} />
           </Form.Item>
         ]
@@ -3234,7 +3253,7 @@ const InquiryPage: FC = () => {
             key="process"
             label="产品工艺"
             name="process"
-            rules={[{ required: true, message: '请选择产品工艺' }]}>
+            rules={[{ required: false, message: '请选择产品工艺' }]}>
             <Checkbox.Group
               options={[
                 { label: '印刷', value: '印刷' },
@@ -3512,7 +3531,7 @@ const InquiryPage: FC = () => {
                 key="craft"
                 label="产品工艺"
                 name="craft"
-                rules={[{ required: true, message: '请选择产品工艺' }]}>
+                rules={[{ required: false, message: '请选择产品工艺' }]}>
                 <Checkbox.Group options={ROOM_CARD_WC_DATA.craft} />
               </Form.Item>
               <Form.Item
@@ -3520,7 +3539,13 @@ const InquiryPage: FC = () => {
                 label="芯片"
                 name="chip_material_code"
                 rules={[{ required: true, message: '请选择芯片' }]}>
-                <Select>
+                <Select
+                  showSearch
+                  filterOption={(input, option) =>
+                    String(option?.value ?? '')
+                      .toLowerCase()
+                      .includes(input.toLowerCase())
+                  }>
                   {ROOM_CARD_WC_DATA.chip_material_code.map((option) => (
                     <Select.Option key={option.value} value={option.value}>
                       {option.label}
@@ -3587,7 +3612,7 @@ const InquiryPage: FC = () => {
                 key="craft"
                 label="产品工艺"
                 name="craft"
-                rules={[{ required: true, message: '请选择产品工艺' }]}>
+                rules={[{ required: false, message: '请选择产品工艺' }]}>
                 <Checkbox.Group options={ROOM_CARD_DND_DATA.craft} />
               </Form.Item>
             </>
@@ -3626,7 +3651,7 @@ const InquiryPage: FC = () => {
                 key="process"
                 label="产品工艺"
                 name="process"
-                rules={[{ required: true, message: '请选择产品工艺' }]}>
+                rules={[{ required: false, message: '请选择产品工艺' }]}>
                 <Checkbox.Group
                   options={[
                     { label: '印刷', value: '印刷' },
@@ -4136,6 +4161,11 @@ const InquiryPage: FC = () => {
       setProgress(0)
       setDisplayedMarkdown('')
       setIsTyping(false) // 重置打字效果状态
+      // 重置下载状态
+      setDownloadStatus('idle')
+      setUniqueId('')
+      setDownloadError('')
+
       // 用于并发
       await Promise.all(
         items.map(async (item) => {
@@ -4229,6 +4259,11 @@ const InquiryPage: FC = () => {
               if (markdownContent) {
                 setFullMarkdown((prev) => [...prev, markdownContent])
               }
+
+              // 提取unique_id（如果响应中包含）
+              if (response.unique_id) {
+                setUniqueId(response.unique_id)
+              }
             }
           } catch (error) {
             console.error(`询价失败 (${item.category}):`, error)
@@ -4241,6 +4276,7 @@ const InquiryPage: FC = () => {
       message.error(error instanceof Error ? error.message : '询价失败，请重试')
     } finally {
       setIsLoading(false) // 询价结束时重置状态
+      setIsInquiryCompleted(true) // 设置询价完成状态
       // 更新 displayedMarkdown 为最新的完整内容
       setDisplayedMarkdown(fullMarkdown.join('\n\n'))
     }
@@ -4280,6 +4316,34 @@ const InquiryPage: FC = () => {
     }
   }, [activeKey, items, form])
 
+  // 处理下载功能
+  const handleDownload = async () => {
+    if (!uniqueId) {
+      message.error('该询价结果不支持下载')
+      return
+    }
+
+    setDownloadStatus('downloading')
+    setDownloadError('')
+
+    try {
+      await exportEnquiry(uniqueId, `询价结果_${new Date().toISOString().split('T')[0]}.xlsx`)
+      setDownloadStatus('success')
+      message.success('询价结果下载成功')
+    } catch (error) {
+      setDownloadStatus('error')
+      const errorMessage = error instanceof Error ? error.message : '下载失败'
+      setDownloadError(errorMessage)
+      message.error(`下载失败: ${errorMessage}`)
+    } finally {
+      // 3秒后重置状态
+      setTimeout(() => {
+        setDownloadStatus('idle')
+        setDownloadError('')
+      }, 3000)
+    }
+  }
+
   return (
     <Container>
       <ContentContainer>
@@ -4289,7 +4353,10 @@ const InquiryPage: FC = () => {
               className: styles.linearGradientButton
             }}>
             <Space align="center" style={{ width: '100%', justifyContent: 'center' }}>
-              <Button icon={<PlusOutlined />} onClick={handleAddCategory} disabled={items.length > 0}>
+              <Button
+                icon={<PlusOutlined />}
+                onClick={handleAddCategory}
+                disabled={items.length > 0 || isInquiryCompleted}>
                 新增询价品类
               </Button>
             </Space>
@@ -4305,7 +4372,11 @@ const InquiryPage: FC = () => {
           <div className="bottom-action">
             <Divider style={{ margin: '12px 0' }} />
             <Space align="center" style={{ width: '100%', justifyContent: 'center' }}>
-              <Button icon={<AntDesignOutlined />} onClick={handleInquiry} loading={isLoading}>
+              <Button
+                icon={<AntDesignOutlined />}
+                onClick={handleInquiry}
+                loading={isLoading}
+                disabled={items.length === 0 || isInquiryCompleted}>
                 {isLoading ? '正在询价...' : '开始询价'}
               </Button>
             </Space>
@@ -4327,7 +4398,7 @@ const InquiryPage: FC = () => {
               <div className="markdown-body">
                 <MessageContainer>
                   <AvatarWrapper>
-                    <StyledAvatar size={32}>{'U'}</StyledAvatar>
+                    <StyledAvatar size={36} src={bigLogoBg}></StyledAvatar>
                   </AvatarWrapper>
                   <ContentWrapper>
                     <TimeWrapper>{new Date().toLocaleString()}</TimeWrapper>
@@ -4344,6 +4415,23 @@ const InquiryPage: FC = () => {
                           status: 'success'
                         }}
                       />
+                      {/* 如果unique_id存在，显示下载按钮 */}
+                      {uniqueId && (
+                        <DownloadButtonWrapper>
+                          <Divider variant="dotted" style={{ margin: 'none' }} />
+                          <Tooltip title={downloadStatus === 'downloading' ? '下载中...' : '下载询价结果'}>
+                            <Button
+                              size="small"
+                              icon={<DownloadOutlined />}
+                              loading={downloadStatus === 'downloading'}
+                              onClick={handleDownload}
+                              disabled={downloadStatus === 'downloading'}
+                              style={{ marginTop: '12px' }}
+                            />
+                          </Tooltip>
+                          {downloadStatus === 'error' && <ErrorMessage>{downloadError}</ErrorMessage>}
+                        </DownloadButtonWrapper>
+                      )}
                     </MarkdownContent>
                   </ContentWrapper>
                 </MessageContainer>
@@ -4407,6 +4495,16 @@ const MarkdownContent = styled.div`
   .markdown-content {
     margin-top: 0;
   }
+`
+
+const DownloadButtonWrapper = styled.div`
+  gap: 8px;
+`
+
+const ErrorMessage = styled.div`
+  color: var(--color-error);
+  font-size: 12px;
+  line-height: 1.2;
 `
 
 export default InquiryPage

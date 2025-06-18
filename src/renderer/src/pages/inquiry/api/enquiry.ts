@@ -108,6 +108,25 @@ export enum ProductType {
   SIX_SMALL_ITEMS = 'six_small_items'
 }
 
+// 导出询价记录参数接口
+export interface DownloadEnquiryParams {
+  unique_id: string
+}
+
+// 导出询价记录响应类型
+export interface DownloadEnquiryResponse {
+  data: Blob
+  filename?: string
+}
+
+// 导出询价记录配置接口
+export interface DownloadEnquiryConfig {
+  filename?: string
+  onProgress?: (progress: number) => void
+  onSuccess?: (data: Blob, filename: string) => void
+  onError?: (error: Error) => void
+}
+
 /**
  * 通用询价函数
  * @param prodType 产品类型
@@ -332,3 +351,94 @@ export const streamBadgeLanyardEnquiry = (filter: BadgeLanyardFilter, config?: S
 export const streamSixSmallItemsEnquiry = (filter: SixSmallItemsFilter, config?: StreamEnquiryConfig): EventSource => {
   return streamEnquiry(ProductType.SIX_SMALL_ITEMS, filter, config)
 }
+
+/**
+ * 基础导出询价记录函数
+ * @param uniqueId 询价记录的唯一标识
+ * @returns Promise<Blob> 返回文件blob数据
+ */
+export const downloadEnquiry = async (uniqueId: string): Promise<Blob> => {
+  if (!uniqueId) {
+    throw new Error('询价记录ID不能为空')
+  }
+
+  try {
+    const response = await http.get<Blob>(
+      '/download-enquiry',
+      { unique_id: uniqueId },
+      {
+        responseType: 'blob'
+      }
+    )
+    return response
+  } catch (error) {
+    throw new Error(`导出询价记录失败: ${error}`)
+  }
+}
+
+/**
+ * 高级导出询价记录函数（支持进度回调和自动保存）
+ * @param uniqueId 询价记录的唯一标识
+ * @param config 下载配置选项
+ * @returns Promise<void>
+ */
+export const downloadEnquiryWithProgress = async (uniqueId: string, config?: DownloadEnquiryConfig): Promise<void> => {
+  if (!uniqueId) {
+    const error = new Error('询价记录ID不能为空')
+    config?.onError?.(error)
+    throw error
+  }
+
+  try {
+    // 获取文件数据
+    const blob = await downloadEnquiry(uniqueId)
+
+    // 生成文件名
+    const defaultFilename = `enquiry_${uniqueId}_${new Date().toISOString().split('T')[0]}.xlsx`
+    const filename = config?.filename || defaultFilename
+
+    // 创建下载链接
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.style.display = 'none'
+
+    // 触发下载
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    // 清理URL对象
+    window.URL.revokeObjectURL(url)
+
+    // 调用成功回调
+    config?.onSuccess?.(blob, filename)
+  } catch (error) {
+    const downloadError = error instanceof Error ? error : new Error(String(error))
+    config?.onError?.(downloadError)
+    throw downloadError
+  }
+}
+
+/**
+ * 便捷导出询价记录函数（推荐使用）
+ * @param uniqueId 询价记录的唯一标识
+ * @param filename 可选的文件名
+ * @returns Promise<void>
+ */
+export const exportEnquiry = async (uniqueId: string, filename?: string): Promise<void> => {
+  return downloadEnquiryWithProgress(uniqueId, {
+    filename,
+    onSuccess: (blob, filename) => {
+      console.log(`询价记录导出成功: ${filename}`)
+    },
+    onError: (error) => {
+      console.error('询价记录导出失败:', error.message)
+    }
+  })
+}
+
+/*
+导出询价记录接口 get请求 http://192.168.0.111:9919/api/v1/download-enquiry?unique_id=f78b7146
+*/
