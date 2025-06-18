@@ -69,6 +69,7 @@ export const extractUniqueHelpers = (userData: any): Helper[] => {
     // 遍历所有角色
     userData.Roles.forEach((role) => {
       if (role.Helpers && Array.isArray(role.Helpers)) {
+        console.log('接口返回的原始助手列表:', role.Helpers)
         // 将当前角色的助手列表添加到总列表中
         // 转换助手数据并添加到列表中
         const convertedHelpers = role.Helpers.map((helper: any) => ({

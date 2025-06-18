@@ -430,7 +430,10 @@ export const downloadEnquiryWithProgress = async (uniqueId: string, config?: Dow
 export const exportEnquiry = async (uniqueId: string, filename?: string): Promise<void> => {
   return downloadEnquiryWithProgress(uniqueId, {
     filename,
-    onSuccess: (blob, filename) => {
+    onSuccess: (
+      // blob,
+      filename
+    ) => {
       console.log(`询价记录导出成功: ${filename}`)
     },
     onError: (error) => {

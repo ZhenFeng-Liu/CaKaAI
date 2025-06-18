@@ -13,7 +13,6 @@ import {
   // UserAddOutlined
 } from '@ant-design/icons'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
-import { usePermissions } from '@renderer/hooks/usePermissions'
 import { Tooltip } from 'antd'
 // import { isLocalAi } from '@renderer/config/env'
 // import ModelSettings from '@renderer/pages/settings/ModelSettings/ModelSettings'
@@ -37,11 +36,35 @@ import InquiryLogPage from './LogSettings/InquiryPage'
 const SettingsPage: FC = () => {
   const { pathname } = useLocation()
   const { t } = useTranslation()
-  const { checkButtonPermission } = usePermissions()
 
   const isRoute = (path: string): string => (pathname.startsWith(path) ? 'active' : '')
 
-  // 定义按钮权限映射
+  // 直接从 userInfo 检查按钮权限的函数
+  const checkUserButtonPermission = (menuName: string, buttonName: string): boolean => {
+    try {
+      const userInfoStr = localStorage.getItem('userInfo')
+      if (!userInfoStr) return false
+
+      const userInfo = JSON.parse(userInfoStr)
+      const roles = userInfo.Roles || []
+
+      // 遍历用户的所有角色
+      for (const role of roles) {
+        // 检查角色级别的按钮权限
+        const buttons = role.Buttons || []
+        const targetButton = buttons.find((button: any) => button.name === buttonName)
+        if (targetButton && targetButton.enable === 1) {
+          return true
+        }
+      }
+      return false
+    } catch (error) {
+      console.error('检查用户按钮权限失败:', error)
+      return false
+    }
+  }
+
+  // 定义按钮权限映射 - 根据实际数据结构调整
   const buttonPermissions = {
     inquiry: 'AI询价',
     log: '询价记录',
@@ -49,28 +72,22 @@ const SettingsPage: FC = () => {
   }
 
   // 检查各个按钮的权限
-  const hasInquiryPermission = checkButtonPermission('AI询价', buttonPermissions.inquiry)
-  const hasLogPermission = checkButtonPermission('AI询价', buttonPermissions.log)
-  const hasDataPermission = checkButtonPermission('AI询价', buttonPermissions.data)
+  const hasInquiryPermission = checkUserButtonPermission('AI询价', buttonPermissions.inquiry)
+  const hasLogPermission = checkUserButtonPermission('AI询价', buttonPermissions.log)
+  const hasDataPermission = checkUserButtonPermission('AI询价', buttonPermissions.data)
 
-  // 如果没有权限配置，默认显示所有菜单（向后兼容）
-  const showAllMenus = !localStorage.getItem('menuPermissions')
-  const finalInquiryPermission = showAllMenus || hasInquiryPermission
-  const finalLogPermission = showAllMenus || hasLogPermission
-  const finalDataPermission = showAllMenus || hasDataPermission
+  // 简化权限判断
+  const finalInquiryPermission = hasInquiryPermission
+  const finalLogPermission = hasLogPermission
+  const finalDataPermission = hasDataPermission
 
-  // 添加调试日志（开发调试用，生产环境可移除）
-  console.log('AI询价权限检查:', {
-    inquiry: hasInquiryPermission,
-    log: hasLogPermission,
-    data: hasDataPermission,
-    menuPermissions: localStorage.getItem('menuPermissions'),
-    parsedPermissions: JSON.parse(localStorage.getItem('menuPermissions') || '[]'),
-    showAllMenus,
-    finalInquiryPermission,
-    finalLogPermission,
-    finalDataPermission
-  })
+  // 确定默认选中的路由
+  const getDefaultRoute = () => {
+    if (finalInquiryPermission) return 'inquiry'
+    if (finalLogPermission) return 'log'
+    if (finalDataPermission) return 'data'
+    return 'inquiry' // 默认回退到 inquiry
+  }
 
   return (
     <Container>
@@ -179,7 +196,7 @@ const SettingsPage: FC = () => {
             <Route path="quickAssistant" element={<QuickAssistantSettings />} />
             <Route path="shortcut" element={<ShortcutSettings />} />
             <Route path="members" element={<MembersSettings />} /> */}
-            <Route index element={<Navigate to="inquiry" replace />} />
+            <Route index element={<Navigate to={getDefaultRoute()} replace />} />
             <Route path="inquiry" element={<InquiryPage />} />
             <Route path="log" element={<InquiryLogPage />} />
             <Route path="data" element={<DataPage />} />
