@@ -13,6 +13,7 @@ import {
   // UserAddOutlined
 } from '@ant-design/icons'
 import { Navbar, NavbarCenter } from '@renderer/components/app/Navbar'
+import { usePermissions } from '@renderer/hooks/usePermissions'
 import { Tooltip } from 'antd'
 // import { isLocalAi } from '@renderer/config/env'
 // import ModelSettings from '@renderer/pages/settings/ModelSettings/ModelSettings'
@@ -36,8 +37,40 @@ import InquiryLogPage from './LogSettings/InquiryPage'
 const SettingsPage: FC = () => {
   const { pathname } = useLocation()
   const { t } = useTranslation()
+  const { checkButtonPermission } = usePermissions()
 
   const isRoute = (path: string): string => (pathname.startsWith(path) ? 'active' : '')
+
+  // 定义按钮权限映射
+  const buttonPermissions = {
+    inquiry: 'AI询价',
+    log: '询价记录',
+    data: '数据清洗平台'
+  }
+
+  // 检查各个按钮的权限
+  const hasInquiryPermission = checkButtonPermission('AI询价', buttonPermissions.inquiry)
+  const hasLogPermission = checkButtonPermission('AI询价', buttonPermissions.log)
+  const hasDataPermission = checkButtonPermission('AI询价', buttonPermissions.data)
+
+  // 如果没有权限配置，默认显示所有菜单（向后兼容）
+  const showAllMenus = !localStorage.getItem('menuPermissions')
+  const finalInquiryPermission = showAllMenus || hasInquiryPermission
+  const finalLogPermission = showAllMenus || hasLogPermission
+  const finalDataPermission = showAllMenus || hasDataPermission
+
+  // 添加调试日志（开发调试用，生产环境可移除）
+  console.log('AI询价权限检查:', {
+    inquiry: hasInquiryPermission,
+    log: hasLogPermission,
+    data: hasDataPermission,
+    menuPermissions: localStorage.getItem('menuPermissions'),
+    parsedPermissions: JSON.parse(localStorage.getItem('menuPermissions') || '[]'),
+    showAllMenus,
+    finalInquiryPermission,
+    finalLogPermission,
+    finalDataPermission
+  })
 
   return (
     <Container>
@@ -104,30 +137,36 @@ const SettingsPage: FC = () => {
               {'会员管理'}
             </MenuItem>
           </MenuItemLink> */}
-          <MenuItemLink to="/inquiry/inquiry">
-            <Tooltip title={t('AI 询价')} placement="right">
-              <MenuItem className={isRoute('/inquiry/inquiry')}>
-                <HomeOutlined />
-                {/* {t('AI 询价')} */}
-              </MenuItem>
-            </Tooltip>
-          </MenuItemLink>
-          <MenuItemLink to="/inquiry/log">
-            <Tooltip title={t('询价记录')} placement="right">
-              <MenuItem className={isRoute('/inquiry/log')}>
-                <ProfileOutlined />
-                {/* {t('询价记录')} */}
-              </MenuItem>
-            </Tooltip>
-          </MenuItemLink>
-          <MenuItemLink to="/inquiry/data">
-            <Tooltip title={t('数据清洗平台')} placement="right">
-              <MenuItem className={isRoute('/inquiry/data')}>
-                <DatabaseOutlined />
-                {/* {t('数据平台')} */}
-              </MenuItem>
-            </Tooltip>
-          </MenuItemLink>
+          {finalInquiryPermission && (
+            <MenuItemLink to="/inquiry/inquiry">
+              <Tooltip title={t('AI 询价')} placement="right">
+                <MenuItem className={isRoute('/inquiry/inquiry')}>
+                  <HomeOutlined />
+                  {/* {t('AI 询价')} */}
+                </MenuItem>
+              </Tooltip>
+            </MenuItemLink>
+          )}
+          {finalLogPermission && (
+            <MenuItemLink to="/inquiry/log">
+              <Tooltip title={t('询价记录')} placement="right">
+                <MenuItem className={isRoute('/inquiry/log')}>
+                  <ProfileOutlined />
+                  {/* {t('询价记录')} */}
+                </MenuItem>
+              </Tooltip>
+            </MenuItemLink>
+          )}
+          {finalDataPermission && (
+            <MenuItemLink to="/inquiry/data">
+              <Tooltip title={t('数据清洗平台')} placement="right">
+                <MenuItem className={isRoute('/inquiry/data')}>
+                  <DatabaseOutlined />
+                  {/* {t('数据平台')} */}
+                </MenuItem>
+              </Tooltip>
+            </MenuItemLink>
+          )}
         </SettingMenus>
         <SettingContent>
           <Routes>

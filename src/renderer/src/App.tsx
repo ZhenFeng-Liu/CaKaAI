@@ -195,9 +195,9 @@ const MainContent: FC = () => {
                       <Route
                         path="/inquiry/*"
                         element={
-                          // <AuthRoute menuName="AI询价">
-                          <InquiryPage />
-                          // </AuthRoute>
+                          <AuthRoute menuName="AI询价">
+                            <InquiryPage />
+                          </AuthRoute>
                         }
                       />
                       <Route path="/settings/*" element={<SettingsPage />} />

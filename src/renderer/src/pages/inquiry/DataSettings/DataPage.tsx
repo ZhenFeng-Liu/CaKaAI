@@ -289,8 +289,8 @@ const DataPage: React.FC = () => {
             拖鞋: 'slipper',
             雨伞: 'umbrella',
             环保笔: 'pen',
-            胸牌: 'badge_lanyard',
-            六小件: 'six_small_items'
+            胸牌: 'badge_lanyard'
+            // 六小件: 'six_small_items'
           }
 
           const response = await upload({
@@ -332,8 +332,8 @@ const DataPage: React.FC = () => {
         拖鞋: 'slipper',
         雨伞: 'umbrella',
         环保笔: 'pen',
-        胸牌: 'badge_lanyard',
-        六小件: 'six_small_items'
+        胸牌: 'badge_lanyard'
+        // 六小件: 'six_small_items'
       }
       const prodType = filenameMap[selectedType]
 

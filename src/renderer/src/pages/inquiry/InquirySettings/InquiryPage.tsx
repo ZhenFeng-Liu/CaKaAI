@@ -417,8 +417,8 @@ const CATEGORY_OPTIONS = [
   { label: '拖鞋', value: 'slipper' },
   { label: '环保笔', value: 'pen' },
   { label: '胸牌', value: 'badge_lanyard' },
-  { label: '雨伞', value: 'umbrella' },
-  { label: '六小件', value: 'six_small_items' }
+  { label: '雨伞', value: 'umbrella' }
+  // { label: '六小件', value: 'six_small_items' }
 ]
 
 // 房卡相关常量数据
@@ -2927,6 +2927,8 @@ const InquiryPage: FC = () => {
   const [downloadError, setDownloadError] = useState<string>('')
   // 添加询价完成状态
   const [isInquiryCompleted, setIsInquiryCompleted] = useState<boolean>(false)
+  // 添加数据返回状态跟踪
+  // const [dataReturned, setDataReturned] = useState<boolean>(false)
 
   const onChange = (key: string | string[]) => {
     setActiveKey(key)
@@ -3903,35 +3905,6 @@ const InquiryPage: FC = () => {
 
   const renderDetailForm = (item: CategoryItem) => <DetailFormComponent item={item} form={form} />
 
-  useEffect(() => {
-    const duration = 3000 // 总持续时间改为3秒
-    const interval = 30 // 更新间隔
-    const steps = duration / interval
-    const increment = 100 / steps
-
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer)
-          setIsLoading(false)
-          return 100
-        }
-        return prev + increment
-      })
-    }, interval)
-
-    // 3秒后强制关闭遮罩层
-    const closeTimer = setTimeout(() => {
-      setIsLoading(false)
-      setProgress(100)
-    }, 3000)
-
-    return () => {
-      clearInterval(timer)
-      clearTimeout(closeTimer)
-    }
-  }, [])
-
   // 使用 useCallback 和 debounce 优化滚动函数
   const scrollToBottom = useCallback(
     debounce(() => {
@@ -4165,6 +4138,22 @@ const InquiryPage: FC = () => {
       setDownloadStatus('idle')
       setUniqueId('')
       setDownloadError('')
+      // setDataReturned(false) // 重置数据返回状态
+
+      // 启动进度条：5秒内到达99%
+      const duration = 5000 // 5秒
+      const interval = 30 // 30ms
+      const steps = duration / interval
+      const increment = 99 / steps
+      const progressTimer = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 99) {
+            clearInterval(progressTimer)
+            return 99
+          }
+          return prev + increment
+        })
+      }, interval)
 
       // 用于并发
       await Promise.all(
@@ -4271,11 +4260,18 @@ const InquiryPage: FC = () => {
           }
         })
       )
+
+      // 数据返回后，进度条到达100%
+      clearInterval(progressTimer)
+      setProgress(100)
     } catch (error) {
       console.error('询价失败:', error)
       message.error(error instanceof Error ? error.message : '询价失败，请重试')
     } finally {
-      setIsLoading(false) // 询价结束时重置状态
+      // 延迟1.5秒后关闭遮罩层
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 1500)
       setIsInquiryCompleted(true) // 设置询价完成状态
       // 更新 displayedMarkdown 为最新的完整内容
       setDisplayedMarkdown(fullMarkdown.join('\n\n'))
@@ -4418,7 +4414,7 @@ const InquiryPage: FC = () => {
                       {/* 如果unique_id存在，显示下载按钮 */}
                       {uniqueId && (
                         <DownloadButtonWrapper>
-                          <Divider variant="dotted" style={{ margin: 'none' }} />
+                          <Divider variant="dotted" style={{ margin: '0' }} />
                           <Tooltip title={downloadStatus === 'downloading' ? '下载中...' : '下载询价结果'}>
                             <Button
                               size="small"

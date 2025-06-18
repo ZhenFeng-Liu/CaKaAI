@@ -15,7 +15,7 @@ export const usePermissions = () => {
   }
 
   const checkButtonPermission = (menuName: string, buttonName: string) => {
-    const menu = permissions.find((p) => p.menu === menuName)
+    const menu = permissions.find((p) => p.menu.menu === menuName)
     return menu?.buttons.some((b) => b.name === buttonName && b.enable === 1) ?? false
   }
 

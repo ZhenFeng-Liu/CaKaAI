@@ -159,9 +159,9 @@ const MainMenus: FC = () => {
   // 新代码: 对'talent'和'aiimages'特殊处理，其他菜单正常权限检查
   const authorizedIcons = sidebarIcons.visible.filter((icon) => {
     // 对于新添加的菜单，临时绕过权限检查
-    if (icon === 'inquiry') {
-      return true
-    }
+    // if (icon === 'inquiry') {
+    //   return true
+    // }
     return checkMenuPermission(menuPermissionMap[icon])
   })
   const iconMap = {
