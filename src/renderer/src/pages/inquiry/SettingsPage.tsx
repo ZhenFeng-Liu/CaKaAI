@@ -40,7 +40,7 @@ const SettingsPage: FC = () => {
   const isRoute = (path: string): string => (pathname.startsWith(path) ? 'active' : '')
 
   // 直接从 userInfo 检查按钮权限的函数
-  const checkUserButtonPermission = (menuName: string, buttonName: string): boolean => {
+  const checkUserButtonPermission = (buttonName: string): boolean => {
     try {
       const userInfoStr = localStorage.getItem('userInfo')
       if (!userInfoStr) return false
@@ -72,9 +72,9 @@ const SettingsPage: FC = () => {
   }
 
   // 检查各个按钮的权限
-  const hasInquiryPermission = checkUserButtonPermission('AI询价', buttonPermissions.inquiry)
-  const hasLogPermission = checkUserButtonPermission('AI询价', buttonPermissions.log)
-  const hasDataPermission = checkUserButtonPermission('AI询价', buttonPermissions.data)
+  const hasInquiryPermission = checkUserButtonPermission(buttonPermissions.inquiry)
+  const hasLogPermission = checkUserButtonPermission(buttonPermissions.log)
+  const hasDataPermission = checkUserButtonPermission(buttonPermissions.data)
 
   // 简化权限判断
   const finalInquiryPermission = hasInquiryPermission
