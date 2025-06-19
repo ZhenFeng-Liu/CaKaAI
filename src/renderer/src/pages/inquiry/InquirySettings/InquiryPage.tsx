@@ -20,6 +20,7 @@ import {
   Radio,
   Select,
   Space,
+  Spin,
   Tooltip
 } from 'antd'
 import { createStyles } from 'antd-style'
@@ -132,44 +133,8 @@ const SideNav = styled.div`
   }
 `
 
-const LoadingOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  border-radius: 8px;
-`
-
-const ProgressBar = styled.div`
-  width: 200px;
-  height: 8px;
-  background: #e0e0e0;
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 12px;
-`
-
-const ProgressFill = styled.div`
-  height: 100%;
-  background: #000;
-  transition: width 0.3s ease;
-  border-radius: 4px;
-`
-
-const LoadingText = styled.div`
-  color: #a0a0a0;
-  font-size: 14px;
-`
-
 const MarkdownContainer = styled(Scrollbar)`
-  position: relative;
+  position: relative !important; // 强制确保为 relative
   font-size: 15px;
   line-height: 1.8;
   color: ${(props) => props.theme.colorText};
@@ -421,11 +386,8 @@ const CATEGORY_OPTIONS = [
   // { label: '六小件', value: 'six_small_items' }
 ]
 
-// 房卡相关常量数据
-const ROOM_CARD_DATA = {}
-
 // 木卡房卡相关常量数据
-const ROOM_CARD_WC_DATA = {
+const INIT_ROOM_CARD_WC_DATA = {
   thickness: [
     {
       value: '1.1~1.3mm',
@@ -805,7 +767,7 @@ const ROOM_CARD_WC_DATA = {
 }
 
 // DND房卡相关常量数据
-const ROOM_CARD_DND_DATA = {
+const INIT_ROOM_CARD_DND_DATA = {
   thickness: [
     {
       value: '3mm',
@@ -855,7 +817,7 @@ const ROOM_CARD_DND_DATA = {
 }
 
 // 拖鞋相关常量数据
-const SLIPPER_DATA = {
+const INIT_SLIPPER_DATA = {
   textures: [
     { key: 'L1', value: '拉毛布+EVA底', label: '拉毛布+EVA底' },
     { key: 'L2', value: '珊瑚绒+EVA底', label: '珊瑚绒+EVA底' },
@@ -905,7 +867,7 @@ const SLIPPER_DATA = {
 }
 
 // 环保笔相关常量数据
-const PEN_DATA = {
+const INIT_PEN_DATA = {
   textures: [
     {
       key: 'L1',
@@ -1028,7 +990,7 @@ const PEN_DATA = {
 }
 
 // 胸牌相关常量数据
-const BADEG_LANYARD_DATA = {
+const INIT_BADEG_LANYARD_DATA = {
   names: [
     {
       key: 'L1',
@@ -1225,7 +1187,7 @@ const BADEG_LANYARD_DATA = {
 }
 
 // 伞相关常量数据
-const UMBRELLA_DATA = {
+const INIT_UMBRELLA_DATA = {
   names: [
     {
       key: 'L1',
@@ -1521,7 +1483,7 @@ const UMBRELLA_DATA = {
 }
 
 // 六小件相关常量数据
-const SIX_SMALL_ITEMS_DATA = {
+const INIT_SIX_SMALL_ITEMS_DATA = {
   names: [
     {
       key: 'L1',
@@ -2908,7 +2870,6 @@ const InquiryPage: FC = () => {
   const [displayedMarkdown, setDisplayedMarkdown] = useState<string>('')
   const [isTyping, setIsTyping] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
-  const [progress, setProgress] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [form] = Form.useForm()
   const [selectedCategory, setSelectedCategory] = useState<CategoryType>()
@@ -2929,6 +2890,15 @@ const InquiryPage: FC = () => {
   const [isInquiryCompleted, setIsInquiryCompleted] = useState<boolean>(false)
   // 添加数据返回状态跟踪
   // const [dataReturned, setDataReturned] = useState<boolean>(false)
+
+  // 品类参数数据用 useState 管理
+  const [roomCardWcData, setRoomCardWcData] = useState(INIT_ROOM_CARD_WC_DATA)
+  const [roomCardDndData, setRoomCardDndData] = useState(INIT_ROOM_CARD_DND_DATA)
+  const [slipperData, setSlipperData] = useState(INIT_SLIPPER_DATA)
+  const [penData, setPenData] = useState(INIT_PEN_DATA)
+  const [badgeLanyardData, setBadgeLanyardData] = useState(INIT_BADEG_LANYARD_DATA)
+  const [umbrellaData, setUmbrellaData] = useState(INIT_UMBRELLA_DATA)
+  const [sixSmallItemsData, setSixSmallItemsData] = useState(INIT_SIX_SMALL_ITEMS_DATA)
 
   const onChange = (key: string | string[]) => {
     setActiveKey(key)
@@ -3084,14 +3054,14 @@ const InquiryPage: FC = () => {
 
   const getCurrentSizeOptions = () => {
     if (!selectedTexture) return []
-    const textureKey = SLIPPER_DATA.textures.find((t) => t.value === selectedTexture)?.key
-    return textureKey ? SLIPPER_DATA.sizes[textureKey as keyof typeof SLIPPER_DATA.sizes] : []
+    const textureKey = slipperData.textures.find((t) => t.value === selectedTexture)?.key
+    return textureKey ? slipperData.sizes[textureKey as keyof typeof slipperData.sizes] : []
   }
 
   const getCurrentCraftOptions = () => {
     if (!selectedTexture) return []
-    const textureKey = SLIPPER_DATA.textures.find((t) => t.value === selectedTexture)?.key
-    return textureKey ? SLIPPER_DATA.crafts[textureKey as keyof typeof SLIPPER_DATA.crafts] : []
+    const textureKey = slipperData.textures.find((t) => t.value === selectedTexture)?.key
+    return textureKey ? slipperData.crafts[textureKey as keyof typeof slipperData.crafts] : []
   }
 
   const getCategoryFormItems = () => {
@@ -3115,7 +3085,7 @@ const InquiryPage: FC = () => {
           categoryItem,
           <Form.Item key="material" label="材质" name="material" rules={[{ required: true, message: '请选择材质' }]}>
             <Radio.Group buttonStyle="outline">
-              {ROOM_CARD_WC_DATA.material.map((option) => (
+              {roomCardWcData.material.map((option) => (
                 <Radio key={option.value} value={option.value}>
                   {option.label}
                 </Radio>
@@ -3128,7 +3098,7 @@ const InquiryPage: FC = () => {
             name="thickness"
             rules={[{ required: true, message: '请选择厚度' }]}>
             <Radio.Group>
-              {ROOM_CARD_WC_DATA.thickness.map((option) => (
+              {roomCardWcData.thickness.map((option) => (
                 <Radio key={option.value} value={option.value}>
                   {option.label}
                 </Radio>
@@ -3150,7 +3120,7 @@ const InquiryPage: FC = () => {
             <InputNumber min={1} />
           </Form.Item>,
           <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: false, message: '请选择产品工艺' }]}>
-            <Checkbox.Group options={ROOM_CARD_WC_DATA.craft} />
+            <Checkbox.Group options={roomCardWcData.craft} />
           </Form.Item>,
           <Form.Item
             key="chip_material_code"
@@ -3164,7 +3134,7 @@ const InquiryPage: FC = () => {
                   .toLowerCase()
                   .includes(input.toLowerCase())
               }>
-              {ROOM_CARD_WC_DATA.chip_material_code.map((option) => (
+              {roomCardWcData.chip_material_code.map((option) => (
                 <Select.Option key={option.value} value={option.value}>
                   {option.label}
                 </Select.Option>
@@ -3187,7 +3157,7 @@ const InquiryPage: FC = () => {
           categoryItem,
           <Form.Item key="material" label="材质" name="material" rules={[{ required: true, message: '请选择材质' }]}>
             <Radio.Group buttonStyle="outline">
-              {ROOM_CARD_DND_DATA.material.map((option) => (
+              {roomCardDndData.material.map((option) => (
                 <Radio key={option.value} value={option.value}>
                   {option.label}
                 </Radio>
@@ -3200,7 +3170,7 @@ const InquiryPage: FC = () => {
             name="thickness"
             rules={[{ required: true, message: '请选择厚度' }]}>
             <Radio.Group>
-              {ROOM_CARD_DND_DATA.thickness.map((option) => (
+              {roomCardDndData.thickness.map((option) => (
                 <Radio key={option.value} value={option.value}>
                   {option.label}
                 </Radio>
@@ -3222,7 +3192,7 @@ const InquiryPage: FC = () => {
             <InputNumber min={1} />
           </Form.Item>,
           <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: false, message: '请选择产品工艺' }]}>
-            <Checkbox.Group options={ROOM_CARD_DND_DATA.craft} />
+            <Checkbox.Group options={roomCardDndData.craft} />
           </Form.Item>
         ]
       case 'room_card':
@@ -3286,7 +3256,7 @@ const InquiryPage: FC = () => {
           categoryItem,
           <Form.Item key="texture" label="材质" name="texture" rules={[{ required: true, message: '请选择材质' }]}>
             <Radio.Group onChange={(e) => handleTextureChange(e.target.value)}>
-              {SLIPPER_DATA.textures.map((option) => (
+              {slipperData.textures.map((option) => (
                 <Radio key={option.key} value={option.value}>
                   {option.label}
                 </Radio>
@@ -3313,7 +3283,7 @@ const InquiryPage: FC = () => {
           </Form.Item>,
           <Form.Item key="packaging" label="包装" name="packaging" rules={[{ required: true, message: '请选择包装' }]}>
             <Radio.Group>
-              {SLIPPER_DATA.packaging.map((option) => (
+              {slipperData.packaging.map((option) => (
                 <Radio key={option.value} value={option.value}>
                   {option.label}
                 </Radio>
@@ -3326,7 +3296,7 @@ const InquiryPage: FC = () => {
           categoryItem,
           <Form.Item key="texture" label="材质" name="texture" rules={[{ required: true, message: '请选择材质' }]}>
             <Radio.Group buttonStyle="outline" onChange={(e) => handlePenTextureChange(e.target.value)}>
-              {PEN_DATA.textures.map((texture) => (
+              {penData.textures.map((texture) => (
                 <Radio key={texture.key} value={texture.value}>
                   {texture.label}
                 </Radio>
@@ -3361,7 +3331,7 @@ const InquiryPage: FC = () => {
               showSearch
               optionFilterProp="label"
               onChange={handleBadgeLanyardNameChange}>
-              {BADEG_LANYARD_DATA.names.map((option) => (
+              {badgeLanyardData.names.map((option) => (
                 <Select.Option key={option.key} value={option.key} label={option.label}>
                   {option.label}
                 </Select.Option>
@@ -3380,7 +3350,7 @@ const InquiryPage: FC = () => {
           categoryItem,
           <Form.Item key="name" label="产品名称" name="name" rules={[{ required: true, message: '请选择产品名称' }]}>
             <Select onChange={handleUmbrellaNameChange} placeholder="请选择产品">
-              {UMBRELLA_DATA.names.map((item) => (
+              {umbrellaData.names.map((item) => (
                 <Select.Option key={item.key} value={item.key}>
                   {item.label}
                 </Select.Option>
@@ -3440,7 +3410,7 @@ const InquiryPage: FC = () => {
           categoryItem,
           <Form.Item key="name" label="产品名称" name="name" rules={[{ required: true, message: '请选择产品名称' }]}>
             <Select onChange={handleSixSmallItemsNameChange} placeholder="请选择产品">
-              {SIX_SMALL_ITEMS_DATA.names.map((item) => (
+              {sixSmallItemsData.names.map((item) => (
                 <Select.Option key={item.key} value={item.key}>
                   {item.label}
                 </Select.Option>
@@ -3495,7 +3465,7 @@ const InquiryPage: FC = () => {
                 name="material"
                 rules={[{ required: true, message: '请选择材质' }]}>
                 <Radio.Group buttonStyle="outline">
-                  {ROOM_CARD_WC_DATA.material.map((option) => (
+                  {roomCardWcData.material.map((option) => (
                     <Radio key={option.value} value={option.value}>
                       {option.label}
                     </Radio>
@@ -3508,7 +3478,7 @@ const InquiryPage: FC = () => {
                 name="thickness"
                 rules={[{ required: true, message: '请选择厚度' }]}>
                 <Radio.Group>
-                  {ROOM_CARD_WC_DATA.thickness.map((option) => (
+                  {roomCardWcData.thickness.map((option) => (
                     <Radio key={option.value} value={option.value}>
                       {option.label}
                     </Radio>
@@ -3534,7 +3504,7 @@ const InquiryPage: FC = () => {
                 label="产品工艺"
                 name="craft"
                 rules={[{ required: false, message: '请选择产品工艺' }]}>
-                <Checkbox.Group options={ROOM_CARD_WC_DATA.craft} />
+                <Checkbox.Group options={roomCardWcData.craft} />
               </Form.Item>
               <Form.Item
                 key="chip_material_code"
@@ -3548,7 +3518,7 @@ const InquiryPage: FC = () => {
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }>
-                  {ROOM_CARD_WC_DATA.chip_material_code.map((option) => (
+                  {roomCardWcData.chip_material_code.map((option) => (
                     <Select.Option key={option.value} value={option.value}>
                       {option.label}
                     </Select.Option>
@@ -3576,7 +3546,7 @@ const InquiryPage: FC = () => {
                 name="material"
                 rules={[{ required: true, message: '请选择材质' }]}>
                 <Radio.Group buttonStyle="outline">
-                  {ROOM_CARD_DND_DATA.material.map((option) => (
+                  {roomCardDndData.material.map((option) => (
                     <Radio key={option.value} value={option.value}>
                       {option.label}
                     </Radio>
@@ -3589,7 +3559,7 @@ const InquiryPage: FC = () => {
                 name="thickness"
                 rules={[{ required: true, message: '请选择厚度' }]}>
                 <Radio.Group>
-                  {ROOM_CARD_DND_DATA.thickness.map((option) => (
+                  {roomCardDndData.thickness.map((option) => (
                     <Radio key={option.value} value={option.value}>
                       {option.label}
                     </Radio>
@@ -3615,7 +3585,7 @@ const InquiryPage: FC = () => {
                 label="产品工艺"
                 name="craft"
                 rules={[{ required: false, message: '请选择产品工艺' }]}>
-                <Checkbox.Group options={ROOM_CARD_DND_DATA.craft} />
+                <Checkbox.Group options={roomCardDndData.craft} />
               </Form.Item>
             </>
           )}
@@ -3685,7 +3655,7 @@ const InquiryPage: FC = () => {
             <>
               <Form.Item key="texture" label="材质" name="texture" rules={[{ required: true, message: '请选择材质' }]}>
                 <Radio.Group onChange={(e) => handleTextureChange(e.target.value)}>
-                  {SLIPPER_DATA.textures.map((option) => (
+                  {slipperData.textures.map((option) => (
                     <Radio key={option.key} value={option.value}>
                       {option.label}
                     </Radio>
@@ -3716,7 +3686,7 @@ const InquiryPage: FC = () => {
                 name="packaging"
                 rules={[{ required: true, message: '请选择包装' }]}>
                 <Radio.Group>
-                  {SLIPPER_DATA.packaging.map((option) => (
+                  {slipperData.packaging.map((option) => (
                     <Radio key={option.value} value={option.value}>
                       {option.label}
                     </Radio>
@@ -3734,7 +3704,7 @@ const InquiryPage: FC = () => {
                   showSearch
                   optionFilterProp="label"
                   onChange={handleBadgeLanyardNameChange}>
-                  {BADEG_LANYARD_DATA.names.map((option) => (
+                  {badgeLanyardData.names.map((option) => (
                     <Select.Option key={option.key} value={option.key} label={option.label}>
                       {option.label}
                     </Select.Option>
@@ -3754,7 +3724,7 @@ const InquiryPage: FC = () => {
             <>
               <Form.Item key="texture" label="材质" name="texture" rules={[{ required: true, message: '请选择材质' }]}>
                 <Radio.Group buttonStyle="outline" onChange={(e) => handlePenTextureChange(e.target.value)}>
-                  {PEN_DATA.textures.map((texture) => (
+                  {penData.textures.map((texture) => (
                     <Radio key={texture.key} value={texture.value}>
                       {texture.label}
                     </Radio>
@@ -3794,7 +3764,7 @@ const InquiryPage: FC = () => {
                 name="name"
                 rules={[{ required: true, message: '请选择产品名称' }]}>
                 <Select onChange={handleUmbrellaNameChange} placeholder="请选择产品">
-                  {UMBRELLA_DATA.names.map((item) => (
+                  {umbrellaData.names.map((item) => (
                     <Select.Option key={item.key} value={item.key}>
                       {item.label}
                     </Select.Option>
@@ -3867,7 +3837,7 @@ const InquiryPage: FC = () => {
                 name="name"
                 rules={[{ required: true, message: '请选择产品名称' }]}>
                 <Select onChange={handleSixSmallItemsNameChange} placeholder="请选择产品">
-                  {SIX_SMALL_ITEMS_DATA.names.map((item) => (
+                  {sixSmallItemsData.names.map((item) => (
                     <Select.Option key={item.key} value={item.key}>
                       {item.label}
                     </Select.Option>
@@ -3977,38 +3947,36 @@ const InquiryPage: FC = () => {
       // 拿到对应品类的参数赋予到相关常量数据
       switch (category) {
         case 'room_card_wc':
-          Object.assign(ROOM_CARD_WC_DATA, res.data)
-          console.log('ROOM_CARD_WC_DATA', ROOM_CARD_WC_DATA)
+          setRoomCardWcData(res.data)
+          console.log('roomCardWcData', res.data)
           break
         case 'room_card_dnd':
-          Object.assign(ROOM_CARD_DND_DATA, res.data)
-          console.log('ROOM_CARD_DND_DATA', ROOM_CARD_DND_DATA)
-          break
-        case 'room_card':
-          Object.assign(ROOM_CARD_DATA, res.data)
-          console.log('ROOM_CARD_DATA', ROOM_CARD_DATA)
+          setRoomCardDndData(res.data)
+          console.log('roomCardDndData', res.data)
           break
         case 'slipper':
-          console.log(res.data)
-          SLIPPER_DATA.packaging = res.data?.packagings
-          Object.assign(SLIPPER_DATA, res.data)
-          console.log('SLIPPER_DATA', SLIPPER_DATA)
+          // 适配接口返回的 packagings 字段为 packaging，保证前端渲染安全
+          setSlipperData({
+            ...res.data,
+            packaging: res.data.packagings || []
+          })
+          console.log('slipperData', { ...res.data, packaging: res.data.packagings || [] })
           break
         case 'pen':
-          Object.assign(PEN_DATA, res.data)
-          console.log('PEN_DATA', PEN_DATA)
+          setPenData(res.data)
+          console.log('penData', res.data)
           break
         case 'badge_lanyard':
-          Object.assign(BADEG_LANYARD_DATA, res.data)
-          console.log('BADEG_LANYARD_DATA', BADEG_LANYARD_DATA)
+          setBadgeLanyardData(res.data)
+          console.log('badgeLanyardData', res.data)
           break
         case 'umbrella':
-          Object.assign(UMBRELLA_DATA, res.data)
-          console.log('UMBRELLA_DATA', UMBRELLA_DATA)
+          setUmbrellaData(res.data)
+          console.log('umbrellaData', res.data)
           break
         case 'six_small_items':
-          Object.assign(SIX_SMALL_ITEMS_DATA, res.data)
-          console.log('SIX_SMALL_ITEMS_DATA', SIX_SMALL_ITEMS_DATA)
+          setSixSmallItemsData(res.data)
+          console.log('sixSmallItemsData', res.data)
           break
       }
     } catch (e) {
@@ -4027,25 +3995,25 @@ const InquiryPage: FC = () => {
 
   const getCurrentPenSizeOptions = () => {
     if (!selectedTexture) return []
-    const textureKey = PEN_DATA.textures.find((t) => t.value === selectedTexture)?.key
-    return textureKey ? PEN_DATA.sizes[textureKey as keyof typeof PEN_DATA.sizes] : []
+    const textureKey = penData.textures.find((t) => t.value === selectedTexture)?.key
+    return textureKey ? penData.sizes[textureKey as keyof typeof penData.sizes] : []
   }
 
   const getCurrentPenCraftOptions = () => {
     if (!selectedTexture) return []
-    const textureKey = PEN_DATA.textures.find((t) => t.value === selectedTexture)?.key
-    return textureKey ? PEN_DATA.crafts[textureKey as keyof typeof PEN_DATA.crafts] : []
+    const textureKey = penData.textures.find((t) => t.value === selectedTexture)?.key
+    return textureKey ? penData.crafts[textureKey as keyof typeof penData.crafts] : []
   }
 
   const handleBadgeLanyardNameChange = (value: string) => {
     // 获取选中项的 label
-    const selectedItem = BADEG_LANYARD_DATA.names.find((item) => item.key === value)
+    const selectedItem = badgeLanyardData.names.find((item) => item.key === value)
     console.log('value:', value)
     console.log('label:', selectedItem?.label)
 
     // 获取选中胸牌的所有参数
-    const sizeOptions = BADEG_LANYARD_DATA.sizes[value as keyof typeof BADEG_LANYARD_DATA.sizes] || []
-    const craftOptions = BADEG_LANYARD_DATA.crafts[value as keyof typeof BADEG_LANYARD_DATA.crafts] || []
+    const sizeOptions = badgeLanyardData.sizes[value as keyof typeof badgeLanyardData.sizes] || []
+    const craftOptions = badgeLanyardData.crafts[value as keyof typeof badgeLanyardData.crafts] || []
 
     // 自动填充联动字段
     form.setFieldsValue({
@@ -4057,16 +4025,16 @@ const InquiryPage: FC = () => {
 
   const handleUmbrellaNameChange = (value: string) => {
     // 获取选中项的 label
-    const selectedItem = UMBRELLA_DATA.names.find((item) => item.key === value)
+    const selectedItem = umbrellaData.names.find((item) => item.key === value)
     console.log('value:', value)
     console.log('label:', selectedItem?.label)
 
     // 获取选中雨伞的所有参数
-    const boneNumOptions = UMBRELLA_DATA.boneNums[value as keyof typeof UMBRELLA_DATA.boneNums] || []
-    const handShankOptions = UMBRELLA_DATA.handShanks[value as keyof typeof UMBRELLA_DATA.handShanks] || []
-    const sizeOptions = UMBRELLA_DATA.sizes[value as keyof typeof UMBRELLA_DATA.sizes] || []
-    const craftOptions = UMBRELLA_DATA.crafts[value as keyof typeof UMBRELLA_DATA.crafts] || []
-    const textureOptions = UMBRELLA_DATA.textures[value as keyof typeof UMBRELLA_DATA.textures] || []
+    const boneNumOptions = umbrellaData.boneNums[value as keyof typeof umbrellaData.boneNums] || []
+    const handShankOptions = umbrellaData.handShanks[value as keyof typeof umbrellaData.handShanks] || []
+    const sizeOptions = umbrellaData.sizes[value as keyof typeof umbrellaData.sizes] || []
+    const craftOptions = umbrellaData.crafts[value as keyof typeof umbrellaData.crafts] || []
+    const textureOptions = umbrellaData.textures[value as keyof typeof umbrellaData.textures] || []
 
     // 自动填充联动字段
     form.setFieldsValue({
@@ -4082,40 +4050,40 @@ const InquiryPage: FC = () => {
   const getCurrentBoneNumOptions = () => {
     const currentItem = items.find((item) => item.key === activeKey)
     if (!currentItem?.selectedUmbrellaName) return []
-    return UMBRELLA_DATA.boneNums[currentItem.selectedUmbrellaName as keyof typeof UMBRELLA_DATA.boneNums] || []
+    return umbrellaData.boneNums[currentItem.selectedUmbrellaName as keyof typeof umbrellaData.boneNums] || []
   }
 
   const getCurrentHandShankOptions = () => {
     const currentItem = items.find((item) => item.key === activeKey)
     if (!currentItem?.selectedUmbrellaName) return []
-    return UMBRELLA_DATA.handShanks[currentItem.selectedUmbrellaName as keyof typeof UMBRELLA_DATA.handShanks] || []
+    return umbrellaData.handShanks[currentItem.selectedUmbrellaName as keyof typeof umbrellaData.handShanks] || []
   }
 
   const getCurrentUmbrellaSizeOptions = () => {
     const currentItem = items.find((item) => item.key === activeKey)
     if (!currentItem?.selectedUmbrellaName) return []
-    return UMBRELLA_DATA.sizes[currentItem.selectedUmbrellaName as keyof typeof UMBRELLA_DATA.sizes] || []
+    return umbrellaData.sizes[currentItem.selectedUmbrellaName as keyof typeof umbrellaData.sizes] || []
   }
 
   const getCurrentUmbrellaCraftOptions = () => {
     const currentItem = items.find((item) => item.key === activeKey)
     if (!currentItem?.selectedUmbrellaName) return []
-    return UMBRELLA_DATA.crafts[currentItem.selectedUmbrellaName as keyof typeof UMBRELLA_DATA.crafts] || []
+    return umbrellaData.crafts[currentItem.selectedUmbrellaName as keyof typeof umbrellaData.crafts] || []
   }
 
   const handleSixSmallItemsNameChange = (value: string) => {
     // 获取选中项的 label
-    const selectedItem = SIX_SMALL_ITEMS_DATA.names.find((item) => item.key === value)
+    const selectedItem = sixSmallItemsData.names.find((item) => item.key === value)
     console.log('value:', value)
     console.log('label:', selectedItem?.label)
 
     // 获取选中六小件的所有参数
-    const textureOptions = SIX_SMALL_ITEMS_DATA.textures[value as keyof typeof SIX_SMALL_ITEMS_DATA.textures] || []
-    const thicknessOptions = SIX_SMALL_ITEMS_DATA.thickness[value as keyof typeof SIX_SMALL_ITEMS_DATA.thickness] || []
-    const lengthOptions = SIX_SMALL_ITEMS_DATA.length[value as keyof typeof SIX_SMALL_ITEMS_DATA.length] || []
-    const widthOptions = SIX_SMALL_ITEMS_DATA.widths[value as keyof typeof SIX_SMALL_ITEMS_DATA.widths] || []
-    const weightOptions = SIX_SMALL_ITEMS_DATA.weights[value as keyof typeof SIX_SMALL_ITEMS_DATA.weights] || []
-    const craftOptions = SIX_SMALL_ITEMS_DATA.crafts[value as keyof typeof SIX_SMALL_ITEMS_DATA.crafts] || []
+    const textureOptions = sixSmallItemsData.textures[value as keyof typeof sixSmallItemsData.textures] || []
+    const thicknessOptions = sixSmallItemsData.thickness[value as keyof typeof sixSmallItemsData.thickness] || []
+    const lengthOptions = sixSmallItemsData.length[value as keyof typeof sixSmallItemsData.length] || []
+    const widthOptions = sixSmallItemsData.widths[value as keyof typeof sixSmallItemsData.widths] || []
+    const weightOptions = sixSmallItemsData.weights[value as keyof typeof sixSmallItemsData.weights] || []
+    const craftOptions = sixSmallItemsData.crafts[value as keyof typeof sixSmallItemsData.crafts] || []
 
     // 自动填充联动字段
     form.setFieldsValue({
@@ -4131,29 +4099,12 @@ const InquiryPage: FC = () => {
   const handleInquiry = async () => {
     try {
       setIsLoading(true) // 开始询价时设置状态
-      setProgress(0)
-      setDisplayedMarkdown('')
       setIsTyping(false) // 重置打字效果状态
       // 重置下载状态
       setDownloadStatus('idle')
       setUniqueId('')
       setDownloadError('')
       // setDataReturned(false) // 重置数据返回状态
-
-      // 启动进度条：5秒内到达99%
-      const duration = 5000 // 5秒
-      const interval = 30 // 30ms
-      const steps = duration / interval
-      const increment = 99 / steps
-      const progressTimer = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 99) {
-            clearInterval(progressTimer)
-            return 99
-          }
-          return prev + increment
-        })
-      }, interval)
 
       // 用于并发
       await Promise.all(
@@ -4260,10 +4211,6 @@ const InquiryPage: FC = () => {
           }
         })
       )
-
-      // 数据返回后，进度条到达100%
-      clearInterval(progressTimer)
-      setProgress(100)
     } catch (error) {
       console.error('询价失败:', error)
       message.error(error instanceof Error ? error.message : '询价失败，请重试')
@@ -4340,6 +4287,16 @@ const InquiryPage: FC = () => {
     }
   }
 
+  // 每次弹窗打开都重置表单和品类选择
+  useEffect(() => {
+    if (isModalOpen) {
+      setSelectedCategory(undefined)
+      setTimeout(() => {
+        form.resetFields()
+      }, 0)
+    }
+  }, [isModalOpen, form])
+
   return (
     <Container>
       <ContentContainer>
@@ -4380,15 +4337,12 @@ const InquiryPage: FC = () => {
         </SideNav>
         <TableContainer right>
           <MarkdownContainer className={isTyping ? 'typing' : ''} ref={markdownContainerRef}>
-            {isLoading && displayedMarkdown === '' && (
-              <LoadingOverlay>
-                <ProgressBar>
-                  <ProgressFill style={{ width: `${progress}%` }} />
-                </ProgressBar>
-                <LoadingText>请稍后，正在询价中 {Math.round(progress)}%</LoadingText>
-              </LoadingOverlay>
-            )}
-            {!isLoading && !displayedMarkdown ? (
+            {isLoading ? (
+              <StyledOverlay>
+                <Spin tip="Loading" size="large" />
+                <div className="ant-spin-text">Caka正在为您生成报价，请耐心等候...</div>
+              </StyledOverlay>
+            ) : !displayedMarkdown ? (
               <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
             ) : (
               <div className="markdown-body">
@@ -4501,6 +4455,30 @@ const ErrorMessage = styled.div`
   color: var(--color-error);
   font-size: 12px;
   line-height: 1.2;
+`
+
+const StyledOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: ${(props) => props.theme.colorBgContainer};
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  & .ant-spin-text {
+    display: block !important;
+    color: ${(props) => props.theme.colorText} !important;
+    font-size: 16px !important;
+    margin-top: 16px !important;
+    text-align: center !important;
+    opacity: 1 !important;
+    background: none !important;
+  }
 `
 
 export default InquiryPage
