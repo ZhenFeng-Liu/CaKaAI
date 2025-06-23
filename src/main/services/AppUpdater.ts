@@ -65,8 +65,18 @@ export default class AppUpdater {
       })
       .then(({ response }) => {
         if (response === 1) {
+          // 设置更新标记，用于在下次启动时要求重新登录
+          mainWindow.webContents.executeJavaScript(`
+            localStorage.setItem("requireReloginAfterUpdate", "true");
+            if (typeof window.checkAuth === 'function') { window.checkAuth(); }
+          `)
+          // 新增：主动通知前端刷新权限
+          mainWindow.webContents.send('require-permission-refresh')
+          logger.info('已设置requireReloginAfterUpdate标记，并通知前端刷新权限')
           app.isQuitting = true
-          setImmediate(() => autoUpdater.quitAndInstall())
+          setImmediate(() => {
+            autoUpdater.quitAndInstall()
+          })
         } else {
           mainWindow.webContents.send('update-downloaded-cancelled')
         }

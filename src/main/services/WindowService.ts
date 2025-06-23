@@ -1,5 +1,4 @@
 import { is } from '@electron-toolkit/utils'
-import { isLinux, isWin } from '@main/constant'
 import { app, BrowserWindow, ipcMain, Menu, MenuItem, shell } from 'electron'
 import Logger from 'electron-log'
 import windowStateKeeper from 'electron-window-state'
@@ -14,7 +13,7 @@ export class WindowService {
   private static instance: WindowService | null = null
   private mainWindow: BrowserWindow | null = null
   private miniWindow: BrowserWindow | null = null
-  private wasFullScreen: boolean = false
+  // private wasFullScreen: boolean = false
   private selectionMenuWindow: BrowserWindow | null = null
   private lastSelectedText: string = ''
   private contextMenu: Menu | null = null
@@ -142,12 +141,12 @@ export class WindowService {
 
     // 处理全屏相关事件
     mainWindow.on('enter-full-screen', () => {
-      this.wasFullScreen = true
+      // this.wasFullScreen = true
       mainWindow.webContents.send('fullscreen-status-changed', true)
     })
 
     mainWindow.on('leave-full-screen', () => {
-      this.wasFullScreen = false
+      // this.wasFullScreen = false
       mainWindow.webContents.send('fullscreen-status-changed', false)
     })
 
@@ -240,30 +239,13 @@ export class WindowService {
   }
 
   private setupWindowLifecycleEvents(mainWindow: BrowserWindow) {
-    mainWindow.on('close', (event) => {
-      // 如果已经触发退出，直接退出
-      if (app.isQuitting) {
-        return app.quit()
-      }
-
-      // 没有开启托盘，且是Windows或Linux系统，直接退出
-      const notInTray = !configManager.getTray()
-      if ((isWin || isLinux) && notInTray) {
-        return app.quit()
-      }
-
-      // 如果是Windows或Linux，且处于全屏状态，则退出应用
-      if (this.wasFullScreen) {
-        if (isWin || isLinux) {
-          return app.quit()
-        } else {
-          event.preventDefault()
-          mainWindow.setFullScreen(false)
-          return
-        }
-      }
-      event.preventDefault()
-      mainWindow.hide()
+    mainWindow.on('close', async () => {
+      // 先清除 localStorage 的 token
+      // if (mainWindow && mainWindow.webContents) {
+      //   await mainWindow.webContents.executeJavaScript("localStorage.removeItem('token')")
+      // }
+      // 然后退出应用
+      app.quit()
     })
 
     mainWindow.on('closed', () => {

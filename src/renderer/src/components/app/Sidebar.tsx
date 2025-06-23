@@ -3,6 +3,7 @@ import {
   FolderOutlined,
   PictureOutlined,
   QuestionCircleOutlined,
+  ReloadOutlined,
   SolutionOutlined,
   TransactionOutlined,
   TranslationOutlined
@@ -21,7 +22,7 @@ import type { MenuProps } from 'antd'
 import { Tooltip } from 'antd'
 import { Avatar } from 'antd'
 import { Dropdown } from 'antd'
-import { FC } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
@@ -61,6 +62,25 @@ const Sidebar: FC = () => {
     })
   }
 
+  // 用于强制刷新Sidebar
+  const [permissionVersion, setPermissionVersion] = useState(0)
+  useEffect(() => {
+    const handler = () => {
+      // 延迟50ms再触发刷新，防止极端race condition
+      setTimeout(() => setPermissionVersion((v) => v + 1), 50)
+    }
+    window.addEventListener('permissions-changed', handler)
+    return () => {
+      window.removeEventListener('permissions-changed', handler)
+    }
+  }, [])
+
+  // 新增：调试日志，Sidebar每次渲染时打印menuPermissions
+  useEffect(() => {
+    const menuPermissions = localStorage.getItem('menuPermissions')
+    console.log('[Sidebar] 渲染时读取到的menuPermissions:', menuPermissions)
+  }, [permissionVersion])
+
   return (
     <Container
       id="app-sidebar"
@@ -75,7 +95,7 @@ const Sidebar: FC = () => {
       )}
       <MainMenusContainer>
         <Menus onClick={MinApp.onClose}>
-          <MainMenus />
+          <MainMenus key={permissionVersion} />
         </Menus>
         {showPinnedApps && (
           <AppsContainer>
@@ -120,6 +140,11 @@ const Sidebar: FC = () => {
             </StyledLink>
           </Tooltip>
         )}
+        <Tooltip title={t('settings.data.clear_cache.button', '刷新权限')} mouseEnterDelay={0.8} placement="right">
+          <Icon onClick={() => window.dispatchEvent(new Event('require-permission-refresh'))}>
+            <ReloadOutlined />
+          </Icon>
+        </Tooltip>
       </Menus>
     </Container>
   )
@@ -164,6 +189,17 @@ const MainMenus: FC = () => {
     // }
     return checkMenuPermission(menuPermissionMap[icon])
   })
+
+  // 增强：若所有菜单权限均为false，自动触发权限刷新或提示
+  useEffect(() => {
+    if (authorizedIcons.length === 0 && sidebarIcons.visible.length > 0) {
+      // 派发权限刷新事件，或弹窗提示
+      window.dispatchEvent(new Event('permissions-changed'))
+      // 可选：弹窗提示
+      // message.warning('未检测到任何可用菜单权限，已自动尝试刷新权限。如仍无菜单，请重新登录。')
+    }
+  }, [authorizedIcons.length, sidebarIcons.visible.length])
+
   const iconMap = {
     assistants: <i className="iconfont icon-chat" />,
     agents: <i className="iconfont icon-business-smart-assistant" />,
@@ -189,6 +225,12 @@ const MainMenus: FC = () => {
     talent: '/talent',
     inquiry: '/inquiry'
   }
+
+  // 新增：调试日志，MainMenus每次渲染时打印menuPermissions
+  useEffect(() => {
+    const menuPermissions = localStorage.getItem('menuPermissions')
+    console.log('[MainMenus] 渲染时读取到的menuPermissions:', menuPermissions)
+  })
 
   return authorizedIcons.map((icon) => {
     const path = pathMap[icon]

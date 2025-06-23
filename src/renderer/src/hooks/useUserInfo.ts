@@ -77,8 +77,17 @@ export const useUserInfo = () => {
         console.log('处理后的权限信息', uniqueMenus)
 
         // 存储用户信息和权限
+        console.log('[权限刷新] 即将写入userInfo和menuPermissions到localStorage')
         localStorage.setItem('userInfo', JSON.stringify(userInfo))
         localStorage.setItem('menuPermissions', JSON.stringify(uniqueMenus))
+        console.log('[权限刷新] 已写入userInfo和menuPermissions到localStorage:', {
+          userInfo,
+          menuPermissions: uniqueMenus
+        })
+
+        // 派发自定义事件，通知权限变更
+        window.dispatchEvent(new Event('permissions-changed'))
+        console.log('[权限刷新] 已派发permissions-changed事件')
 
         // 显示成功消息
         if (showMessage) {
@@ -112,7 +121,11 @@ export const useUserInfo = () => {
             duration: 3
           })
         }
-
+        // 降级处理：清空本地权限缓存
+        localStorage.removeItem('menuPermissions')
+        localStorage.removeItem('userInfo')
+        window.dispatchEvent(new Event('permissions-changed'))
+        message.warning('权限同步失败，已清空本地权限，请检查网络或重新登录')
         setError(errorMsg)
         if (onError) {
           onError(errorMsg)
@@ -129,7 +142,11 @@ export const useUserInfo = () => {
           duration: 3
         })
       }
-
+      // 降级处理：清空本地权限缓存
+      localStorage.removeItem('menuPermissions')
+      localStorage.removeItem('userInfo')
+      window.dispatchEvent(new Event('permissions-changed'))
+      message.warning('权限同步失败，已清空本地权限，请检查网络或重新登录')
       setError(error)
       if (onError) {
         onError(error)

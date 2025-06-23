@@ -2,6 +2,7 @@ import { LockOutlined, LogoutOutlined } from '@ant-design/icons' // 修正图标
 import { memberApi } from '@renderer/api/member' // 添加这一行
 import { userApi } from '@renderer/api/user' // 添加这一行
 import DefaultAvatar from '@renderer/assets/images/avatar.png'
+import { db } from '@renderer/databases'
 import useAvatar from '@renderer/hooks/useAvatar'
 import { useSettings } from '@renderer/hooks/useSettings'
 import ImageStorage from '@renderer/services/ImageStorage'
@@ -209,8 +210,28 @@ const PopupContainer: React.FC<Props> = ({ resolve }) => {
       localStorage.removeItem('tavily_api_key')
       // 清除本地isAdmin
       localStorage.removeItem('isAdmin')
+      // 清除本地Apikey
+      localStorage.removeItem('Apikey')
+      // 清除本地persist:cherry-studio
+      localStorage.removeItem('persist:cherry-studio')
       // 清除本地所有缓存
-      localStorage.clear()
+      // localStorage.clear()
+      // 清除CherryStudio的IndexedDB
+      try {
+        // 清除所有表的数据
+        await db.transaction('rw', db.tables, async () => {
+          for (const table of db.tables) {
+            await table.clear()
+          }
+        })
+        console.log('Successfully cleared IndexedDB data')
+      } catch (error) {
+        console.error('Error clearing IndexedDB:', error)
+      }
+
+      // 派发自定义事件，通知权限变更
+      window.dispatchEvent(new Event('permissions-changed'))
+
       // 显示成功消息
       message.success('退出登录成功')
 

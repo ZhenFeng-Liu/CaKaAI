@@ -9,12 +9,13 @@ import { AppLogo } from '@renderer/config/env' // 根据实际路径调整
 import store, { persistor } from '@renderer/store'
 // import { Provider as ProviderType } from '@renderer/types'
 // import { uuid } from '@renderer/utils'
-import { message } from 'antd'
-import { FC, useEffect, useState } from 'react'
+import { message, Spin } from 'antd'
+import { createContext, FC, useContext, useEffect, useState } from 'react'
 import { Provider as ReduxProvider } from 'react-redux'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 import { PersistGate } from 'redux-persist/integration/react'
 
+import { menuApi } from './api/menu'
 import Sidebar from './components/app/Sidebar'
 import TopViewContainer from './components/TopView'
 import AntdProvider from './context/AntdProvider'
@@ -22,6 +23,7 @@ import StyleSheetManager from './context/StyleSheetManager'
 import { SyntaxHighlighterProvider } from './context/SyntaxHighlighterProvider'
 import { ThemeProvider } from './context/ThemeProvider'
 import NavigationHandler from './handler/NavigationHandler'
+import useUserInfo from './hooks/useUserInfo'
 import AgentsPage from './pages/agents/AgentsPage'
 import AIimagesPage from './pages/aiimages/AIimagesPage'
 import AppsPage from './pages/apps/AppsPage'
@@ -267,14 +269,74 @@ const MainContent: FC = () => {
 //   return null // 这是一个纯逻辑组件，不渲染任何UI
 // }
 
+// 菜单全局Context定义
+type MenuContextType = {
+  menuData: any[]
+  setMenuData: (data: any[]) => void
+}
+const MenuContext = createContext<MenuContextType>({
+  menuData: [],
+  setMenuData: () => {}
+})
+
+export const useMenu = () => useContext(MenuContext)
+
 function App(): JSX.Element {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [permissionRefreshing, setPermissionRefreshing] = useState(false)
+  const { fetchAndProcessUserInfo, loading: userInfoLoading } = useUserInfo()
+  const [menuData, setMenuData] = useState<any[]>([])
 
   // 检查登录状态函数
   const checkAuth = () => {
+    // 检查是否需要在更新后重新登录
+    const requireReloginAfterUpdate = localStorage.getItem('requireReloginAfterUpdate')
+    if (requireReloginAfterUpdate === 'true') {
+      // 清除标记
+      localStorage.removeItem('requireReloginAfterUpdate')
+      // 清除token强制重新登录
+      localStorage.removeItem('token')
+      // 清除本地用户信息
+      localStorage.removeItem('userInfo')
+      // 清除本地菜单权限
+      localStorage.removeItem('menuPermissions')
+      // 清除本地tavily_api_key
+      localStorage.removeItem('tavily_api_key')
+      // 清除本地isAdmin
+      localStorage.removeItem('isAdmin')
+      // 清除本地Apikey
+      localStorage.removeItem('Apikey')
+      // 清除本地persist:cherry-studio
+      localStorage.removeItem('persist:cherry-studio')
+      // 清除本地所有缓存
+      // localStorage.clear()
+      // 清除CherryStudio的IndexedDB
+      import('./databases').then(({ default: db }) => {
+        db.transaction('rw', db.tables, async () => {
+          for (const table of db.tables) {
+            await table.clear()
+          }
+        })
+          .then(() => {
+            console.log('Successfully cleared IndexedDB data')
+            setIsAuthenticated(false)
+            message.info('软件已更新，请重新登录')
+            window.location.href = '/#/login'
+          })
+          .catch((error) => {
+            console.error('Error clearing IndexedDB:', error)
+            setIsAuthenticated(false)
+            message.info('软件已更新，请重新登录')
+            window.location.href = '/#/login'
+          })
+      })
+      return false
+    }
+
     const token = localStorage.getItem('token')
     if (!token) {
       setIsAuthenticated(false)
+      window.location.href = '/#/login'
       return false
     }
 
@@ -287,6 +349,7 @@ function App(): JSX.Element {
         localStorage.removeItem('token')
         setIsAuthenticated(false)
         message.error('登录已过期，请重新登录')
+        window.location.href = '/#/login'
         return false
       } else {
         setIsAuthenticated(true)
@@ -295,7 +358,66 @@ function App(): JSX.Element {
     } catch (error) {
       localStorage.removeItem('token')
       setIsAuthenticated(false)
+      window.location.href = '/#/login'
       return false
+    }
+  }
+
+  // 检查版本更新并刷新权限
+  const checkVersionAndRefreshPermissions = async () => {
+    try {
+      // 检查是否有版本更新标记
+      const lastVersion = localStorage.getItem('lastAppVersion')
+
+      // 动态获取当前版本号
+      let currentVersion = '3.0.14' // 默认值
+      try {
+        const packageJsonResponse = await fetch('/package.json')
+        if (packageJsonResponse.ok) {
+          const contentType = packageJsonResponse.headers.get('content-type') || ''
+          if (contentType.includes('application/json')) {
+            const packageJson = await packageJsonResponse.json()
+            if (packageJson && typeof packageJson.version === 'string') {
+              currentVersion = packageJson.version
+            } else {
+              console.warn('package.json内容无version字段，使用默认值')
+            }
+          } else {
+            // 可能返回了html等
+            const text = await packageJsonResponse.text()
+            if (text.trim().startsWith('<!doctype') || text.trim().startsWith('<html')) {
+              console.warn('fetch /package.json 返回HTML，可能未正确部署静态资源，使用默认版本号')
+            } else {
+              console.warn('fetch /package.json 返回非JSON内容，使用默认版本号')
+            }
+          }
+        } else {
+          console.warn('无法从package.json获取版本号，响应码:', packageJsonResponse.status, '使用默认值')
+        }
+      } catch (error) {
+        console.warn('无法从package.json获取版本号，使用默认值:', error)
+      }
+
+      if (lastVersion && lastVersion !== currentVersion) {
+        console.log('检测到版本更新，刷新用户权限...')
+
+        // 新增：设置升级后需重新登录标记，并立即触发checkAuth
+        localStorage.setItem('requireReloginAfterUpdate', 'true')
+        checkAuth()
+        // 直接return，避免后续权限刷新逻辑在未登录状态下执行
+        return
+
+        // 获取当前用户信息
+        // const userInfoStr = localStorage.getItem('userInfo')
+        // if (userInfoStr) {
+        //   ...（原有权限刷新逻辑保留但不再此处执行）
+        // }
+
+        // 更新版本记录
+        // localStorage.setItem('lastAppVersion', currentVersion)
+      }
+    } catch (error) {
+      console.error('版本检查和权限刷新失败:', error)
     }
   }
 
@@ -303,8 +425,11 @@ function App(): JSX.Element {
     // 初始检查
     checkAuth()
 
+    // 检查版本更新并刷新权限
+    checkVersionAndRefreshPermissions()
+
     // 定期检查token状态
-    const interval = setInterval(checkAuth, 60000) // 每分钟检查一次
+    const interval = setInterval(checkAuth, 1000) // 每3秒检查一次
 
     // 监听退出登录事件
     const handleLogout = () => {
@@ -313,14 +438,80 @@ function App(): JSX.Element {
 
     window.addEventListener('app-logout', handleLogout)
 
+    // 监听localStorage变化，token被清除或覆盖时立即checkAuth
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'token') {
+        checkAuth()
+      }
+    }
+    window.addEventListener('storage', handleStorage)
+
+    // 监听主进程主动要求权限刷新
+    const handlePermissionRefresh = async () => {
+      setPermissionRefreshing(true)
+      try {
+        const userInfoStr = localStorage.getItem('userInfo')
+        const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null
+        if (userInfo && userInfo.uid) {
+          console.log('[权限刷新] handlePermissionRefresh: 开始调用fetchAndProcessUserInfo')
+          await fetchAndProcessUserInfo(userInfo.uid, { showMessage: true })
+          console.log('[权限刷新] handlePermissionRefresh: fetchAndProcessUserInfo已完成')
+        } else {
+          console.log('[权限刷新] handlePermissionRefresh: 未找到有效userInfo，跳过刷新')
+        }
+      } catch (e) {
+        // 可选：message.error('权限刷新失败')
+        console.error('[权限刷新] handlePermissionRefresh: 异常', e)
+      }
+      setPermissionRefreshing(false)
+    }
+    window.addEventListener('require-permission-refresh', handlePermissionRefresh)
+
     return () => {
       clearInterval(interval)
       window.removeEventListener('app-logout', handleLogout)
+      window.removeEventListener('storage', handleStorage)
+      window.removeEventListener('require-permission-refresh', handlePermissionRefresh)
     }
   }, [])
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      // 主界面挂载时拉取菜单
+      menuApi
+        .query()
+        .then((response) => {
+          if (response.Data) {
+            const transformed = menuApi.transformMenuData(response.Data)
+            setMenuData(transformed)
+          }
+        })
+        .catch((err) => {
+          // 错误处理将在后续步骤补充
+          console.error('菜单拉取失败', err)
+        })
+    }
+  }, [isAuthenticated])
+
   return (
     <>
+      {(permissionRefreshing || userInfoLoading) && (
+        <div
+          style={{
+            position: 'fixed',
+            zIndex: 9999,
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(255,255,255,0.4)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+          <Spin size="large" tip="正在刷新权限..." />
+        </div>
+      )}
       {/* <ReduxProvider store={store}>
         {isAuthenticated ? <MainContent /> : <LoginPage setIsAuthenticated={setIsAuthenticated} />}
       </ReduxProvider> */}
@@ -329,7 +520,9 @@ function App(): JSX.Element {
           <ThemeProvider>
             <AntdProvider>
               <SyntaxHighlighterProvider>
-                {isAuthenticated ? <MainContent /> : <LoginPage setIsAuthenticated={setIsAuthenticated} />}
+                <MenuContext.Provider value={{ menuData, setMenuData }}>
+                  {isAuthenticated ? <MainContent /> : <LoginPage setIsAuthenticated={setIsAuthenticated} />}
+                </MenuContext.Provider>
               </SyntaxHighlighterProvider>
             </AntdProvider>
           </ThemeProvider>

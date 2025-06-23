@@ -51,11 +51,21 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
         // 替换原来的用户信息获取逻辑
         try {
           // 使用新的Hook获取用户信息
-          await fetchAndProcessUserInfo(response.Data.uid, {
+          const result = await fetchAndProcessUserInfo(response.Data.uid, {
             showMessage: true,
             redirectAfterSuccess: false, // 修改为false，由我们自己控制重定向
             setIsAuthenticated
           })
+
+          if (!result) {
+            // 拉取用户信息失败，阻止进入主界面
+            message.error({
+              content: '获取用户信息失败，请重试登录',
+              duration: 3
+            })
+            setIsAuthenticated(false)
+            return
+          }
 
           // 设置认证状态
           setIsAuthenticated(true)
@@ -73,6 +83,12 @@ const LoginPage: FC<LoginPageProps> = ({ setIsAuthenticated }) => {
           }, 100)
         } catch (error) {
           console.error('登录过程中出错:', error)
+          message.error({
+            content: '登录成功但获取用户信息失败，请重试',
+            duration: 3
+          })
+          setIsAuthenticated(false)
+          return
         }
       } else {
         // 根据不同的错误码显示不同的错误信息
