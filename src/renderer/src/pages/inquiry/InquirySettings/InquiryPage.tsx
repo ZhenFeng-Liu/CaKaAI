@@ -33,6 +33,7 @@ import {
   DNDRoomCardEnquiry,
   exportEnquiry,
   penEnquiry,
+  pvcStandardCardEnquiry,
   roomCardEnquiry,
   sixSmallItemsEnquiry,
   slipperEnquiry,
@@ -329,7 +330,7 @@ const CategoryRadioGroup = styled(Radio.Group)`
   }
 `
 
-// 定义品类类型：品类：room_card_wc--木卡房卡、room_card_dnd--DND房卡、slipper--拖鞋、room_card--房卡、pen--环保笔、umbrella--伞、badge_lanyard--胸牌、six_small_items--六小件
+// 定义品类类型：品类：room_card_wc--木卡房卡、room_card_dnd--DND房卡、pvc_standard_card--PVC房卡、slipper--拖鞋、room_card--房卡、pen--环保笔、umbrella--伞、badge_lanyard--胸牌、six_small_items--六小件
 type CategoryType =
   | 'room_card_wc'
   | 'room_card_dnd'
@@ -339,6 +340,7 @@ type CategoryType =
   | 'badge_lanyard'
   | 'umbrella'
   | 'six_small_items'
+  | 'pvc_standard_card'
 
 // 定义品类数据接口
 interface CategoryItem {
@@ -371,13 +373,18 @@ interface CategoryItem {
   prod_length?: string
   prod_width?: string
   chip_material_code?: string
+  magnetic?: string
   encrypt?: string
+  select_craft?: string
+  card_types?: string
+  card_type?: string
 }
 
 // 定义品类选项
 const CATEGORY_OPTIONS = [
   { label: '木质房卡', value: 'room_card_wc' },
   { label: '木质DND', value: 'room_card_dnd' },
+  { label: 'PVC房卡', value: 'pvc_standard_card' },
   // { label: '房卡', value: 'room_card' },
   { label: '拖鞋', value: 'slipper' },
   { label: '环保笔', value: 'pen' },
@@ -2853,6 +2860,454 @@ const INIT_SIX_SMALL_ITEMS_DATA = {
   }
 }
 
+// PVC房卡数据
+const INIT_PVC_STANDARD_CARD_DATA = {
+  sizes: [
+    {
+      value: '85.5',
+      label: '长度'
+    },
+    {
+      value: '54',
+      label: '宽度'
+    }
+  ],
+  card_types: [
+    {
+      value: '芯片卡',
+      label: '芯片卡'
+    },
+    {
+      value: '磁条卡',
+      label: '磁条卡'
+    }
+  ],
+  encrypt: [
+    {
+      value: '是',
+      label: '是'
+    },
+    {
+      value: '否',
+      label: '否'
+    }
+  ],
+  craft: [
+    {
+      value: '磨砂面卡',
+      label: '磨砂面卡'
+    },
+    {
+      value: '烫金/银LOGO',
+      label: '烫金/银LOGO'
+    },
+    {
+      value: 'UV光油',
+      label: 'UV光油'
+    },
+    {
+      value: '潘通色',
+      label: '潘通色'
+    },
+    {
+      value: '打孔5MM',
+      label: '打孔5MM'
+    },
+    {
+      value: '打孔3*15MM',
+      label: '打孔3*15MM'
+    },
+    {
+      value: '冲缺口',
+      label: '冲缺口'
+    },
+    {
+      value: '编印条形码',
+      label: '编印条形码'
+    },
+    {
+      value: '编印号码黑色',
+      label: '编印号码黑色'
+    },
+    {
+      value: '编印号码金/银/白色',
+      label: '编印号码金/银/白色'
+    },
+    {
+      value: '编印二维码',
+      label: '编印二维码'
+    },
+    {
+      value: '凸码烫金/银',
+      label: '凸码烫金/银'
+    },
+    {
+      value: '套OPP袋子',
+      label: '套OPP袋子'
+    },
+    {
+      value: '套连体OPP袋子',
+      label: '套连体OPP袋子'
+    },
+    {
+      value: '保护膜',
+      label: '保护膜'
+    },
+    {
+      value: '刮刮膜',
+      label: '刮刮膜'
+    },
+    {
+      value: 'UV防伪蓝',
+      label: 'UV防伪蓝'
+    },
+    {
+      value: '橙色激光码',
+      label: '橙色激光码'
+    },
+    {
+      value: '白色签名条/透明签名条',
+      label: '白色签名条/透明签名条'
+    }
+  ],
+  magnetic: [
+    {
+      value: '300 OE磁条',
+      label: '300 OE磁条'
+    },
+    {
+      value: '650 OE磁条',
+      label: '650 OE磁条'
+    },
+    {
+      value: '2750 OE磁条',
+      label: '2750 OE磁条'
+    },
+    {
+      value: '4000 OE磁条',
+      label: '4000 OE磁条'
+    }
+  ],
+  chip_material_code: [
+    {
+      value: '芯片-NXP S50 1k(4byte)-CL.001.00.001',
+      label: '芯片-NXP S50 1k(4byte)-CL.001.00.001'
+    },
+    {
+      value: '芯片-FM1108S(4byte)-CL.001.00.002',
+      label: '芯片-FM1108S(4byte)-CL.001.00.002'
+    },
+    {
+      value: '芯片-K50-CL.001.00.003',
+      label: '芯片-K50-CL.001.00.003'
+    },
+    {
+      value: '芯片-FM11RF32N-CL.001.00.004',
+      label: '芯片-FM11RF32N-CL.001.00.004'
+    },
+    {
+      value: '芯片-NXP S70 EV1-CL.001.00.005',
+      label: '芯片-NXP S70 EV1-CL.001.00.005'
+    },
+    {
+      value: '芯片-NXP S20-CL.001.00.006',
+      label: '芯片-NXP S20-CL.001.00.006'
+    },
+    {
+      value: '芯片-TK4100-CL.001.00.007',
+      label: '芯片-TK4100-CL.001.00.007'
+    },
+    {
+      value: '芯片-5200-CL.001.00.008',
+      label: '芯片-5200-CL.001.00.008'
+    },
+    {
+      value: '芯片-G36A-CL.001.00.009',
+      label: '芯片-G36A-CL.001.00.009'
+    },
+    {
+      value: '芯片-T5577-CL.001.00.010',
+      label: '芯片-T5577-CL.001.00.010'
+    },
+    {
+      value: '芯片-2K-90-CL.001.00.011',
+      label: '芯片-2K-90-CL.001.00.011'
+    },
+    {
+      value: '芯片-旧版2K-CL.001.00.012',
+      label: '芯片-旧版2K-CL.001.00.012'
+    },
+    {
+      value: '芯片-EM4305-CL.001.00.013',
+      label: '芯片-EM4305-CL.001.00.013'
+    },
+    {
+      value: '芯片-NXP Ultralight EV1(48byte)-CL.001.00.014',
+      label: '芯片-NXP Ultralight EV1(48byte)-CL.001.00.014'
+    },
+    {
+      value: '芯片-G36B-CL.001.00.015',
+      label: '芯片-G36B-CL.001.00.015'
+    },
+    {
+      value: '芯片-NXP Ultralight C(17PF)-CL.001.00.016',
+      label: '芯片-NXP Ultralight C(17PF)-CL.001.00.016'
+    },
+    {
+      value: '芯片-SRI512-CL.001.00.017',
+      label: '芯片-SRI512-CL.001.00.017'
+    },
+    {
+      value: '芯片-SRE55VO2P-CL.001.00.018',
+      label: '芯片-SRE55VO2P-CL.001.00.018'
+    },
+    {
+      value: '芯片-I CODE SLI-CL.001.00.019',
+      label: '芯片-I CODE SLI-CL.001.00.019'
+    },
+    {
+      value: '芯片-NXP S50(gc)-CL.001.00.020',
+      label: '芯片-NXP S50(gc)-CL.001.00.020'
+    },
+    {
+      value: '芯片-CUID-CL.001.00.021',
+      label: '芯片-CUID-CL.001.00.021'
+    },
+    {
+      value: '芯片-UID-CL.001.00.022',
+      label: '芯片-UID-CL.001.00.022'
+    },
+    {
+      value: '芯片-ISSI4439-CL.001.00.023',
+      label: '芯片-ISSI4439-CL.001.00.023'
+    },
+    {
+      value: '芯片-FM S50-CL.001.00.024',
+      label: '芯片-FM S50-CL.001.00.024'
+    },
+    {
+      value: '芯片-TI 2K-CL.001.00.025',
+      label: '芯片-TI 2K-CL.001.00.025'
+    },
+    {
+      value: '芯片-UL-EV1 COB(48byte)-CL.001.00.026',
+      label: '芯片-UL-EV1 COB(48byte)-CL.001.00.026'
+    },
+    {
+      value: '芯片-G36A 晶圆-CL.001.00.027',
+      label: '芯片-G36A 晶圆-CL.001.00.027'
+    },
+    {
+      value: '芯片-新版2K-CL.001.00.028',
+      label: '芯片-新版2K-CL.001.00.028'
+    },
+    {
+      value: '芯片-FM1280-194-A1-CL.001.00.030',
+      label: '芯片-FM1280-194-A1-CL.001.00.030'
+    },
+    {
+      value: '芯片-FM1280-198-C1-CL.001.00.031',
+      label: '芯片-FM1280-198-C1-CL.001.00.031'
+    },
+    {
+      value: '芯片-NXP NTAG213-CL.001.00.029',
+      label: '芯片-NXP NTAG213-CL.001.00.029'
+    },
+    {
+      value: '芯片-gc ULT -C-CL.001.00.032',
+      label: '芯片-gc ULT -C-CL.001.00.032'
+    },
+    {
+      value: '芯片-NXP DESFire EV1 2K(7byte)-CL.001.005',
+      label: '芯片-NXP DESFire EV1 2K(7byte)-CL.001.005'
+    },
+    {
+      value: '芯片-NXP DESFire EV1 4K(7byte)-CL.001.006',
+      label: '芯片-NXP DESFire EV1 4K(7byte)-CL.001.006'
+    },
+    {
+      value: '芯片-PLUS X 4K 7B-CL.001.007',
+      label: '芯片-PLUS X 4K 7B-CL.001.007'
+    },
+    {
+      value: '芯片-NXP Plus EV1 4K-CL.001.008',
+      label: '芯片-NXP Plus EV1 4K-CL.001.008'
+    },
+    {
+      value: '芯片-NXP Plus EV1 2K-CL.001.009',
+      label: '芯片-NXP Plus EV1 2K-CL.001.009'
+    },
+    {
+      value: '芯片-HT4168-CL.001.010',
+      label: '芯片-HT4168-CL.001.010'
+    },
+    {
+      value: '芯片-FM11RM08S(7byte)-CL.001.011',
+      label: '芯片-FM11RM08S(7byte)-CL.001.011'
+    },
+    {
+      value: '芯片-NXP D81(7byte)-CL.001.012',
+      label: '芯片-NXP D81(7byte)-CL.001.012'
+    },
+    {
+      value: '芯片-Hitag 2-CL.001.013',
+      label: '芯片-Hitag 2-CL.001.013'
+    },
+    {
+      value: '芯片-NXP Ultralight EV1(128bytes）-CL.001.014',
+      label: '芯片-NXP Ultralight EV1(128bytes）-CL.001.014'
+    },
+    {
+      value: '芯片-NXP S50 EV1(7byte）-CL.001.00.033',
+      label: '芯片-NXP S50 EV1(7byte）-CL.001.00.033'
+    },
+    {
+      value: '芯片-NXP PLUS X 2K(7byte)-CL.001.015',
+      label: '芯片-NXP PLUS X 2K(7byte)-CL.001.015'
+    },
+    {
+      value: '芯片-NXP NTAG215-CL.001.016',
+      label: '芯片-NXP NTAG215-CL.001.016'
+    },
+    {
+      value: '芯片-I CODE SLIX2-CL.001.00.034',
+      label: '芯片-I CODE SLIX2-CL.001.00.034'
+    },
+    {
+      value: '芯片-MCU-CL.001.00.035',
+      label: '芯片-MCU-CL.001.00.035'
+    },
+    {
+      value: '芯片-NXP D42-CL.001.00.036',
+      label: '芯片-NXP D42-CL.001.00.036'
+    },
+    {
+      value: '芯片-NXP D22-CL.001.00.037',
+      label: '芯片-NXP D22-CL.001.00.037'
+    },
+    {
+      value: '芯片-NXP D82 70pf-CL.001.00.038',
+      label: '芯片-NXP D82 70pf-CL.001.00.038'
+    },
+    {
+      value: '芯片-JT1024 -CL.001.00.039',
+      label: '芯片-JT1024 -CL.001.00.039'
+    },
+    {
+      value: '芯片-NXP PLUS S 2K(7byte)-CL.001.00.040',
+      label: '芯片-NXP PLUS S 2K(7byte)-CL.001.00.040'
+    },
+    {
+      value: '芯片-NTAG216-CL.001.0017',
+      label: '芯片-NTAG216-CL.001.0017'
+    },
+    {
+      value: '芯片-NXP DESFire EV3 4K(7byte)-CL.001.0018',
+      label: '芯片-NXP DESFire EV3 4K(7byte)-CL.001.0018'
+    },
+    {
+      value: '芯片-FM1280-7102-C1-CL.001.0019',
+      label: '芯片-FM1280-7102-C1-CL.001.0019'
+    },
+    {
+      value: '芯片-I CDOE SLI X -CL.001.0020',
+      label: '芯片-I CDOE SLI X -CL.001.0020'
+    },
+    {
+      value: '芯片-NXP Desfire EV1 8K(7byte)-CL.001.0021',
+      label: '芯片-NXP Desfire EV1 8K(7byte)-CL.001.0021'
+    },
+    {
+      value: '芯片-NXP Desfire EV2 2K(7byte)-CL.001.0022',
+      label: '芯片-NXP Desfire EV2 2K(7byte)-CL.001.0022'
+    },
+    {
+      value: '芯片-NXP Desfire EV3 2K(7byte)-CL.001.0023',
+      label: '芯片-NXP Desfire EV3 2K(7byte)-CL.001.0023'
+    },
+    {
+      value: '芯片-NXP DESFire EV2 4K(7byte)-CL.001.0024',
+      label: '芯片-NXP DESFire EV2 4K(7byte)-CL.001.0024'
+    },
+    {
+      value: '芯片-NXP Desfire EV2 8K(7byte)-CL.001.0025',
+      label: '芯片-NXP Desfire EV2 8K(7byte)-CL.001.0025'
+    },
+    {
+      value: '芯片-EM4200-CL.001.0028',
+      label: '芯片-EM4200-CL.001.0028'
+    },
+    {
+      value: '芯片-UHF 9662-CL.001.0029',
+      label: '芯片-UHF 9662-CL.001.0029'
+    },
+    {
+      value: '芯片-NXP S70 7B-CL.001.0030',
+      label: '芯片-NXP S70 7B-CL.001.0030'
+    },
+    {
+      value: '芯片-MIFARE Plus EV2 2K -CL.001.0031',
+      label: '芯片-MIFARE Plus EV2 2K -CL.001.0031'
+    },
+    {
+      value: '芯片-NXP Ultralight C wafer(17PF)-CL.001.0032',
+      label: '芯片-NXP Ultralight C wafer(17PF)-CL.001.0032'
+    },
+    {
+      value: '芯片-Hitag 2-CL.001.0033',
+      label: '芯片-Hitag 2-CL.001.0033'
+    },
+    {
+      value: '芯片-FM24C02-CL.001.0034',
+      label: '芯片-FM24C02-CL.001.0034'
+    },
+    {
+      value: '芯片-NXP UL-C 50PF-CL.001.0035',
+      label: '芯片-NXP UL-C 50PF-CL.001.0035'
+    },
+    {
+      value: '芯片-NXP DESFire Light -CL.001.0036',
+      label: '芯片-NXP DESFire Light -CL.001.0036'
+    },
+    {
+      value: '芯片-NXP Hitag 1-CL.001.0037',
+      label: '芯片-NXP Hitag 1-CL.001.0037'
+    },
+    {
+      value: '辅料配件-LED发光灯珠COB-CL.001.0038',
+      label: '辅料配件-LED发光灯珠COB-CL.001.0038'
+    },
+    {
+      value: '芯片-MIFARE Plus EV2 4K -CL.001.0039',
+      label: '芯片-MIFARE Plus EV2 4K -CL.001.0039'
+    },
+    {
+      value: '芯片-MIFARE Plus EV2 4k(7byte)-CL.001.0040',
+      label: '芯片-MIFARE Plus EV2 4k(7byte)-CL.001.0040'
+    },
+    {
+      value: '芯片-Monza R6-CL.001.0041',
+      label: '芯片-Monza R6-CL.001.0041'
+    },
+    {
+      value: '芯片-CPU(FM1208-09)-CL.001.00.0042',
+      label: '芯片-CPU(FM1208-09)-CL.001.00.0042'
+    },
+    {
+      value: '芯片-MIFARE Classic EV1 1K(7byte)-CL.001.00.0043',
+      label: '芯片-MIFARE Classic EV1 1K(7byte)-CL.001.00.0043'
+    },
+    {
+      value: '芯片-NXP S50 EV1(4byte）-CL.001.00.0044',
+      label: '芯片-NXP S50 EV1(4byte）-CL.001.00.0044'
+    },
+    {
+      value: '无芯片',
+      label: '无芯片'
+    }
+  ]
+}
+
 // 定义品类标签映射
 const CATEGORY_LABEL_MAP: Record<CategoryType, string> = {
   room_card_wc: '木质房卡',
@@ -2862,7 +3317,8 @@ const CATEGORY_LABEL_MAP: Record<CategoryType, string> = {
   pen: '环保笔',
   badge_lanyard: '胸牌',
   umbrella: '雨伞',
-  six_small_items: '六小件'
+  six_small_items: '六小件',
+  pvc_standard_card: 'PVC房卡'
 }
 
 const InquiryPage: FC = () => {
@@ -2899,7 +3355,7 @@ const InquiryPage: FC = () => {
   const [badgeLanyardData, setBadgeLanyardData] = useState(INIT_BADEG_LANYARD_DATA)
   const [umbrellaData, setUmbrellaData] = useState(INIT_UMBRELLA_DATA)
   const [sixSmallItemsData, setSixSmallItemsData] = useState(INIT_SIX_SMALL_ITEMS_DATA)
-
+  const [pvcStandardCardData, setPvcStandardCardData] = useState(INIT_PVC_STANDARD_CARD_DATA)
   const onChange = (key: string | string[]) => {
     setActiveKey(key)
   }
@@ -2979,7 +3435,9 @@ const InquiryPage: FC = () => {
         prod_length: values.prod_length,
         prod_width: values.prod_width,
         chip_material_code: values.chip_material_code,
+        magnetic: values.magnetic,
         encrypt: values.encrypt,
+        card_type: values.card_types,
         children: renderDetailForm({
           key: newKey,
           label: values.category,
@@ -3003,9 +3461,12 @@ const InquiryPage: FC = () => {
           prod_length: values.prod_length,
           prod_width: values.prod_width,
           chip_material_code: values.chip_material_code,
+          magnetic: values.magnetic,
           encrypt: values.encrypt,
           children: null,
-          extra: null
+          extra: null,
+          card_type: values.card_types,
+          select_craft: values.select_craft
         }),
         extra: null
       }
@@ -3440,6 +3901,101 @@ const InquiryPage: FC = () => {
             <Input disabled placeholder="请选择产品名称后自动显示" />
           </Form.Item>
         ]
+      case 'pvc_standard_card':
+        return [
+          categoryItem,
+          <Form.Item
+            key="length"
+            label="长度mm"
+            name="length"
+            initialValue={85.5}
+            rules={[{ required: true, message: '请输入长度' }]}>
+            <InputNumber min={1} disabled />
+          </Form.Item>,
+          <Form.Item
+            key="width"
+            label="宽度mm"
+            name="width"
+            initialValue={54}
+            rules={[{ required: true, message: '请输入宽度' }]}>
+            <InputNumber min={1} disabled />
+          </Form.Item>,
+          // 卡类型默认选择芯片
+          <Form.Item
+            key="card_types"
+            label="卡类型11"
+            name="card_types"
+            rules={[{ required: true, message: '请选择卡类型' }]}>
+            <Radio.Group>
+              {pvcStandardCardData.card_types.map((option) => (
+                <Radio key={option.value} value={option.value}>
+                  {option.label}
+                </Radio>
+              ))}
+            </Radio.Group>
+          </Form.Item>,
+          <Form.Item dependencies={['card_types']} noStyle key="dynamic_card_type">
+            {({ getFieldValue }) => {
+              const type = getFieldValue('card_types')
+              if (type === '芯片卡') {
+                return (
+                  <>
+                    <Form.Item
+                      key="chip_material_code"
+                      label="芯片"
+                      name="chip_material_code"
+                      rules={[{ required: true, message: '请选择芯片' }]}>
+                      <Select>
+                        {pvcStandardCardData.chip_material_code.map((option) => (
+                          <Select.Option key={option.value} value={option.value}>
+                            {option.label}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                    <Form.Item
+                      key="encrypt"
+                      label="是否加密"
+                      name="encrypt"
+                      rules={[{ required: true, message: '请选择是否加密' }]}>
+                      <Select>
+                        <Select.Option value="是">是</Select.Option>
+                        <Select.Option value="否">否</Select.Option>
+                      </Select>
+                    </Form.Item>
+                  </>
+                )
+              }
+              if (type === '磁条卡') {
+                return (
+                  <Form.Item
+                    key="magnetic"
+                    label="磁条"
+                    name="magnetic"
+                    rules={[{ required: true, message: '请选择磁条' }]}>
+                    <Select>
+                      {pvcStandardCardData.magnetic.map((option) => (
+                        <Select.Option key={option.value} value={option.value}>
+                          {option.label}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                )
+              }
+              return null
+            }}
+          </Form.Item>,
+          <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: true, message: '请选择工艺' }]}>
+            <Select mode="multiple">
+              {pvcStandardCardData.craft.map((option) => (
+                <Select.Option key={option.value} value={option.value}>
+                  {option.label}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        ]
       default:
         return [categoryItem]
     }
@@ -3868,6 +4424,91 @@ const InquiryPage: FC = () => {
               </Form.Item>
             </>
           )}
+
+          {item.category === 'pvc_standard_card' && (
+            <>
+              <Form.Item key="length" label="长度mm" name="length" rules={[{ required: true, message: '请输入长度' }]}>
+                <InputNumber min={1} />
+              </Form.Item>
+              <Form.Item key="width" label="宽度mm" name="width" rules={[{ required: true, message: '请输入宽度' }]}>
+                <InputNumber min={1} />
+              </Form.Item>
+              <Form.Item
+                key="card_types"
+                label="卡类型"
+                name="card_types"
+                rules={[{ required: true, message: '请选择卡类型' }]}>
+                <Radio.Group>
+                  {pvcStandardCardData.card_types.map((option) => (
+                    <Radio key={option.value} value={option.value}>
+                      {option.label}
+                    </Radio>
+                  ))}
+                </Radio.Group>
+              </Form.Item>
+              <Form.Item dependencies={['card_types']} noStyle key="dynamic_card_type">
+                {({ getFieldValue }) => {
+                  const type = getFieldValue('card_types')
+                  if (type === '芯片卡') {
+                    return (
+                      <>
+                        <Form.Item
+                          key="chip_material_code"
+                          label="芯片"
+                          name="chip_material_code"
+                          rules={[{ required: true, message: '请选择芯片' }]}>
+                          <Select>
+                            {pvcStandardCardData.chip_material_code.map((option) => (
+                              <Select.Option key={option.value} value={option.value}>
+                                {option.label}
+                              </Select.Option>
+                            ))}
+                          </Select>
+                        </Form.Item>
+                        <Form.Item
+                          key="encrypt"
+                          label="是否加密"
+                          name="encrypt"
+                          rules={[{ required: true, message: '请选择是否加密' }]}>
+                          <Select>
+                            <Select.Option value="是">是</Select.Option>
+                            <Select.Option value="否">否</Select.Option>
+                          </Select>
+                        </Form.Item>
+                      </>
+                    )
+                  }
+                  if (type === '磁条卡') {
+                    return (
+                      <Form.Item
+                        key="magnetic"
+                        label="磁条"
+                        name="magnetic"
+                        rules={[{ required: true, message: '请选择磁条' }]}>
+                        <Select>
+                          {pvcStandardCardData.magnetic.map((option) => (
+                            <Select.Option key={option.value} value={option.value}>
+                              {option.label}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      </Form.Item>
+                    )
+                  }
+                  return null
+                }}
+              </Form.Item>
+              <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: true, message: '请选择工艺' }]}>
+                <Select mode="multiple">
+                  {pvcStandardCardData.craft.map((option) => (
+                    <Select.Option key={option.value} value={option.value}>
+                      {option.label}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </>
+          )}
         </Form>
       </div>
     )
@@ -3977,6 +4618,10 @@ const InquiryPage: FC = () => {
         case 'six_small_items':
           setSixSmallItemsData(res.data)
           console.log('sixSmallItemsData', res.data)
+          break
+        case 'pvc_standard_card':
+          setPvcStandardCardData(res.data)
+          console.log('pvcStandardCardData', res.data)
           break
       }
     } catch (e) {
@@ -4189,6 +4834,21 @@ const InquiryPage: FC = () => {
                   craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || ''
                 })
                 break
+              case 'pvc_standard_card':
+                response = await pvcStandardCardEnquiry({
+                  // name: item.name || '',
+                  card_type: item.card_type || '',
+                  magnetic: item.magnetic || '',
+                  chip_material_code: item.chip_material_code || '',
+                  prod_length: item.length?.toString() || '',
+                  prod_width: item.width?.toString() || '',
+                  encrypt: item.encrypt?.toString() || '',
+                  select_craft: [
+                    ...(Array.isArray(item.craft) ? item.craft : item.craft ? [item.craft] : []),
+                    ...(item.magnetic ? [item.magnetic] : [])
+                  ]
+                })
+                break
               default:
                 throw new Error(`不支持的产品类型: ${item.category}`)
             }
@@ -4254,7 +4914,18 @@ const InquiryPage: FC = () => {
     if (typeof activeKey === 'string') {
       const currentItem = items.find((item) => item.key === activeKey)
       if (currentItem) {
-        form.setFieldsValue(currentItem)
+        form.setFieldsValue({
+          ...currentItem,
+          // / 明确指定所有动态字段
+          card_types: currentItem.card_type,
+          chip_material_code: currentItem.chip_material_code,
+          magnetic: currentItem.magnetic,
+          encrypt: currentItem.encrypt
+        })
+        // 再次打印
+        setTimeout(() => {
+          console.log('form fields after set:', form.getFieldsValue())
+        }, 100)
       }
     }
   }, [activeKey, items, form])

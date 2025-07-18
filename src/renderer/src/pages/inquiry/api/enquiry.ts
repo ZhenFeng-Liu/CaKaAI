@@ -96,6 +96,18 @@ export interface DNDRoomCardFilter {
   craft: string //若干个用+拼接
 }
 
+// pvc标准卡询价参数
+export interface PvcStandardCardFilter {
+  name?: string
+  prod_length: string
+  prod_width: string
+  card_type: string
+  chip_material_code: string
+  encrypt: string
+  magnetic?: string
+  select_craft: string[] //若干个用+拼接
+}
+
 // 产品类型枚举
 export enum ProductType {
   ROOM_CARD = 'room_card',
@@ -105,7 +117,8 @@ export enum ProductType {
   PEN = 'pen',
   UMBRELLA = 'umbrella',
   BADGE_LANYARD = 'badge_lanyard',
-  SIX_SMALL_ITEMS = 'six_small_items'
+  SIX_SMALL_ITEMS = 'six_small_items',
+  PVC_STANDARD_CARD = 'pvc_standard_card'
 }
 
 // 导出询价记录参数接口
@@ -221,6 +234,15 @@ export const badgeLanyardEnquiry = async (filter: BadgeLanyardFilter): Promise<a
  */
 export const sixSmallItemsEnquiry = async (filter: SixSmallItemsFilter): Promise<any> => {
   return enquiry(ProductType.SIX_SMALL_ITEMS, filter)
+}
+
+/**
+ * pvc标准卡询价
+ * @param filter pvc标准卡询价参数
+ * @returns Promise<any>
+ */
+export const pvcStandardCardEnquiry = async (filter: PvcStandardCardFilter): Promise<any> => {
+  return enquiry(ProductType.PVC_STANDARD_CARD, filter)
 }
 
 /**

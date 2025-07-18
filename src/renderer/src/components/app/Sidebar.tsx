@@ -22,6 +22,7 @@ import type { MenuProps } from 'antd'
 import { Tooltip } from 'antd'
 import { Avatar } from 'antd'
 import { Dropdown } from 'antd'
+import { message, Modal } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -42,6 +43,7 @@ const Sidebar: FC = () => {
   const { pinned } = useMinapps()
   const { isAdmin } = useAdminCheck()
   const onEditUser = () => UserPopup.show()
+  const [showClearModal, setShowClearModal] = useState(false)
 
   const macTransparentWindow = isMac && windowStyle === 'transparent'
   const sidebarBgColor = macTransparentWindow ? 'transparent' : 'var(--navbar-background)'
@@ -140,12 +142,56 @@ const Sidebar: FC = () => {
             </StyledLink>
           </Tooltip>
         )}
-        <Tooltip title={t('settings.data.clear_cache.button', '刷新权限')} mouseEnterDelay={0.8} placement="right">
-          <Icon onClick={() => window.dispatchEvent(new Event('require-permission-refresh'))}>
+        <Tooltip title={t('settings.data.clear_cache.button', '清除全部数据')} mouseEnterDelay={0.8} placement="right">
+          {/* onClick={() => window.dispatchEvent(new Event('require-permission-refresh'))} */}
+          <Icon onClick={() => setShowClearModal(true)}>
             <ReloadOutlined />
           </Icon>
         </Tooltip>
       </Menus>
+      <Modal
+        title={t('settings.data.clear_cache.button', '清除全部数据')}
+        open={showClearModal}
+        onOk={async () => {
+          // 清除localStorage
+          localStorage.clear()
+          // 清除sessionStorage
+          sessionStorage.clear()
+          // 清除所有IndexedDB数据库
+          if (window.indexedDB && indexedDB.databases) {
+            try {
+              const dbs = await indexedDB.databases()
+              if (dbs && dbs.length > 0) {
+                for (const db of dbs) {
+                  if (db.name) {
+                    indexedDB.deleteDatabase(db.name)
+                  }
+                }
+              }
+            } catch (e) {
+              // 某些环境下不支持indexedDB.databases()，此处忽略异常
+            }
+          }
+          // 清除Cache Storage
+          if (window.caches && caches.keys) {
+            try {
+              const keys = await caches.keys()
+              for (const key of keys) {
+                await caches.delete(key)
+              }
+            } catch (e) {
+              // 清除Cache Storage时发生异常，忽略
+            }
+          }
+          message.success(t('settings.data.clear_cache.success', '清除成功'))
+          setShowClearModal(false)
+          window.location.reload()
+        }}
+        onCancel={() => setShowClearModal(false)}
+        okText={t('common.confirm', '确认')}
+        cancelText={t('common.cancel', '取消')}>
+        {t('settings.data.clear_cache.confirm', '确定要清除当前加载网站的全部数据吗？此操作不可恢复。')}
+      </Modal>
     </Container>
   )
 }
