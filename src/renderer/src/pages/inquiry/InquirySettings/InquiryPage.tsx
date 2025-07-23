@@ -4005,7 +4005,7 @@ const InquiryPage: FC = () => {
               return null
             }}
           </Form.Item>,
-          <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: true, message: '请选择工艺' }]}>
+          <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: false, message: '请选择工艺' }]}>
             <Select mode="multiple">
               {pvcStandardCardData.craft.map((option) => (
                 <Select.Option key={option.value} value={option.value}>
@@ -4530,7 +4530,7 @@ const InquiryPage: FC = () => {
                   return null
                 }}
               </Form.Item>
-              <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: true, message: '请选择工艺' }]}>
+              <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: false, message: '请选择工艺' }]}>
                 <Select mode="multiple">
                   {pvcStandardCardData.craft.map((option) => (
                     <Select.Option key={option.value} value={option.value}>
