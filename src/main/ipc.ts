@@ -63,6 +63,11 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
 
   ipcMain.handle('app:restart-tray', () => TrayService.getInstance().restartTray())
 
+  ipcMain.handle('app:restart', () => {
+    app.relaunch()
+    app.exit(0)
+  })
+
   ipcMain.handle('config:set', (_, key: string, value: any) => {
     configManager.set(key, value)
   })

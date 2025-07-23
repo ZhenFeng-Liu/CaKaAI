@@ -106,6 +106,7 @@ export interface PvcStandardCardFilter {
   encrypt: string
   magnetic?: string
   select_craft: string[] //若干个用+拼接
+  thickness: string
 }
 
 // 产品类型枚举

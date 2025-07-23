@@ -3305,6 +3305,12 @@ const INIT_PVC_STANDARD_CARD_DATA = {
       value: '无芯片',
       label: '无芯片'
     }
+  ],
+  thickness: [
+    {
+      value: '0.79-0.81',
+      label: '厚度'
+    }
   ]
 }
 
@@ -3920,10 +3926,23 @@ const InquiryPage: FC = () => {
             rules={[{ required: true, message: '请输入宽度' }]}>
             <InputNumber min={1} disabled />
           </Form.Item>,
+          <Form.Item
+            key="thickness"
+            label="厚度mm"
+            name="thickness"
+            rules={[{ required: true, message: '请选择厚度' }]}>
+            <Radio.Group>
+              {pvcStandardCardData.thickness.map((option) => (
+                <Radio key={option.value} value={option.value}>
+                  {option.value}
+                </Radio>
+              ))}
+            </Radio.Group>
+          </Form.Item>,
           // 卡类型默认选择芯片
           <Form.Item
             key="card_types"
-            label="卡类型11"
+            label="卡类型"
             name="card_types"
             rules={[{ required: true, message: '请选择卡类型' }]}>
             <Radio.Group>
@@ -4434,6 +4453,19 @@ const InquiryPage: FC = () => {
                 <InputNumber min={1} />
               </Form.Item>
               <Form.Item
+                key="thickness"
+                label="厚度mm"
+                name="thickness"
+                rules={[{ required: true, message: '请选择厚度' }]}>
+                <Radio.Group>
+                  {pvcStandardCardData.thickness.map((option) => (
+                    <Radio key={option.value} value={option.value}>
+                      {option.value}
+                    </Radio>
+                  ))}
+                </Radio.Group>
+              </Form.Item>
+              <Form.Item
                 key="card_types"
                 label="卡类型"
                 name="card_types"
@@ -4846,7 +4878,8 @@ const InquiryPage: FC = () => {
                   select_craft: [
                     ...(Array.isArray(item.craft) ? item.craft : item.craft ? [item.craft] : []),
                     ...(item.magnetic ? [item.magnetic] : [])
-                  ]
+                  ],
+                  thickness: item.thickness || ''
                 })
                 break
               default:

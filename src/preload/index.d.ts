@@ -21,6 +21,7 @@ declare global {
       setLanguage: (theme: LanguageVarious) => void
       setTray: (isActive: boolean) => void
       restartTray: () => void
+      restart: () => Promise<void>
       setTheme: (theme: 'light' | 'dark') => void
       minApp: (options: { url: string; windowOptions?: Electron.BrowserWindowConstructorOptions }) => void
       reload: () => void

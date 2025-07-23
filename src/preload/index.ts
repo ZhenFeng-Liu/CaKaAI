@@ -108,7 +108,8 @@ const api = {
   },
   shell: {
     openExternal: shell.openExternal
-  }
+  },
+  restart: () => ipcRenderer.invoke('app:restart')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

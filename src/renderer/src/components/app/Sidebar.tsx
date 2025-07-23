@@ -185,7 +185,7 @@ const Sidebar: FC = () => {
           }
           message.success(t('settings.data.clear_cache.success', '清除成功'))
           setShowClearModal(false)
-          window.location.reload()
+          window.api.restart()
         }}
         onCancel={() => setShowClearModal(false)}
         okText={t('common.confirm', '确认')}
