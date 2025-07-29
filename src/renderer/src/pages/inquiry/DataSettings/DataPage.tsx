@@ -24,9 +24,11 @@ import {
   // RawProductData,
   RawSixPieceData,
   RawSlipperData,
+  RawSmartProductsData,
   RawUmbrellaData,
   SixPieceData,
   SlipperData,
+  SmartProductsData,
   UmbrellaData
 } from './types'
 
@@ -263,6 +265,27 @@ const sixPieceColumns: ColumnsType<SixPieceData> = [
   { title: '税率', dataIndex: 'tax', width: 80, align: 'center' as const, render: (value) => renderCell(value) }
 ]
 
+// 智慧产品表格列定义
+const smartProductsColumns: ColumnsType<SmartProductsData> = [
+  { title: '序号', dataIndex: 'serial', width: 80, align: 'center' as const, fixed: 'left' },
+  {
+    title: '产品编号',
+    dataIndex: 'id',
+    width: 90,
+    align: 'center' as const,
+    fixed: 'left',
+    render: (value) => renderCell(value)
+  },
+  { title: '物料编码（C.L）', dataIndex: 'material_code', width: 150, align: 'center' as const },
+  { title: '物料编码（C.P）', dataIndex: 'material_code2', width: 150, align: 'center' as const },
+  { title: '产品名称', dataIndex: 'name', width: 200, align: 'center' as const },
+  { title: '材质/参数', dataIndex: 'texture', width: 500, align: 'center' as const },
+  { title: '打样数量', dataIndex: 'proofingNum', width: 150, align: 'center' as const },
+  { title: '大货交期（自然日）', dataIndex: 'prodDelTime', width: 180, align: 'center' as const },
+  { title: '是否含运', dataIndex: 'isTransport', width: 180, align: 'center' as const },
+  { title: '指导价（未税人民币，元/pcs）', dataIndex: 'stepNum', width: 300, align: 'center' as const }
+]
+
 const Container = styled.div<{ $theme?: ThemeMode }>`
   background: ${({ $theme }) => ($theme === ThemeMode.dark ? '#18191c' : '#f8f8f8')};
   height: 100%;
@@ -320,6 +343,7 @@ const DataPage: React.FC = () => {
   const [umbrellaData, setUmbrellaData] = useState<UmbrellaData[]>([])
   const [badgeData, setBadgeData] = useState<BadgeData[]>([])
   const [sixPieceData, setSixPieceData] = useState<SixPieceData[]>([])
+  const [smartProductsData, setRawSmartProductsData] = useState<SmartProductsData[]>([])
   const [loading, setLoading] = useState(false)
 
   const fetchData = useCallback(async () => {
@@ -360,6 +384,11 @@ const DataPage: React.FC = () => {
             ...item
           }))
           setSixPieceData(transformedData)
+        } else if (selectedType === '智慧产品') {
+          const transformedData = response.data.map((item: RawSmartProductsData) => ({
+            ...item
+          }))
+          setRawSmartProductsData(transformedData)
         }
       } else {
         message.error(response.message || '获取数据失败')
@@ -415,8 +444,9 @@ const DataPage: React.FC = () => {
             拖鞋: 'slipper',
             雨伞: 'umbrella',
             环保笔: 'pen',
-            胸牌: 'badge_lanyard',
-            六小件: 'six_small_items'
+            胸牌: 'badge_lanyard'
+            // 六小件: 'six_small_items',
+            // 智慧产品: 'smart_products'
           }
 
           const response = await upload({
@@ -458,8 +488,9 @@ const DataPage: React.FC = () => {
         拖鞋: 'slipper',
         雨伞: 'umbrella',
         环保笔: 'pen',
-        胸牌: 'badge_lanyard',
-        六小件: 'six_small_items'
+        胸牌: 'badge_lanyard'
+        // 六小件: 'six_small_items',
+        // 智慧产品: 'smart_products'
       }
       const prodType = filenameMap[selectedType]
 
@@ -561,6 +592,16 @@ const DataPage: React.FC = () => {
             <Table<SixPieceData>
               columns={sixPieceColumns}
               dataSource={sixPieceData}
+              scroll={{ x: 'max-content', y: 'calc(100vh - 200px)' }}
+              bordered
+              pagination={false}
+              loading={loading}
+              style={{ minWidth: 800 }}
+            />
+          ) : selectedType === '智慧产品' ? (
+            <Table<SixPieceData>
+              columns={smartProductsColumns}
+              dataSource={smartProductsData}
               scroll={{ x: 'max-content', y: 'calc(100vh - 200px)' }}
               bordered
               pagination={false}

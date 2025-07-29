@@ -13,7 +13,14 @@ export const queryProdType = (prodType: ProdType): Promise<ProdTypeResponse> => 
 /**
  * CSV文件下载类型
  */
-export type CsvFileProdType = 'room_card' | 'slipper' | 'umbrella' | 'badge_lanyard' | 'six_small_items' | 'pen'
+export type CsvFileProdType =
+  | 'room_card'
+  | 'slipper'
+  | 'umbrella'
+  | 'badge_lanyard'
+  | 'six_small_items'
+  | 'pen'
+  | 'smart_products'
 
 /**
  * 品类csv下载接口
@@ -36,7 +43,14 @@ export const prodtypeDownload = (prodType: CsvFileProdType): Promise<Blob> => {
 /**
  * 产品类型枚举
  */
-export type UploadProdType = 'room_card' | 'slipper' | 'umbrella' | 'badge_lanyard' | 'six_small_items' | 'pen'
+export type UploadProdType =
+  | 'room_card'
+  | 'slipper'
+  | 'umbrella'
+  | 'badge_lanyard'
+  | 'six_small_items'
+  | 'pen'
+  | 'smart_products'
 
 /**
  * 上传请求参数类型

@@ -15,6 +15,7 @@ export type ProdType =
   | 'umbrella'
   | 'badge_lanyard'
   | 'six_small_items'
+  | 'smart_products'
 
 // 品类数据接口响应
 export interface ProdTypeResponse {

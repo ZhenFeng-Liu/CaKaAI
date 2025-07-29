@@ -240,8 +240,58 @@ export interface SixPieceData {
   tax: string
 }
 
+// 智慧产品原始数据接口
+export interface RawSmartProductsData {
+  serial: string
+  id: string
+  material_code: string
+  name: string
+  texture: string
+  thickness: string
+  length: string
+  width: string
+  weight: string
+  craft: string
+  proofingNum: string
+  sampleDelTime: string
+  prodDelTime: string
+  stepNum: string
+  sampleCharge: string
+  invoices: string
+  tax: string
+}
+
+// 智慧产品表格数据接口
+export interface SmartProductsData {
+  key: string
+  serial: string
+  productNo: string
+  materialCode: string
+  name: string
+  texture: string
+  thickness: string
+  length: string
+  width: string
+  weight: string
+  craft: string
+  proofingNum: string
+  sampleLead: string
+  bulkLead: string
+  ladderPrice: string
+  proofingFee: string
+  invoice: string
+  tax: string
+}
+
 // 通用表格数据类型
-export type TableData = ProductData | SlipperData | EcoPenData | UmbrellaData | BadgeData | SixPieceData
+export type TableData =
+  | ProductData
+  | SlipperData
+  | EcoPenData
+  | UmbrellaData
+  | BadgeData
+  | SixPieceData
+  | SmartProductsData
 
 // 通用表格列类型
 export type TableColumns = ColumnsType<TableData>

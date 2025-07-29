@@ -118,6 +118,13 @@ export interface PvcStandardCardFilter {
   sales_quantity: string
 }
 
+// 智慧产品询价参数
+export interface smartProductsFilter {
+  name: string
+  texture: string
+  sales_quantity: string
+}
+
 // 产品类型枚举
 export enum ProductType {
   ROOM_CARD = 'room_card',
@@ -128,7 +135,8 @@ export enum ProductType {
   UMBRELLA = 'umbrella',
   BADGE_LANYARD = 'badge_lanyard',
   SIX_SMALL_ITEMS = 'six_small_items',
-  PVC_STANDARD_CARD = 'pvc_standard_card'
+  PVC_STANDARD_CARD = 'pvc_standard_card',
+  SMART_PRODUCTS = 'smart_products'
 }
 
 // 导出询价记录参数接口
@@ -253,6 +261,15 @@ export const sixSmallItemsEnquiry = async (filter: SixSmallItemsFilter): Promise
  */
 export const pvcStandardCardEnquiry = async (filter: PvcStandardCardFilter): Promise<any> => {
   return enquiry(ProductType.PVC_STANDARD_CARD, filter)
+}
+
+/**
+ * 智慧产品询价
+ * @param filter 智慧产品询价参数
+ * @returns Promise<any>
+ */
+export const smartProductsEnquiry = async (filter: smartProductsFilter): Promise<any> => {
+  return enquiry(ProductType.SMART_PRODUCTS, filter)
 }
 
 /**

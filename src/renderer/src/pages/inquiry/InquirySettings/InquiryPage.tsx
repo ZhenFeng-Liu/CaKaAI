@@ -37,6 +37,7 @@ import {
   roomCardEnquiry,
   sixSmallItemsEnquiry,
   slipperEnquiry,
+  smartProductsEnquiry,
   umbrellaEnquiry,
   WoodenRoomCardEnquiry
 } from '../api/enquiry'
@@ -342,6 +343,7 @@ type CategoryType =
   | 'umbrella'
   | 'six_small_items'
   | 'pvc_standard_card'
+  | 'smart_products'
 
 // 定义品类数据接口
 interface CategoryItem {
@@ -393,6 +395,7 @@ const CATEGORY_OPTIONS = [
   { label: '胸牌', value: 'badge_lanyard' },
   { label: '雨伞', value: 'umbrella' }
   // { label: '六小件', value: 'six_small_items' }
+  // { label: '智慧产品', value: 'smart_products' }
 ]
 
 // 木卡房卡相关常量数据
@@ -3316,6 +3319,124 @@ const INIT_PVC_STANDARD_CARD_DATA = {
   ]
 }
 
+// 智慧产品
+const SMART_PRODUCTS_DATA = {
+  names: [
+    {
+      key: 'L1',
+      value: '激光雕刻机K9',
+      label: '激光雕刻机K9'
+    },
+    {
+      key: 'L2',
+      value: 'K9配件-滤芯',
+      label: 'K9配件-滤芯'
+    },
+    {
+      key: 'L3',
+      value: 'K9配件-电源线',
+      label: 'K9配件-电源线'
+    },
+    {
+      key: 'L4',
+      value: 'K9配件-数据线',
+      label: 'K9配件-数据线'
+    },
+    {
+      key: 'L5',
+      value: 'K9配件-激光器',
+      label: 'K9配件-激光器'
+    },
+    {
+      key: 'L6',
+      value: 'K9配件-灯条',
+      label: 'K9配件-灯条'
+    },
+    {
+      key: 'L7',
+      value: 'K9配件-步进电机',
+      label: 'K9配件-步进电机'
+    },
+    {
+      key: 'L8',
+      value: '净化器风机',
+      label: '净化器风机'
+    },
+    {
+      key: 'L9',
+      value: '卡盒',
+      label: '卡盒'
+    },
+    {
+      key: 'L10',
+      value: 'K9配件-挡光板',
+      label: 'K9配件-挡光板'
+    }
+  ],
+  textures: {
+    L1: [
+      {
+        label: 'ABS(外壳），长宽高为415*260*220',
+        value: 'ABS(外壳），长宽高为415*260*220'
+      }
+    ],
+    L2: [
+      {
+        label: '120*110*100mm',
+        value: '120*110*100mm'
+      }
+    ],
+    L3: [
+      {
+        label: '',
+        value: ''
+      }
+    ],
+    L4: [
+      {
+        label: '',
+        value: ''
+      }
+    ],
+    L5: [
+      {
+        label: '40+40*110mm,5W压缩光驱动板＋气咀',
+        value: '40+40*110mm,5W压缩光驱动板＋气咀'
+      }
+    ],
+    L6: [
+      {
+        label: '126-11.9mm,12V LED 灯',
+        value: '126-11.9mm,12V LED 灯'
+      }
+    ],
+    L7: [
+      {
+        label: '42步进，42*42*35mm，轴长17.5mm，保持力矩280mN. m .PH2.0-6P接口，防锈抗腐蚀',
+        value: '42步进，42*42*35mm，轴长17.5mm，保持力矩280mN. m .PH2.0-6P接口，防锈抗腐蚀'
+      }
+    ],
+    L8: [
+      {
+        label: '120*120*32mm，台达BFC1212A12V/2A转速3700RPM配A34线 XH -4P端子，线长450mm',
+        value: '120*120*32mm，台达BFC1212A12V/2A转速3700RPM配A34线 XH -4P端子，线长450mm'
+      }
+    ],
+    L9: [
+      {
+        label: '70*100mm, ABS 材料，内外面喷油半光亚银灰色 PANTONE 20-0001TPM',
+        value: '70*100mm, ABS 材料，内外面喷油半光亚银灰色 PANTONE 20-0001TPM'
+      }
+    ],
+    L10: [
+      {
+        label: '',
+        value: ''
+      }
+    ]
+  }
+}
+
 // 定义品类标签映射
 const CATEGORY_LABEL_MAP: Record<CategoryType, string> = {
   room_card_wc: '木质房卡',
@@ -3326,7 +3447,8 @@ const CATEGORY_LABEL_MAP: Record<CategoryType, string> = {
   badge_lanyard: '胸牌',
   umbrella: '雨伞',
   six_small_items: '六小件',
-  pvc_standard_card: 'PVC房卡'
+  pvc_standard_card: 'PVC房卡',
+  smart_products: '智慧产品'
 }
 
 const InquiryPage: FC = () => {
@@ -3364,6 +3486,7 @@ const InquiryPage: FC = () => {
   const [umbrellaData, setUmbrellaData] = useState(INIT_UMBRELLA_DATA)
   const [sixSmallItemsData, setSixSmallItemsData] = useState(INIT_SIX_SMALL_ITEMS_DATA)
   const [pvcStandardCardData, setPvcStandardCardData] = useState(INIT_PVC_STANDARD_CARD_DATA)
+  const [smartProductsData, setSmartProductsData] = useState(SMART_PRODUCTS_DATA)
   const onChange = (key: string | string[]) => {
     setActiveKey(key)
   }
@@ -3671,14 +3794,14 @@ const InquiryPage: FC = () => {
           </Form.Item>,
           <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: false, message: '请选择产品工艺' }]}>
             <Checkbox.Group options={roomCardDndData.craft} />
-          </Form.Item>,
-          <Form.Item
-            key="sales_quantity"
-            label="销售数量"
-            name="sales_quantity"
-            rules={[{ required: false, message: '请输入销售数量' }]}>
-            <InputNumber min={0} />
           </Form.Item>
+          // <Form.Item
+          //   key="sales_quantity"
+          //   label="销售数量"
+          //   name="sales_quantity"
+          //   rules={[{ required: false, message: '请输入销售数量' }]}>
+          //   <InputNumber min={0} />
+          // </Form.Item>
         ]
       case 'room_card':
         return [
@@ -4082,6 +4205,35 @@ const InquiryPage: FC = () => {
             <InputNumber min={0} />
           </Form.Item>
         ]
+      case 'smart_products':
+        return [
+          categoryItem,
+          <Form.Item key="name" label="产品名称" name="name" rules={[{ required: true, message: '请选择产品名称' }]}>
+            <Select onChange={(e) => handleSmartProductsChange(e)} placeholder="请选择产品">
+              {smartProductsData.names.map((item) => (
+                <Select.Option key={item.key} value={item.value}>
+                  {item.label}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>,
+          <Form.Item key="texture" label="材质/参数" name="texture" rules={[{ required: true, message: '请选择材质' }]}>
+            <Select>
+              {getCurrentTexturesOptions().map((option) => (
+                <Select.Option key={option.value} value={option.value}>
+                  {option.label}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>,
+          <Form.Item
+            key="sales_quantity"
+            label="销售数量"
+            name="sales_quantity"
+            rules={[{ required: false, message: '请输入销售数量' }]}>
+            <InputNumber min={0} />
+          </Form.Item>
+        ]
       default:
         return [categoryItem]
     }
@@ -4236,13 +4388,13 @@ const InquiryPage: FC = () => {
                 rules={[{ required: false, message: '请选择产品工艺' }]}>
                 <Checkbox.Group options={roomCardDndData.craft} />
               </Form.Item>
-              <Form.Item
+              {/* <Form.Item
                 key="sales_quantity"
                 label="销售数量"
                 name="sales_quantity"
                 rules={[{ required: false, message: '请输入销售数量' }]}>
                 <InputNumber min={0} />
-              </Form.Item>
+              </Form.Item> */}
             </>
           )}
 
@@ -4671,6 +4823,44 @@ const InquiryPage: FC = () => {
               </Form.Item>
             </>
           )}
+
+          {item.category === 'smart_products' && (
+            <>
+              <Form.Item
+                key="name"
+                label="产品名称"
+                name="name"
+                rules={[{ required: true, message: '请选择产品名称' }]}>
+                <Select onChange={(e) => handleSmartProductsChange(e)} placeholder="请选择产品">
+                  {smartProductsData.names.map((item) => (
+                    <Select.Option key={item.key} value={item.value}>
+                      {item.label}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                key="texture"
+                label="材质/参数"
+                name="texture"
+                rules={[{ required: true, message: '请选择材质' }]}>
+                <Select>
+                  {getCurrentTexturesOptions().map((option) => (
+                    <Select.Option key={option.value} value={option.value}>
+                      {option.label}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                key="sales_quantity"
+                label="销售数量"
+                name="sales_quantity"
+                rules={[{ required: false, message: '请输入销售数量' }]}>
+                <InputNumber min={0} />
+              </Form.Item>
+            </>
+          )}
         </Form>
       </div>
     )
@@ -4784,6 +4974,10 @@ const InquiryPage: FC = () => {
         case 'pvc_standard_card':
           setPvcStandardCardData(res.data)
           console.log('pvcStandardCardData', res.data)
+          break
+        case 'smart_products':
+          setSmartProductsData(res.data)
+          console.log('smartProductsData', res.data)
           break
       }
     } catch (e) {
@@ -4903,6 +5097,33 @@ const InquiryPage: FC = () => {
       craft: craftOptions[0]?.value
     })
   }
+
+  const handleSmartProductsChange = (value: string) => {
+    console.log(value)
+    setSelectedTexture(value)
+    // 重置尺码和工艺选择
+    form.setFieldsValue({
+      texture: undefined
+    })
+    // 获取选中项的 label
+    // const selectedItem = smartProductsData.names.find((item) => item.key === value)
+    // console.log('value:', value)
+    // console.log('label:', selectedItem?.label)
+
+    // 获取选中的所有参数
+    // const textureOptions = smartProductsData.textures[value as keyof typeof smartProductsData.textures] || []
+    // 自动填充联动字段
+    // form.setFieldsValue({
+    //   texture: textureOptions[0]?.value
+    // })
+  }
+
+  const getCurrentTexturesOptions = () => {
+    if (!selectedTexture) return []
+    const textureKey = smartProductsData.names.find((t) => t.value === selectedTexture)?.key
+    return textureKey ? smartProductsData.textures[textureKey as keyof typeof smartProductsData.textures] : []
+  }
+
   const handleInquiry = async () => {
     try {
       setIsLoading(true) // 开始询价时设置状态
@@ -5018,6 +5239,13 @@ const InquiryPage: FC = () => {
                     ...(item.magnetic ? [item.magnetic] : [])
                   ],
                   thickness: item.thickness || '',
+                  sales_quantity: item.sales_quantity?.toString() || '0'
+                })
+                break
+              case 'smart_products':
+                response = await smartProductsEnquiry({
+                  name: item.name || '',
+                  texture: item.texture || '',
                   sales_quantity: item.sales_quantity?.toString() || '0'
                 })
                 break
