@@ -2,8 +2,8 @@ import { message } from 'antd'
 
 // API 配置
 export const API_CONFIG = {
-  // BASE_URL: 'http://192.168.0.123:9919/api/v1', // 正式环境，统一使用API文档中的基础URL
-  BASE_URL: 'http://192.168.0.111:9919/api/v1', // 本地环境，统一使用API文档中的基础URL
+  BASE_URL: 'http://192.168.0.123:9919/api/v1', // 正式环境，统一使用API文档中的基础URL
+  // BASE_URL: 'http://192.168.0.111:9919/api/v1', // 本地环境，统一使用API文档中的基础URL
   TIMEOUT: 300000 // 增加到5分钟
 }
 

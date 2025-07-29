@@ -81,4 +81,4 @@ afterPack: scripts/after-pack.js
 afterSign: scripts/notarize.js
 releaseInfo:
   releaseNotes: |
-    CaKa AI 更新日志: V1.0.0版本
+    CaKa AI 更新日志: V3.2.0版本
