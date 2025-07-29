@@ -174,12 +174,20 @@ const ContentContainer = styled.div`
 `
 
 const MarkdownContainer = styled(Scrollbar)`
-  padding: 15px;
-  display: flex;
-  width: 100%;
-  flex-direction: column;
+  position: relative !important; // 强制确保为 relative
+  font-size: 15px;
+  line-height: 1.8;
+  color: ${(props) => props.theme.colorText};
+  background: ${(props) => props.theme.colorBgContainer};
+  border-radius: 8px;
+  padding-bottom: 15px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   overflow-x: auto;
-
+  display: flex;
+  flex-direction: column;
+  width: 100%;
   /* Markdown 基础样式 */
   .markdown-body {
     font-size: 14px;
@@ -197,6 +205,7 @@ const MarkdownContainer = styled(Scrollbar)`
   /* 确保 Markdown 组件样式正确显示 */
   .markdown {
     width: 100%;
+    overflow-x: auto;
   }
 `
 

@@ -31,6 +31,7 @@ export interface RoomCardFilter {
   craft: string
   chip: string
   encrypt: string
+  sales_quantity: string
 }
 
 // 拖鞋询价参数
@@ -39,6 +40,7 @@ export interface SlipperFilter {
   size: string
   craft: string
   packaging: string
+  sales_quantity: string
 }
 
 // 环保笔询价参数
@@ -46,6 +48,7 @@ export interface PenFilter {
   texture: string
   size: string
   craft: string
+  sales_quantity: string
 }
 
 // 伞询价参数
@@ -56,6 +59,7 @@ export interface UmbrellaFilter {
   boneNum: string
   handShank: string
   craft: string
+  sales_quantity: string
 }
 
 // 胸牌询价参数
@@ -63,6 +67,7 @@ export interface BadgeLanyardFilter {
   name: string
   size: string
   craft: string
+  sales_quantity: string
 }
 
 // 六小件询价参数
@@ -74,6 +79,7 @@ export interface SixSmallItemsFilter {
   width: string
   weight: string
   craft: string
+  sales_quantity: string
 }
 
 // 木卡房卡询价参数
@@ -85,6 +91,7 @@ export interface WoodenRoomCardFilter {
   craft: string //若干个用+拼接
   chip_material_code: string
   encrypt: string
+  sales_quantity: string
 }
 
 // DND房卡询价参数
@@ -94,6 +101,7 @@ export interface DNDRoomCardFilter {
   material: string
   thickness: string
   craft: string //若干个用+拼接
+  sales_quantity: string
 }
 
 // pvc标准卡询价参数
@@ -107,6 +115,7 @@ export interface PvcStandardCardFilter {
   magnetic?: string
   select_craft: string[] //若干个用+拼接
   thickness: string
+  sales_quantity: string
 }
 
 // 产品类型枚举

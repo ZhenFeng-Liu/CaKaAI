@@ -141,20 +141,20 @@ const MarkdownContainer = styled(Scrollbar)`
   color: ${(props) => props.theme.colorText};
   background: ${(props) => props.theme.colorBgContainer};
   border-radius: 8px;
-  padding: 32px;
-  border: 0.5px solid var(--color-border);
+  padding-bottom: 15px;
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
   display: flex;
   flex-direction: column;
-
+  width: 100%;
   /* Markdown 基础样式 */
   .markdown-body {
     font-size: 14px;
     line-height: 1.6;
     color: var(--color-text);
+    padding: 20px;
     margin: 0 auto;
     width: 100%;
     overflow-x: auto;
@@ -166,6 +166,7 @@ const MarkdownContainer = styled(Scrollbar)`
   /* 确保 Markdown 组件样式正确显示 */
   .markdown {
     width: 100%;
+    overflow-x: auto;
   }
 
   > div {
@@ -354,6 +355,7 @@ interface CategoryItem {
   process?: string[]
   chip?: string
   encrypted?: string
+  sales_quantity?: string
   // 拖鞋特有字段
   texture?: string
   size?: string
@@ -3444,6 +3446,7 @@ const InquiryPage: FC = () => {
         magnetic: values.magnetic,
         encrypt: values.encrypt,
         card_type: values.card_types,
+        sales_quantity: values.sales_quantity,
         children: renderDetailForm({
           key: newKey,
           label: values.category,
@@ -3472,7 +3475,8 @@ const InquiryPage: FC = () => {
           children: null,
           extra: null,
           card_type: values.card_types,
-          select_craft: values.select_craft
+          select_craft: values.select_craft,
+          sales_quantity: values.sales_quantity
         }),
         extra: null
       }
@@ -3617,6 +3621,13 @@ const InquiryPage: FC = () => {
               <Select.Option value="是">是</Select.Option>
               <Select.Option value="否">否</Select.Option>
             </Select>
+          </Form.Item>,
+          <Form.Item
+            key="sales_quantity"
+            label="销售数量"
+            name="sales_quantity"
+            rules={[{ required: false, message: '请输入销售数量' }]}>
+            <InputNumber min={0} />
           </Form.Item>
         ]
       case 'room_card_dnd':
@@ -3660,6 +3671,13 @@ const InquiryPage: FC = () => {
           </Form.Item>,
           <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: false, message: '请选择产品工艺' }]}>
             <Checkbox.Group options={roomCardDndData.craft} />
+          </Form.Item>,
+          <Form.Item
+            key="sales_quantity"
+            label="销售数量"
+            name="sales_quantity"
+            rules={[{ required: false, message: '请输入销售数量' }]}>
+            <InputNumber min={0} />
           </Form.Item>
         ]
       case 'room_card':
@@ -3716,6 +3734,13 @@ const InquiryPage: FC = () => {
               <Select.Option value="1">是</Select.Option>
               <Select.Option value="0">否</Select.Option>
             </Select>
+          </Form.Item>,
+          <Form.Item
+            key="sales_quantity"
+            label="销售数量"
+            name="sales_quantity"
+            rules={[{ required: false, message: '请输入销售数量' }]}>
+            <InputNumber min={0} />
           </Form.Item>
         ]
       case 'slipper':
@@ -3756,6 +3781,13 @@ const InquiryPage: FC = () => {
                 </Radio>
               ))}
             </Radio.Group>
+          </Form.Item>,
+          <Form.Item
+            key="sales_quantity"
+            label="销售数量"
+            name="sales_quantity"
+            rules={[{ required: false, message: '请输入销售数量' }]}>
+            <InputNumber min={0} />
           </Form.Item>
         ]
       case 'pen':
@@ -3787,6 +3819,13 @@ const InquiryPage: FC = () => {
                 </Select.Option>
               ))}
             </Select>
+          </Form.Item>,
+          <Form.Item
+            key="sales_quantity"
+            label="销售数量"
+            name="sales_quantity"
+            rules={[{ required: false, message: '请输入销售数量' }]}>
+            <InputNumber min={0} />
           </Form.Item>
         ]
       case 'badge_lanyard':
@@ -3810,6 +3849,13 @@ const InquiryPage: FC = () => {
           </Form.Item>,
           <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: true, message: '请选择工艺' }]}>
             <Input disabled placeholder="请选择名称后自动显示" />
+          </Form.Item>,
+          <Form.Item
+            key="sales_quantity"
+            label="销售数量"
+            name="sales_quantity"
+            rules={[{ required: false, message: '请输入销售数量' }]}>
+            <InputNumber min={0} />
           </Form.Item>
         ]
       case 'umbrella':
@@ -3870,6 +3916,13 @@ const InquiryPage: FC = () => {
                 </Select.Option>
               ))}
             </Select>
+          </Form.Item>,
+          <Form.Item
+            key="sales_quantity"
+            label="销售数量"
+            name="sales_quantity"
+            rules={[{ required: false, message: '请输入销售数量' }]}>
+            <InputNumber min={0} />
           </Form.Item>
         ]
       case 'six_small_items':
@@ -3905,6 +3958,13 @@ const InquiryPage: FC = () => {
           </Form.Item>,
           <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: true, message: '请选择工艺' }]}>
             <Input disabled placeholder="请选择产品名称后自动显示" />
+          </Form.Item>,
+          <Form.Item
+            key="sales_quantity"
+            label="销售数量"
+            name="sales_quantity"
+            rules={[{ required: false, message: '请输入销售数量' }]}>
+            <InputNumber min={0} />
           </Form.Item>
         ]
       case 'pvc_standard_card':
@@ -4013,6 +4073,13 @@ const InquiryPage: FC = () => {
                 </Select.Option>
               ))}
             </Select>
+          </Form.Item>,
+          <Form.Item
+            key="sales_quantity"
+            label="销售数量"
+            name="sales_quantity"
+            rules={[{ required: false, message: '请输入销售数量' }]}>
+            <InputNumber min={0} />
           </Form.Item>
         ]
       default:
@@ -4110,6 +4177,13 @@ const InquiryPage: FC = () => {
                   <Select.Option value="否">否</Select.Option>
                 </Select>
               </Form.Item>
+              <Form.Item
+                key="sales_quantity"
+                label="销售数量"
+                name="sales_quantity"
+                rules={[{ required: false, message: '请输入销售数量' }]}>
+                <InputNumber min={0} />
+              </Form.Item>
             </>
           )}
 
@@ -4161,6 +4235,13 @@ const InquiryPage: FC = () => {
                 name="craft"
                 rules={[{ required: false, message: '请选择产品工艺' }]}>
                 <Checkbox.Group options={roomCardDndData.craft} />
+              </Form.Item>
+              <Form.Item
+                key="sales_quantity"
+                label="销售数量"
+                name="sales_quantity"
+                rules={[{ required: false, message: '请输入销售数量' }]}>
+                <InputNumber min={0} />
               </Form.Item>
             </>
           )}
@@ -4223,6 +4304,13 @@ const InquiryPage: FC = () => {
                   <Select.Option value="0">否</Select.Option>
                 </Select>
               </Form.Item>
+              <Form.Item
+                key="sales_quantity"
+                label="销售数量"
+                name="sales_quantity"
+                rules={[{ required: false, message: '请输入销售数量' }]}>
+                <InputNumber min={0} />
+              </Form.Item>
             </>
           )}
 
@@ -4268,6 +4356,13 @@ const InquiryPage: FC = () => {
                   ))}
                 </Radio.Group>
               </Form.Item>
+              <Form.Item
+                key="sales_quantity"
+                label="销售数量"
+                name="sales_quantity"
+                rules={[{ required: false, message: '请输入销售数量' }]}>
+                <InputNumber min={0} />
+              </Form.Item>
             </>
           )}
 
@@ -4291,6 +4386,13 @@ const InquiryPage: FC = () => {
               </Form.Item>
               <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: true, message: '请选择工艺' }]}>
                 <Input disabled placeholder="请选择名称后自动显示" />
+              </Form.Item>
+              <Form.Item
+                key="sales_quantity"
+                label="销售数量"
+                name="sales_quantity"
+                rules={[{ required: false, message: '请输入销售数量' }]}>
+                <InputNumber min={0} />
               </Form.Item>
             </>
           )}
@@ -4327,6 +4429,13 @@ const InquiryPage: FC = () => {
                     </Select.Option>
                   ))}
                 </Select>
+              </Form.Item>
+              <Form.Item
+                key="sales_quantity"
+                label="销售数量"
+                name="sales_quantity"
+                rules={[{ required: false, message: '请输入销售数量' }]}>
+                <InputNumber min={0} />
               </Form.Item>
             </>
           )}
@@ -4401,6 +4510,13 @@ const InquiryPage: FC = () => {
                   ))}
                 </Select>
               </Form.Item>
+              <Form.Item
+                key="sales_quantity"
+                label="销售数量"
+                name="sales_quantity"
+                rules={[{ required: false, message: '请输入销售数量' }]}>
+                <InputNumber min={0} />
+              </Form.Item>
             </>
           )}
 
@@ -4440,6 +4556,13 @@ const InquiryPage: FC = () => {
               </Form.Item>
               <Form.Item key="craft" label="产品工艺" name="craft" rules={[{ required: true, message: '请选择工艺' }]}>
                 <Input disabled placeholder="请选择产品名称后自动显示" />
+              </Form.Item>
+              <Form.Item
+                key="sales_quantity"
+                label="销售数量"
+                name="sales_quantity"
+                rules={[{ required: false, message: '请输入销售数量' }]}>
+                <InputNumber min={0} />
               </Form.Item>
             </>
           )}
@@ -4538,6 +4661,13 @@ const InquiryPage: FC = () => {
                     </Select.Option>
                   ))}
                 </Select>
+              </Form.Item>
+              <Form.Item
+                key="sales_quantity"
+                label="销售数量"
+                name="sales_quantity"
+                rules={[{ required: false, message: '请输入销售数量' }]}>
+                <InputNumber min={0} />
               </Form.Item>
             </>
           )}
@@ -4800,7 +4930,8 @@ const InquiryPage: FC = () => {
                   prod_width: item.prod_width?.toString() || '',
                   craft: item.craft?.join('+') || '',
                   chip_material_code: item.chip_material_code || '',
-                  encrypt: item.encrypt || ''
+                  encrypt: item.encrypt || '',
+                  sales_quantity: item.sales_quantity?.toString() || '0'
                 })
                 break
               case 'room_card_dnd':
@@ -4809,7 +4940,8 @@ const InquiryPage: FC = () => {
                   thickness: item.thickness || '',
                   prod_length: item.prod_length?.toString() || '',
                   prod_width: item.prod_width?.toString() || '',
-                  craft: item.craft?.join('+') || ''
+                  craft: item.craft?.join('+') || '',
+                  sales_quantity: item.sales_quantity?.toString() || '0'
                 })
                 break
               case 'room_card':
@@ -4820,7 +4952,8 @@ const InquiryPage: FC = () => {
                   width: item.width?.toString() || '',
                   craft: item.process?.join(';') || '',
                   chip: item.chip || '',
-                  encrypt: item.encrypted || ''
+                  encrypt: item.encrypted || '',
+                  sales_quantity: item.sales_quantity?.toString() || '0'
                 })
                 break
               case 'slipper':
@@ -4828,14 +4961,16 @@ const InquiryPage: FC = () => {
                   texture: item.texture || '',
                   size: item.size || '',
                   craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || '',
-                  packaging: item.packaging || ''
+                  packaging: item.packaging || '',
+                  sales_quantity: item.sales_quantity?.toString() || '0'
                 })
                 break
               case 'pen':
                 response = await penEnquiry({
                   texture: item.texture || '',
                   size: item.size || '',
-                  craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || ''
+                  craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || '',
+                  sales_quantity: item.sales_quantity?.toString() || '0'
                 })
                 break
               case 'umbrella':
@@ -4845,14 +4980,16 @@ const InquiryPage: FC = () => {
                   size: item.size || '',
                   boneNum: item.boneNum || '',
                   handShank: item.handShank || '',
-                  craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || ''
+                  craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || '',
+                  sales_quantity: item.sales_quantity?.toString() || '0'
                 })
                 break
               case 'badge_lanyard':
                 response = await badgeLanyardEnquiry({
                   name: item.name || '',
                   size: item.size || '',
-                  craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || ''
+                  craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || '',
+                  sales_quantity: item.sales_quantity?.toString() || '0'
                 })
                 break
               case 'six_small_items':
@@ -4863,7 +5000,8 @@ const InquiryPage: FC = () => {
                   length: item.length?.toString() || '',
                   width: item.width?.toString() || '',
                   weight: item.weight?.toString() || '',
-                  craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || ''
+                  craft: Array.isArray(item.craft) ? item.craft.join(',') : item.craft || '',
+                  sales_quantity: item.sales_quantity?.toString() || '0'
                 })
                 break
               case 'pvc_standard_card':
@@ -4879,7 +5017,8 @@ const InquiryPage: FC = () => {
                     ...(Array.isArray(item.craft) ? item.craft : item.craft ? [item.craft] : []),
                     ...(item.magnetic ? [item.magnetic] : [])
                   ],
-                  thickness: item.thickness || ''
+                  thickness: item.thickness || '',
+                  sales_quantity: item.sales_quantity?.toString() || '0'
                 })
                 break
               default:
